@@ -60,14 +60,14 @@ def button_select_pressed():
         draw_menu()
     elif selected_item == 1:
         # Начинаем обновление репозитория
-        display_status("Обновление начато...", 10)
+        display_status("Обновление...", 10)
         #draw_menu()
 
         stdout, stderr = update_repo()  # Вызываем обновление через git_update.py
 
         if stdout:
             # Если обновление прошло успешно, показываем успех
-            display_status("Обновление завершено!", 10)
+            display_status("Завершено!", 10)
         elif stderr:
             # Если произошла ошибка, показываем ошибку
             display_status(f"Ошибка: {stderr}", 10)
