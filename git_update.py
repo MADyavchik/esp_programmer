@@ -2,8 +2,7 @@ import subprocess
 import time
 import os
 import sys
-from menu import draw_menu  # Импортируем функцию для рисования меню
-from menu import reboot_pi
+
 # init display
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
@@ -24,7 +23,7 @@ except:
 def update_repo():
     try:
         # Начало обновления
-        draw_menu()  # Показываем начальное сообщение на экране
+
         with canvas(device) as draw:
             draw.text((10, 10), "Updating...", font=font, fill="white")
 
