@@ -1,12 +1,19 @@
 import time
-import board
-import digitalio
-from adafruit_ssd1306 import SSD1306_I2C
+from luma.core.render import canvas
+from luma.oled.device import ssd1306
+from luma.core.interface.serial import i2c
+from PIL import ImageFont
 from gpiozero import Button
 
 # Настройка дисплея
-i2c = board.I2C()
-oled = SSD1306_I2C(128, 64, i2c)
+serial = i2c(port=1, address=0x3C)  # Подключение через I2C
+device = ssd1306(serial)  # Инициализация устройства SSD1306
+
+# Настройка шрифта
+try:
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+except:
+    font = ImageFont.load_default()
 
 # Настройка кнопок
 btn_up = Button(5)    # Кнопка вверх
@@ -20,13 +27,13 @@ selected_item = 0
 
 # Функция для отрисовки главного меню
 def draw_menu():
-    oled.fill(0)  # Очистить экран
-    for i, item in enumerate(menu_items):
-        if i == selected_item:
-            oled.text(f"> {item}", 10, 10 + i * 20, 1)  # Выделить выбранный пункт
-        else:
-            oled.text(item, 10, 10 + i * 20, 1)  # Отобразить остальные пункты
-    oled.show()
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, outline="white", fill="black")  # Очистить экран
+        for i, item in enumerate(menu_items):
+            if i == selected_item:
+                draw.text((10, 10 + i * 20), f"> {item}", font=font, fill="white")  # Выделить выбранный пункт
+            else:
+                draw.text((10, 10 + i * 20), item, font=font, fill="white")  # Отобразить остальные пункты
 
 # Обработчики кнопок
 def button_up_pressed():
@@ -47,15 +54,11 @@ def button_back_pressed():
     draw_menu()
 
 def button_select_pressed():
-    if selected_item == 0:
-        oled.fill(0)
-        oled.text("Выбор прошивки", 10, 10)
-        oled.show()
-        time.sleep(2)  # Заглушка на переход, можно добавить логику выбора прошивки
-    elif selected_item == 1:
-        oled.fill(0)
-        oled.text("Обновление...", 10, 10)
-        oled.show()
+    with canvas(device) as draw:
+        if selected_item == 0:
+            draw.text((10, 10), "Выбор прошивки", font=font, fill="white")
+        elif selected_item == 1:
+            draw.text((10, 10), "Обновление...", font=font, fill="white")
         time.sleep(2)  # Заглушка на обновление
     draw_menu()
 
