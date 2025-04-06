@@ -2,6 +2,8 @@ import subprocess
 import os
 import sys
 from menu import draw_menu  # Импортируем функцию для рисования меню
+# init display
+from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from luma.core.render import canvas
 from PIL import ImageFont
