@@ -1,4 +1,5 @@
 import subprocess
+import time
 import os
 import sys
 from menu import draw_menu  # Импортируем функцию для рисования меню
@@ -24,7 +25,7 @@ def update_repo():
         # Начало обновления
         draw_menu()  # Показываем начальное сообщение на экране
         with canvas(device) as draw:
-            draw.text((10, 10), "Обновление началось...", font=font, fill="white")
+            draw.text((10, 10), "Updating...", font=font, fill="white")
 
         print("[GIT] Выполняю git pull...")
         result = subprocess.run(['git', 'pull'], capture_output=True, text=True)
@@ -32,17 +33,22 @@ def update_repo():
         if result.returncode == 0:
             # Обновление прошло успешно
             with canvas(device) as draw:
-                draw.text((10, 10), "Репозиторий обновлён!", font=font, fill="white")
+                draw.text((10, 10), "Success!", font=font, fill="white")
             print("[GIT] Репозиторий успешно обновлен!")
+            time.sleep(2)
 
             # Перезапуск программы после успешного обновления
+            with canvas(device) as draw:
+                draw.text((10, 10), "Reboot..", font=font, fill="white")
             print("[GIT] Перезапуск программы...")
+            time.sleep(1)
             os.execv(sys.executable, ['python3'] + sys.argv)  # Перезапуск текущего скрипта (main.py)
         else:
             # Ошибка при обновлении
             with canvas(device) as draw:
                 draw.text((10, 10), f"Ошибка: {result.stderr}", font=font, fill="white")
             print(f"[GIT] Ошибка при обновлении: {result.stderr}")
+            time.sleep(2)
 
     except Exception as e:
         # Общая ошибка
