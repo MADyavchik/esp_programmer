@@ -2,6 +2,8 @@ import subprocess
 import os
 import sys
 from menu import draw_menu  # Импортируем функцию для рисования меню
+from luma.core.render import canvas
+from PIL import ImageFont
 
 # Функция для обновления репозитория
 def update_repo():
