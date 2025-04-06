@@ -16,10 +16,10 @@ except:
     font = ImageFont.load_default()
 
 # Кнопки (номер пинов может быть другим у тебя — проверь!)
-btn_up = Button(5)
-btn_down = Button(6)
-btn_back = Button(19)
-btn_select = Button(26)
+btn_up = Button(5, bounce_time=0.2)
+btn_down = Button(6, bounce_time=0.2)
+btn_back = Button(19, bounce_time=0.2)
+btn_select = Button(26, bounce_time=0.2)
 
 # Пункты меню
 menu_items = ["FLASH", "UPDATE"]
