@@ -1,7 +1,8 @@
-import time
-from menu import draw_menu  # Импортируем функцию для отрисовки меню
+from menu import start_main_menu
+from flash_menu import start_flash_menu
 
+def main():
+    start_main_menu(open_flash_menu=start_flash_menu)
 
-# Главный цикл программы
-while True:
-    time.sleep(0.1)
+if __name__ == "__main__":
+    main()
