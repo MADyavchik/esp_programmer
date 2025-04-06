@@ -48,7 +48,7 @@ def button_select_pressed():
         print("Выбран пункт FLASH")
 
 # Привязка кнопок
-setup_buttons(button_up_pressed, button_down_pressed, button_back_pressed, button_select_pressed, back_hold_action=reboot_pi)
+setup_buttons(button_up_pressed, button_down_pressed, button_back_pressed, button_select_pressed)
 
 # Стартовое меню
 flash_draw_menu()
