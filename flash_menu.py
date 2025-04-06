@@ -17,24 +17,24 @@ except:
     font = ImageFont.load_default()
 
 # Пункты меню
-menu_items = ["Universal", "Master", "Repiater", "Sens_SW", "Sensor"]
+menu_flash_items = ["Universal", "Master", "Repiater", "Sens_SW", "Sensor"]
 selected_item = [0]  # Используем список для передачи по ссылке
 
 # Функция отрисовки меню
 def flash_draw_menu():
     with canvas(device) as draw:
-        for i, item in enumerate(menu_items):
+        for i, item in enumerate(menu_flash_items):
             prefix = "> " if i == selected_item[0] else "  "
             draw.text((10, 10 + i * 20), prefix + item, font=font, fill="white")
 
 
 # Обработчики для меню
 def button_up_pressed():
-    selected_item[0] = (selected_item[0] - 1) % len(menu_items)
+    selected_item[0] = (selected_item[0] - 1) % len(menu_flash_items)
     flash_draw_menu()
 
 def button_down_pressed():
-    selected_item[0] = (selected_item[0] + 1) % len(menu_items)
+    selected_item[0] = (selected_item[0] + 1) % len(menu_flash_items)
     flash_draw_menu()
 
 def button_back_pressed():
