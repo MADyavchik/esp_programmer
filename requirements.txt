@@ -1,5 +1,5 @@
 esptool
 requests
 pillow
-adafruit-circuitpython-ssd1306
+luma.oled
 gpiozero
