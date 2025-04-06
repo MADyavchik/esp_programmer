@@ -7,7 +7,7 @@ from luma.oled.device import ssd1306
 from PIL import ImageFont
 import os
 
-from flash_menu import flash_draw_menu
+#from flash_menu import flash_draw_menu
 
 
 # Настройка дисплея
