@@ -51,7 +51,7 @@ def button_select_pressed():
 setup_buttons(button_up_pressed, button_down_pressed, button_back_pressed, button_select_pressed, back_hold_action=reboot_pi)
 
 # Стартовое меню
-draw_menu()
+flash_draw_menu()
 
 # Основной цикл программы
 while True:
