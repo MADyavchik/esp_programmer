@@ -61,7 +61,7 @@ def button_select_pressed():
     elif selected_item == 1:
         # Начинаем обновление репозитория
         display_status("Обновление начато...", 10)
-        draw_menu()
+        #draw_menu()
 
         stdout, stderr = update_repo()  # Вызываем обновление через git_update.py
 
