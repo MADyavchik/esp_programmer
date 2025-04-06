@@ -1,8 +1,6 @@
-# main.py
+import time
+from menu import draw_menu  # Импортируем функцию для отрисовки меню
 
-def main():
-    print("Запуск автономного программатора ESP32")
-    # Здесь будет логика меню, дисплей, кнопки и т.д.
-
-if __name__ == "__main__":
-    main()
+# Главный цикл программы
+while True:
+    time.sleep(0.1)

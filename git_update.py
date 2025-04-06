@@ -1,19 +1,15 @@
 import subprocess
 
+# Функция для обновления репозитория
 def update_repo():
     try:
-        # Запуск git pull
-        print("[UPDATE] Выполняю git pull...")
-        process = subprocess.Popen(
-            ['git', 'pull', 'origin', 'main'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        print("[GIT] Выполняю git pull...")
+        # Запускаем команду git pull
+        result = subprocess.run(['git', 'pull'], capture_output=True, text=True)
 
-        stdout, stderr = process.communicate()  # Считываем вывод после выполнения команды
-        if process.returncode == 0:
-            return stdout.decode('utf-8'), None  # Возвращаем результат успешного выполнения
+        if result.returncode == 0:
+            print("[GIT] Репозиторий успешно обновлен!")
         else:
-            return None, stderr.decode('utf-8')  # Возвращаем ошибку, если она есть
+            print(f"[GIT] Ошибка при обновлении: {result.stderr}")
     except Exception as e:
-        return None, str(e)  # Возвращаем исключение, если произошла ошибка
+        print(f"[GIT] Ошибка: {e}")
