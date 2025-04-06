@@ -26,6 +26,7 @@ def update_repo():
 
         with canvas(device) as draw:
             draw.text((10, 10), "Updating...", font=font, fill="white")
+            time.sleep(2)
 
         print("[GIT] Выполняю git pull...")
         result = subprocess.run(['git', 'pull'], capture_output=True, text=True)
