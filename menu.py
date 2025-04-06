@@ -19,7 +19,7 @@ def start_main_menu(open_flash_menu):
 
     def select():
         if selected[0] == 0:
-            open_flash_menu(start_main_menu)  # переход в flash_menu
+            open_flash_menu()  # переход в flash_menu
         else:
             print("Update...")
 
