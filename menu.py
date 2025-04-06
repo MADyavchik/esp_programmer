@@ -1,10 +1,8 @@
 import time
-from gpiozero import Button
-from luma.core.interface.serial import i2c
-from luma.oled.device import ssd1306
 from luma.core.render import canvas
 from PIL import ImageFont
-from git_update import update_repo  # Импортируем функцию для обновления репозитория
+from luma.core.interface.serial import i2c
+from luma.oled.device import ssd1306
 
 # Настройка дисплея
 serial = i2c(port=1, address=0x3C)
@@ -15,12 +13,6 @@ try:
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 except:
     font = ImageFont.load_default()
-
-# Кнопки с debounce
-btn_up = Button(5, bounce_time=0.2)
-btn_down = Button(6, bounce_time=0.2)
-btn_back = Button(19, bounce_time=0.2)
-btn_select = Button(26, bounce_time=0.2)
 
 # Пункты меню
 menu_items = ["FLASH", "UPDATE"]
@@ -33,42 +25,45 @@ def draw_menu():
             prefix = "> " if i == selected_item else "  "
             draw.text((10, 10 + i * 20), prefix + item, font=font, fill="white")
 
-# Обработчики кнопок (с циклической прокруткой и логами)
+# Функция для отображения статуса обновления
+def display_status(status_text):
+    with canvas(device) as draw:
+        draw.text((10, 10), status_text, font=font, fill="white")
+
+# Обработчики кнопок (с циклической прокруткой)
 def button_up_pressed():
     global selected_item
     selected_item = (selected_item - 1) % len(menu_items)
-    print(f"[UP] selected_item: {selected_item}")
     draw_menu()
 
 def button_down_pressed():
     global selected_item
     selected_item = (selected_item + 1) % len(menu_items)
-    print(f"[DOWN] selected_item: {selected_item}")
     draw_menu()
 
 def button_back_pressed():
     global selected_item
     selected_item = 0
-    print("[BACK] Reset to 0")
     draw_menu()
 
 def button_select_pressed():
-    print(f"[SELECT] on item: {menu_items[selected_item]}")
     with canvas(device) as draw:
         if selected_item == 0:
             draw.text((10, 10), "Выбор прошивки", font=font, fill="white")
         elif selected_item == 1:
             draw.text((10, 10), "Обновление...", font=font, fill="white")
-            update_repo()  # Если выбрали "UPDATE", выполняем обновление
-            draw.text((10, 30), "Обновление завершено", font=font, fill="white")
     time.sleep(2)
     draw_menu()
 
-# Привязка обработчиков
+# Привязка обработчиков к кнопкам
 btn_up.when_pressed = button_up_pressed
 btn_down.when_pressed = button_down_pressed
 btn_back.when_pressed = button_back_pressed
 btn_select.when_pressed = button_select_pressed
 
-# Стартовое меню
+# Отображаем начальное меню
 draw_menu()
+
+# Цикл (можно оставить пустым, gpiozero сам отслеживает кнопки)
+while True:
+    time.sleep(0.1)
