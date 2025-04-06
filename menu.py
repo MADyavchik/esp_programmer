@@ -5,8 +5,9 @@ from buttons import setup_buttons  # Импортируем настройки �
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from PIL import ImageFont
+import os
 
-#from flash_menu import flash_draw_menu
+from flash_menu import flash_draw_menu
 
 
 # Настройка дисплея
@@ -55,7 +56,7 @@ def button_select_pressed():
         print("Обновление начнется...")
     else:
         print("Выбран пункт FLASH")
-        #flash_draw_menu()
+        flash_draw_menu()
 
 # Привязка кнопок
 setup_buttons(button_up_pressed, button_down_pressed, button_back_pressed, button_select_pressed, back_hold_action=reboot_pi)
