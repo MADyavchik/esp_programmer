@@ -5,6 +5,8 @@ from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 import os, time
 
+from git_update import update_repo
+
 device = ssd1306(i2c(port=1, address=0x3C))
 font = ImageFont.load_default()
 menu_items = ["FLASH", "UPDATE"]
@@ -22,6 +24,7 @@ def start_main_menu(open_flash_menu):
             open_flash_menu()  # переход в flash_menu
         else:
             print("Update...")
+            update_repo()  # вызов обновления
 
     def up(): selected[0] = (selected[0] - 1) % len(menu_items); draw()
     def down(): selected[0] = (selected[0] + 1) % len(menu_items); draw()
