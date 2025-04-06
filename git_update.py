@@ -2,7 +2,7 @@ import subprocess
 import time
 import os
 import sys
-
+def reboot(): os.system("sudo reboot")
 # init display
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
@@ -38,7 +38,7 @@ def update_repo():
             time.sleep(2)
 
             # Перезапуск программы после успешного обновления
-            reboot_pi()
+            reboot()
             #with canvas(device) as draw:
                 #draw.text((10, 10), "Reboot..", font=font, fill="white")
             #print("[GIT] Перезапуск программы...")
