@@ -22,7 +22,7 @@ def start_flash_menu(return_to_main_menu):
 
     def up(): selected[0] = (selected[0] - 1) % len(items); draw()
     def down(): selected[0] = (selected[0] + 1) % len(items); draw()
-    def back(): return_to_main_menu(start_flash_menu)  # назад в главное меню
+    def back(): return_to_main_menu()  # назад в главное меню
     def reboot(): os.system("sudo reboot")
 
     setup_buttons(up, down, back, select, back_hold_action=reboot)
