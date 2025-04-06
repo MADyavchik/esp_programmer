@@ -2,8 +2,19 @@ import subprocess
 import os
 import sys
 from menu import draw_menu  # Импортируем функцию для рисования меню
+from luma.oled.device import ssd1306
 from luma.core.render import canvas
 from PIL import ImageFont
+
+# Настройка дисплея
+serial = i2c(port=1, address=0x3C)
+device = ssd1306(serial)
+
+# Подгружаем шрифт
+try:
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+except:
+    font = ImageFont.load_default()
 
 # Функция для обновления репозитория
 def update_repo():
