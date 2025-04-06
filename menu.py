@@ -4,6 +4,7 @@ from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from luma.core.render import canvas
 from PIL import ImageFont
+from git_update import update_repo  # Импортируем функцию обновления репозитория
 
 # Настройка дисплея
 serial = i2c(port=1, address=0x3C)
@@ -53,13 +54,15 @@ def button_back_pressed():
 
 def button_select_pressed():
     print(f"[SELECT] on item: {menu_items[selected_item]}")
-    with canvas(device) as draw:
-        if selected_item == 0:
+    if selected_item == 0:
+        with canvas(device) as draw:
             draw.text((10, 10), "Выбор прошивки", font=font, fill="white")
-        elif selected_item == 1:
+        draw_menu()
+    elif selected_item == 1:
+        update_repo()  # Вызываем функцию обновления через Git
+        with canvas(device) as draw:
             draw.text((10, 10), "Обновление...", font=font, fill="white")
-    time.sleep(2)
-    draw_menu()
+        draw_menu()
 
 # Привязка обработчиков
 btn_up.when_pressed = button_up_pressed
