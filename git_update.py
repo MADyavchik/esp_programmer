@@ -3,6 +3,7 @@ import time
 import os
 import sys
 from menu import draw_menu  # Импортируем функцию для рисования меню
+from menu import reboot_pi
 # init display
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
@@ -38,11 +39,12 @@ def update_repo():
             time.sleep(2)
 
             # Перезапуск программы после успешного обновления
-            with canvas(device) as draw:
-                draw.text((10, 10), "Reboot..", font=font, fill="white")
-            print("[GIT] Перезапуск программы...")
-            time.sleep(1)
-            os.execv(sys.executable, ['python3'] + sys.argv)  # Перезапуск текущего скрипта (main.py)
+            reboot_pi()
+            #with canvas(device) as draw:
+                #draw.text((10, 10), "Reboot..", font=font, fill="white")
+            #print("[GIT] Перезапуск программы...")
+            #time.sleep(1)
+            #os.execv(sys.executable, ['python3'] + sys.argv)  # Перезапуск текущего скрипта (main.py)
         else:
             # Ошибка при обновлении
             with canvas(device) as draw:
