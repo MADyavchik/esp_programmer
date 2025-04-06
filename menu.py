@@ -4,7 +4,7 @@ from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from luma.core.render import canvas
 from PIL import ImageFont
-from git_update import update_repo  # Импортируем функцию обновления репозитория
+from git_update import update_repo  # Импортируем функцию для обновления репозитория
 
 # Настройка дисплея
 serial = i2c(port=1, address=0x3C)
@@ -33,36 +33,50 @@ def draw_menu():
             prefix = "> " if i == selected_item else "  "
             draw.text((10, 10 + i * 20), prefix + item, font=font, fill="white")
 
-# Обработчики кнопок (с циклической прокруткой и логами)
+# Функция отображения статуса
+def display_status(message, y_position=10):
+    with canvas(device) as draw:
+        draw.text((10, y_position), message, font=font, fill="white")
+
+# Обработчики кнопок
 def button_up_pressed():
     global selected_item
     selected_item = (selected_item - 1) % len(menu_items)
-    print(f"[UP] selected_item: {selected_item}")
     draw_menu()
 
 def button_down_pressed():
     global selected_item
     selected_item = (selected_item + 1) % len(menu_items)
-    print(f"[DOWN] selected_item: {selected_item}")
     draw_menu()
 
 def button_back_pressed():
     global selected_item
     selected_item = 0
-    print("[BACK] Reset to 0")
     draw_menu()
 
 def button_select_pressed():
-    print(f"[SELECT] on item: {menu_items[selected_item]}")
     if selected_item == 0:
-        with canvas(device) as draw:
-            draw.text((10, 10), "Выбор прошивки", font=font, fill="white")
+        display_status("Выбор прошивки", 10)
         draw_menu()
     elif selected_item == 1:
-        update_repo()  # Вызываем функцию обновления через Git
-        with canvas(device) as draw:
-            draw.text((10, 10), "Обновление...", font=font, fill="white")
+        # Начинаем обновление репозитория
+        display_status("Обновление начато...", 10)
         draw_menu()
+
+        stdout, stderr = update_repo()  # Вызываем обновление через git_update.py
+
+        if stdout:
+            # Если обновление прошло успешно, показываем успех
+            display_status("Обновление завершено!", 10)
+        elif stderr:
+            # Если произошла ошибка, показываем ошибку
+            display_status(f"Ошибка: {stderr}", 10)
+        else:
+            # Если произошла неизвестная ошибка
+            display_status("Неизвестная ошибка", 10)
+
+        time.sleep(2)  # Показываем результат несколько секунд
+        draw_menu()  # Обновляем меню
 
 # Привязка обработчиков
 btn_up.when_pressed = button_up_pressed
