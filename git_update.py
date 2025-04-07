@@ -39,7 +39,7 @@ def update_repo():
             time.sleep(2)
 
             # Перезапуск программы после успешного обновления
-            reboot()
+            #reboot()
             #with canvas(device) as draw:
                 #draw.text((10, 10), "Reboot..", font=font, fill="white")
             #print("[GIT] Перезапуск программы...")
