@@ -5,6 +5,7 @@ from luma.oled.device import ssd1306
 from PIL import ImageFont
 from buttons import setup_buttons
 import time
+import threading
 
 from esp_flasher import flash_firmware
 
@@ -50,9 +51,14 @@ def start_flash_menu(go_to_main_menu):
     def back():
         go_to_main_menu()
 
+    #def select():
+        #name = items[selected[0]]
+        #print(f"Выбрано: {name}")
+        #flash_firmware(name.lower())  # передаём имя папки
     def select():
         name = items[selected[0]]
         print(f"Выбрано: {name}")
-        flash_firmware(name.lower())  # передаём имя папки
+        threading.Thread(target=flash_firmware, args=(name.lower(),), daemon=True).start()
+
 
     setup_buttons(up, down, back, select)
