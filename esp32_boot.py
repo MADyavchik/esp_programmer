@@ -20,6 +20,7 @@ def setup():
     GPIO.setup(EN_PIN, GPIO.OUT, initial=GPIO.HIGH)
 
 def enter_bootloader():
+    setup()
     logging.info("Перевод ESP32 в режим загрузчика...")
     GPIO.output(BOOT_PIN, GPIO.LOW)
     time.sleep(0.15)
@@ -29,6 +30,7 @@ def enter_bootloader():
     logging.info("ESP32 теперь в режиме загрузчика.")
 
 def exit_bootloader():
+    setup()
     logging.info("Выход из режима загрузчика...")
     GPIO.output(BOOT_PIN, GPIO.HIGH)
     time.sleep(0.1)
