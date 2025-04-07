@@ -15,7 +15,7 @@ except:
     font = ImageFont.load_default()
 
 # МЕНЮ
-items = [f"FW{i}" for i in range(1, 11)]  # Пример: FW1..FW10
+items = ["Universal", "Master", "Repiater","Sens_SW", "Sens_OLD"]
 selected = [0]
 scroll = [0]
 VISIBLE_LINES = 3  # Кол-во видимых строк
