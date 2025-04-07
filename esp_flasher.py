@@ -103,6 +103,7 @@ def flash_firmware(firmware_name):
                     prev_percent = percent
                     logging.info(f"🔄 Обновление: {percent}%")
                     draw_progress_bar(percent, message="Flashing...")
+                    clear()  # Обновление экрана с новой информацией
 
         process.wait()
 
