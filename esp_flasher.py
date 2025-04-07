@@ -1,80 +1,85 @@
-import subprocess
-import time
 import os
-from pathlib import Path
+import subprocess
+import logging
 from esp32_boot import enter_bootloader, exit_bootloader
 
+logging.basicConfig(level=logging.INFO)
+
+FLASH_DIR = "esp"
 PORT = "/dev/ttyS0"
-FLASH_ARGS = [
-    ("bootloader_0x1000.bin", "0x1000"),
-    ("firmware_0x10000.bin",  "0x10000"),
-    ("partitions_0x8000.bin", "0x8000"),
-    ("ota_data_initial_0xe000.bin", "0xe000"),
-    # NVS добавим динамически
-]
 
-# Отображение: прошивка -> NVS
-NVS_MAP = {
-    "Universal": "repeater_nvs_0x9000.bin",
-    "Master":    "master_nvs_0x9000.bin",
-    "Repiater":  "repeater_nvs_0x9000.bin",
-    "Sens_SW":   "sw_nvs_0x9000.bin",
-    "Sens_OLD":  "sw_nvs_0x9000.bin",
-}
+# Названия прошивок без NVS
+NO_NVS = ["sens_sw", "sens_old"]
 
-ESP_DIR = Path(__file__).parent / "esp"
+def flash_firmware(firmware_name):
+    firmware_name = firmware_name.lower()
+    logging.info(f"🚀 Начинаем прошивку: {firmware_name}")
 
-def flash_firmware(fw_name: str):
-    print(f"🚀 Начинаем прошивку: {fw_name}")
+    firmware_path = os.path.join(FLASH_DIR, firmware_name)
 
-    if fw_name not in NVS_MAP:
-        print(f"❌ Неизвестная прошивка: {fw_name}")
+    if not os.path.exists(firmware_path):
+        logging.error(f"❌ Папка с прошивкой не найдена: {firmware_path}")
         return
 
-    # Список всех .bin файлов для прошивки
-    bin_files = FLASH_ARGS.copy()
-    nvs_file = NVS_MAP[fw_name]
-    bin_files.append((nvs_file, "0x9000"))
+    # Обязательные бинарники
+    bootloader = os.path.join(firmware_path, "bootloader_0x1000.bin")
+    firmware = os.path.join(firmware_path, "firmware_0x10000.bin")
+    partitions = os.path.join(firmware_path, "partitions_0x8000.bin")
+    ota = os.path.join(firmware_path, "ota_data_initial_0xe000.bin")
 
-    # Проверка наличия всех файлов
-    for filename, _ in bin_files:
-        path = ESP_DIR / filename
-        if not path.exists():
-            print(f"❌ Файл не найден: {path}")
+    # NVS — только если прошивка его использует
+    use_nvs = firmware_name not in NO_NVS
+    if use_nvs:
+        # Подставляем нужный nvs-файл
+        if firmware_name == "master":
+            nvs = os.path.join(firmware_path, "master_nvs_0x9000.bin")
+        elif firmware_name == "repeater":
+            nvs = os.path.join(firmware_path, "repeater_nvs_0x9000.bin")
+        else:
+            nvs = os.path.join(firmware_path, "sw_nvs_0x9000.bin")
+
+        if not os.path.exists(nvs):
+            logging.error(f"❌ NVS-файл не найден: {nvs}")
+            return
+
+    # Проверка основных файлов
+    for file in [bootloader, firmware, partitions, ota]:
+        if not os.path.exists(file):
+            logging.error(f"❌ Файл не найден: {file}")
             return
 
     try:
-        print("🔌 Перевод ESP32 в режим bootloader...")
+        logging.info("🔌 Перевод ESP32 в режим bootloader...")
         enter_bootloader()
-        time.sleep(1)
 
-        print("🧹 Очистка флеша...")
-        subprocess.run(["esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT, "erase_flash"], check=True)
+        logging.info("🧽 Очистка флеша...")
+        subprocess.run([
+            "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT, "erase_flash"
+        ], check=True)
 
-        print("🔄 Перезагрузка после очистки...")
-        exit_bootloader()
-        time.sleep(1)
-
-        print("🔁 Повторный вход в bootloader...")
+        logging.info("🔁 Повторный вход в bootloader...")
         enter_bootloader()
-        time.sleep(1)
 
-        print("📦 Запись прошивки:")
-        cmd = [
+        logging.info("📦 Прошиваем...")
+
+        flash_args = [
             "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT,
-            "write_flash", "--flash_mode", "dio", "--flash_freq", "40m", "--flash_size", "4MB"
+            "write_flash", "--flash_mode", "dio", "--flash_freq", "40m", "--flash_size", "4MB",
+            "0x1000", bootloader,
+            "0x10000", firmware,
+            "0x8000", partitions,
+            "0xe000", ota,
         ]
 
-        for filename, addr in bin_files:
-            full_path = str(ESP_DIR / filename)
-            cmd += [addr, full_path]
-            print(f"  - {addr}: {filename}")
+        if use_nvs:
+            flash_args += ["0x9000", nvs]
 
-        subprocess.run(cmd, check=True)
+        subprocess.run(flash_args, check=True)
 
-        print("✅ Выход из bootloader...")
+        logging.info("✅ Прошивка завершена, перезагрузка...")
         exit_bootloader()
-        print("🎉 Прошивка завершена успешно!")
 
     except subprocess.CalledProcessError as e:
-        print(f"⚠️ Ошибка прошивки: {e}")
+        logging.error(f"Прошивка не удалась: {e}")
+    except Exception as e:
+        logging.error(f"Ошибка: {e}")

@@ -17,7 +17,7 @@ except:
     font = ImageFont.load_default()
 
 # МЕНЮ
-items = ["Universal", "Master", "Repiater","Sens_SW", "Sens_OLD"]
+items = ["Universal", "Master", "Repeater","Sens_SW", "Sens_OLD"]
 selected = [0]
 scroll = [0]
 VISIBLE_LINES = 3  # Кол-во видимых строк
@@ -51,9 +51,8 @@ def start_flash_menu(go_to_main_menu):
         go_to_main_menu()
 
     def select():
-        firmware_name = items[selected[0]]
-        print(f"Выбрано: {firmware_name}")
-        flash_firmware(firmware_name)
-        # Здесь можно прошивать выбранный firmware
+        name = items[selected[0]]
+        print(f"Выбрано: {name}")
+        flash_firmware(name.lower())  # передаём имя папки
 
     setup_buttons(up, down, back, select)
