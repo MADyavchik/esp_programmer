@@ -30,6 +30,9 @@ def reboot_pi():
     with canvas(device) as draw:
         draw.text((10, 10), "Перезагрузка...", font=font, fill="white")
     time.sleep(1)
+
+    device.clear()
+    device.show()  # Обновляем экран, чтобы он реально очистился
     os.system("sudo reboot")
 
 # Основная функция запуска главного меню

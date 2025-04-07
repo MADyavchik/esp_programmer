@@ -40,11 +40,11 @@ def update_repo():
 
             # Перезапуск программы после успешного обновления
             #reboot()
-            #with canvas(device) as draw:
-                #draw.text((10, 10), "Reboot..", font=font, fill="white")
-            #print("[GIT] Перезапуск программы...")
-            #time.sleep(1)
-            #os.execv(sys.executable, ['python3'] + sys.argv)  # Перезапуск текущего скрипта (main.py)
+            with canvas(device) as draw:
+                draw.text((10, 10), "Reboot..", font=font, fill="white")
+            print("[GIT] Перезапуск программы...")
+            time.sleep(1)
+            os.execv(sys.executable, ['python3'] + sys.argv)  # Перезапуск текущего скрипта (main.py)
         else:
             # Ошибка при обновлении
             with canvas(device) as draw:
