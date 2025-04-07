@@ -5,7 +5,7 @@ from esp32_boot import enter_bootloader, exit_bootloader
 from oled_ui import draw_progress_bar, show_message, clear
 import re
 import time
-import sys
+import threading
 
 logging.basicConfig(level=logging.INFO)
 
@@ -81,7 +81,21 @@ def flash_firmware(firmware_name):
         if use_nvs:
             flash_args += ["0x9000", nvs]
 
-        # Запуск с отслеживанием прогресса
+        # Создаем поток для отображения прогресса
+        def update_progress():
+            prev_percent = -1
+            while process.poll() is None:
+                line = process.stdout.readline().strip()
+                logging.info(line)
+                match = re.search(r"\((\d+)%\)", line)
+                if match:
+                    percent = int(match.group(1))
+                    if percent != prev_percent:
+                        prev_percent = percent
+                        draw_progress_bar(percent, message="Flashing...")
+                time.sleep(0.1)  # небольшой интервал между обновлениями
+
+        # Запуск процесса прошивки
         process = subprocess.Popen(
             flash_args,
             stdout=subprocess.PIPE,
@@ -90,23 +104,12 @@ def flash_firmware(firmware_name):
             universal_newlines=True
         )
 
-        prev_percent = -1  # Изначально прогресс неизвестен
-
-        for line in process.stdout:
-            line = line.strip()
-            logging.info(line)
-            match = re.search(r"\((\d+)%\)", line)
-            if match:
-                percent = int(match.group(1))
-
-                # Обновление прогресс-бара только если процент изменился
-                if percent != prev_percent:
-                    prev_percent = percent
-                    logging.info(f"🔄 Обновление: {percent}%")
-                    draw_progress_bar(percent, message="Flashing...")
-                    sys.stdout.flush()  # Немедленное обновление
+        # Запускаем отдельный поток для обновления прогресса
+        progress_thread = threading.Thread(target=update_progress)
+        progress_thread.start()
 
         process.wait()
+        progress_thread.join()
 
         logging.info("✅ Прошивка завершена, перезагрузка...")
         draw_progress_bar(100, message="Done")
