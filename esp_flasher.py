@@ -101,6 +101,7 @@ def flash_firmware(firmware_name):
                 # Обновление прогресс-бара только если процент изменился
                 if percent != prev_percent:
                     prev_percent = percent
+                    logging.info(f"🔄 Обновление: {percent}%")
                     draw_progress_bar(percent, message="Flashing...")
 
         process.wait()
