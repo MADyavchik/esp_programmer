@@ -1,35 +1,57 @@
-from buttons import setup_buttons
+# menu.py
+import time
 from luma.core.render import canvas
-from PIL import ImageFont
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
-import os, time
+from PIL import ImageFont
+import os
+from buttons import setup_buttons
+from git_update import update_repo  # <-- функция обновления
 
-from git_update import update_repo
+# Настройка дисплея
+serial = i2c(port=1, address=0x3C)
+device = ssd1306(serial)
 
-device = ssd1306(i2c(port=1, address=0x3C))
-font = ImageFont.load_default()
+try:
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+except:
+    font = ImageFont.load_default()
+
 menu_items = ["FLASH", "UPDATE"]
 selected = [0]
 
-def start_main_menu(open_flash_menu):
-    def draw():
-        with canvas(device) as draw_canvas:
-            for i, item in enumerate(menu_items):
-                prefix = "> " if i == selected[0] else "  "
-                draw_canvas.text((10, 10 + i*20), prefix + item, font=font, fill="white")
+def draw_menu():
+    with canvas(device) as draw:
+        for i, item in enumerate(menu_items):
+            prefix = "> " if i == selected[0] else "  "
+            draw.text((10, 10 + i * 20), prefix + item, font=font, fill="white")
+
+def reboot_pi():
+    with canvas(device) as draw:
+        draw.text((10, 10), "Перезагрузка...", font=font, fill="white")
+    time.sleep(1)
+    os.system("sudo reboot")
+
+# Основная функция запуска главного меню
+def start_main_menu(go_to_flash_menu):
+    draw_menu()
+
+    def up():
+        selected[0] = (selected[0] - 1) % len(menu_items)
+        draw_menu()
+
+    def down():
+        selected[0] = (selected[0] + 1) % len(menu_items)
+        draw_menu()
+
+    def back():
+        selected[0] = 0
+        draw_menu()
 
     def select():
         if selected[0] == 0:
-            open_flash_menu()  # переход в flash_menu
+            go_to_flash_menu()  # переход в подменю прошивок
         else:
-            print("Update...")
-            update_repo()  # вызов обновления
+            update_repo()  # запуск обновления
 
-    def up(): selected[0] = (selected[0] - 1) % len(menu_items); draw()
-    def down(): selected[0] = (selected[0] + 1) % len(menu_items); draw()
-    def back(): selected[0] = 0; draw()
-    def reboot(): os.system("sudo reboot")
-
-    setup_buttons(up, down, back, select, back_hold_action=reboot)
-    draw()
+    setup_buttons(up, down, back, select, back_hold_action=reboot_pi)
