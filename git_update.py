@@ -43,10 +43,10 @@ def update_repo():
             with canvas(device) as draw:
                 draw.text((10, 10), "Rebooting app...", font=font, fill="white")
 
-                device.show()
-                time.sleep(1)
+            device.show()
+            time.sleep(1)
 
-                os.execv(sys.executable, [sys.executable] + sys.argv)
+            os.execv(sys.executable, [sys.executable] + sys.argv)
         else:
             # Ошибка при обновлении
             with canvas(device) as draw:
