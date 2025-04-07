@@ -94,7 +94,7 @@ def flash_firmware(firmware_name):
             line = line.strip()
             print(f"💬 {line}")
             logging.info(line)
-            match = re.search(r"\((\d+)%\)", line)
+            match = re.search(r"\((\d+)\s*%\)", line)
             if match:
                 percent = int(match.group(1))
                 if percent != prev_percent:
