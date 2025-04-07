@@ -2,7 +2,6 @@ import os
 import subprocess
 import logging
 from esp32_boot import enter_bootloader, exit_bootloader
-
 from oled_ui import draw_progress_bar, show_message, clear
 import re
 import time
@@ -11,6 +10,8 @@ logging.basicConfig(level=logging.INFO)
 
 FLASH_DIR = "esp"
 PORT = "/dev/ttyS0"
+
+# Названия прошивок без NVS
 NO_NVS = ["sens_sw", "sens_old"]
 
 def flash_firmware(firmware_name):
@@ -29,9 +30,10 @@ def flash_firmware(firmware_name):
     partitions = os.path.join(firmware_path, "partitions_0x8000.bin")
     ota = os.path.join(firmware_path, "ota_data_initial_0xe000.bin")
 
-    # NVS
+    # NVS — только если прошивка его использует
     use_nvs = firmware_name not in NO_NVS
     if use_nvs:
+        # Подставляем нужный nvs-файл
         if firmware_name == "master":
             nvs = os.path.join(firmware_path, "master_nvs_0x9000.bin")
         elif firmware_name == "repeater":
@@ -43,14 +45,14 @@ def flash_firmware(firmware_name):
             logging.error(f"❌ NVS-файл не найден: {nvs}")
             return
 
-    # Проверка файлов
+    # Проверка основных файлов
     for file in [bootloader, firmware, partitions, ota]:
         if not os.path.exists(file):
             logging.error(f"❌ Файл не найден: {file}")
             return
 
     try:
-        logging.info("🔌 Входим в bootloader...")
+        logging.info("🔌 Перевод ESP32 в режим bootloader...")
         show_message("Bootloader...")
         enter_bootloader()
 
@@ -89,27 +91,28 @@ def flash_firmware(firmware_name):
 
         for line in process.stdout:
             line = line.strip()
-            print(line)
+            logging.info(line)
             match = re.search(r"\((\d+)%\)", line)
             if match:
                 percent = int(match.group(1))
+                # Обновление прогресс-бара
                 draw_progress_bar(percent, message="Flashing")
 
         process.wait()
 
-        logging.info("✅ Готово! Перезагрузка...")
+        logging.info("✅ Прошивка завершена, перезагрузка...")
         draw_progress_bar(100, message="Done")
         time.sleep(1)
         clear()
         exit_bootloader()
 
     except subprocess.CalledProcessError as e:
-        logging.error(f"❌ Ошибка прошивки: {e}")
+        logging.error(f"Прошивка не удалась: {e}")
         show_message("❌ Ошибка прошивки")
         time.sleep(2)
         clear()
     except Exception as e:
-        logging.error(f"❌ Ошибка: {e}")
+        logging.error(f"Ошибка: {e}")
         show_message("❌ Ошибка")
         time.sleep(2)
         clear()
