@@ -92,6 +92,7 @@ def flash_firmware(firmware_name):
             if not line:
                 break
             line = line.strip()
+            print(f"💬 {line}")
             logging.info(line)
             match = re.search(r"\((\d+)%\)", line)
             if match:
