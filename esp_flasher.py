@@ -3,6 +3,10 @@ import subprocess
 import logging
 from esp32_boot import enter_bootloader, exit_bootloader
 
+from oled_ui import draw_progress_bar, show_message, clear
+import re  # для разбора %
+import time
+
 logging.basicConfig(level=logging.INFO)
 
 FLASH_DIR = "esp"
@@ -50,9 +54,11 @@ def flash_firmware(firmware_name):
 
     try:
         logging.info("🔌 Перевод ESP32 в режим bootloader...")
+        show_message("Bootloader...")
         enter_bootloader()
 
         logging.info("🧽 Очистка флеша...")
+        show_message("Erasing flash...")
         subprocess.run([
             "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT, "erase_flash"
         ], check=True)
@@ -61,6 +67,7 @@ def flash_firmware(firmware_name):
         enter_bootloader()
 
         logging.info("📦 Прошиваем...")
+        show_message("Flashing...")
 
         flash_args = [
             "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT,
@@ -74,9 +81,31 @@ def flash_firmware(firmware_name):
         if use_nvs:
             flash_args += ["0x9000", nvs]
 
-        subprocess.run(flash_args, check=True)
+        #subprocess.run(flash_args, check=True)
+        process = subprocess.Popen(
+            flash_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            bufsize=1
+        )
+
+        for line in process.stdout:
+            line = line.strip()
+            print(line)
+            match = re.search(r"\((\d+)%\)", line)
+            if match:
+                percent = int(match.group(1))
+                draw_progress_bar(percent)
+
+        process.wait()
 
         logging.info("✅ Прошивка завершена, перезагрузка...")
+        # вставка
+        draw_progress_bar(100, message="Done")
+        time.sleep(1)
+        clear()
+
         exit_bootloader()
 
     except subprocess.CalledProcessError as e:
