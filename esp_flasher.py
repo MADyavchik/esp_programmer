@@ -109,7 +109,7 @@ def flash_firmware(firmware_name):
         logging.info("✅ Прошивка завершена, перезагрузка...")
         draw_progress_bar(100, message="Done")
         time.sleep(1)
-        clear()
+        #clear()
         exit_bootloader()
 
     except subprocess.CalledProcessError as e:
