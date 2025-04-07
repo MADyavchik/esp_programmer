@@ -89,14 +89,19 @@ def flash_firmware(firmware_name):
             universal_newlines=True
         )
 
+        prev_percent = -1  # Изначально прогресс неизвестен
+
         for line in process.stdout:
             line = line.strip()
             logging.info(line)
             match = re.search(r"\((\d+)%\)", line)
             if match:
                 percent = int(match.group(1))
-                # Обновление прогресс-бара
-                draw_progress_bar(percent, message="Flashing")
+
+                # Обновление прогресс-бара только если процент изменился
+                if percent != prev_percent:
+                    prev_percent = percent
+                    draw_progress_bar(percent, message="Flashing...")
 
         process.wait()
 
