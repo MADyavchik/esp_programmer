@@ -5,6 +5,7 @@ from esp32_boot import enter_bootloader, exit_bootloader
 from oled_ui import draw_progress_bar, show_message, clear
 import re
 import time
+import sys
 
 logging.basicConfig(level=logging.INFO)
 
@@ -103,7 +104,7 @@ def flash_firmware(firmware_name):
                     prev_percent = percent
                     logging.info(f"🔄 Обновление: {percent}%")
                     draw_progress_bar(percent, message="Flashing...")
-                    clear()  # Обновление экрана с новой информацией
+                    sys.stdout.flush()  # Немедленное обновление
 
         process.wait()
 
