@@ -6,6 +6,8 @@ from PIL import ImageFont
 from buttons import setup_buttons
 import time
 
+from esp_flasher import flash_firmware
+
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
 
@@ -49,7 +51,9 @@ def start_flash_menu(go_to_main_menu):
         go_to_main_menu()
 
     def select():
-        print(f"Выбрано: {items[selected[0]]}")
+        firmware_name = items[selected[0]]
+        print(f"Выбрано: {firmware_name}")
+        flash_firmware(firmware_name)
         # Здесь можно прошивать выбранный firmware
 
     setup_buttons(up, down, back, select)
