@@ -4,15 +4,13 @@ import logging
 from esp32_boot import enter_bootloader, exit_bootloader
 
 from oled_ui import draw_progress_bar, show_message, clear
-import re  # для разбора %
+import re
 import time
 
 logging.basicConfig(level=logging.INFO)
 
 FLASH_DIR = "esp"
 PORT = "/dev/ttyS0"
-
-# Названия прошивок без NVS
 NO_NVS = ["sens_sw", "sens_old"]
 
 def flash_firmware(firmware_name):
@@ -31,10 +29,9 @@ def flash_firmware(firmware_name):
     partitions = os.path.join(firmware_path, "partitions_0x8000.bin")
     ota = os.path.join(firmware_path, "ota_data_initial_0xe000.bin")
 
-    # NVS — только если прошивка его использует
+    # NVS
     use_nvs = firmware_name not in NO_NVS
     if use_nvs:
-        # Подставляем нужный nvs-файл
         if firmware_name == "master":
             nvs = os.path.join(firmware_path, "master_nvs_0x9000.bin")
         elif firmware_name == "repeater":
@@ -46,14 +43,14 @@ def flash_firmware(firmware_name):
             logging.error(f"❌ NVS-файл не найден: {nvs}")
             return
 
-    # Проверка основных файлов
+    # Проверка файлов
     for file in [bootloader, firmware, partitions, ota]:
         if not os.path.exists(file):
             logging.error(f"❌ Файл не найден: {file}")
             return
 
     try:
-        logging.info("🔌 Перевод ESP32 в режим bootloader...")
+        logging.info("🔌 Входим в bootloader...")
         show_message("Bootloader...")
         enter_bootloader()
 
@@ -66,11 +63,11 @@ def flash_firmware(firmware_name):
         logging.info("🔁 Повторный вход в bootloader...")
         enter_bootloader()
 
-        logging.info("📦 Прошиваем...")
+        logging.info("📦 Прошивка...")
         show_message("Flashing...")
 
         flash_args = [
-            "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT,
+            "python3", "-u", "-m", "esptool", "--chip", "esp32", "-b", "460800", "-p", PORT,
             "write_flash", "--flash_mode", "dio", "--flash_freq", "40m", "--flash_size", "4MB",
             "0x1000", bootloader,
             "0x10000", firmware,
@@ -81,13 +78,13 @@ def flash_firmware(firmware_name):
         if use_nvs:
             flash_args += ["0x9000", nvs]
 
-        #subprocess.run(flash_args, check=True)
+        # Запуск с отслеживанием прогресса
         process = subprocess.Popen(
             flash_args,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            bufsize=1
+            bufsize=1,
+            universal_newlines=True
         )
 
         for line in process.stdout:
@@ -96,19 +93,23 @@ def flash_firmware(firmware_name):
             match = re.search(r"\((\d+)%\)", line)
             if match:
                 percent = int(match.group(1))
-                draw_progress_bar(percent)
+                draw_progress_bar(percent, message="Flashing")
 
         process.wait()
 
-        logging.info("✅ Прошивка завершена, перезагрузка...")
-        # вставка
+        logging.info("✅ Готово! Перезагрузка...")
         draw_progress_bar(100, message="Done")
         time.sleep(1)
         clear()
-
         exit_bootloader()
 
     except subprocess.CalledProcessError as e:
-        logging.error(f"Прошивка не удалась: {e}")
+        logging.error(f"❌ Ошибка прошивки: {e}")
+        show_message("❌ Ошибка прошивки")
+        time.sleep(2)
+        clear()
     except Exception as e:
-        logging.error(f"Ошибка: {e}")
+        logging.error(f"❌ Ошибка: {e}")
+        show_message("❌ Ошибка")
+        time.sleep(2)
+        clear()
