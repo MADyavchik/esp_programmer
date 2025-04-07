@@ -26,6 +26,7 @@ def draw_progress_bar(percent, message="Flashing..."):
 
     device.display(image)
 
+
 def show_message(text):
     image = Image.new("1", device.size)
     draw = ImageDraw.Draw(image)

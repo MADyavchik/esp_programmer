@@ -1,3 +1,4 @@
+# esp_flasher.py
 import os
 import subprocess
 import logging
@@ -31,22 +32,18 @@ def flash_firmware(firmware_name):
     partitions = os.path.join(firmware_path, "partitions_0x8000.bin")
     ota = os.path.join(firmware_path, "ota_data_initial_0xe000.bin")
 
-    # NVS — только если прошивка его использует
     use_nvs = firmware_name not in NO_NVS
     if use_nvs:
-        # Подставляем нужный nvs-файл
         if firmware_name == "master":
             nvs = os.path.join(firmware_path, "master_nvs_0x9000.bin")
         elif firmware_name == "repeater":
             nvs = os.path.join(firmware_path, "repeater_nvs_0x9000.bin")
         else:
             nvs = os.path.join(firmware_path, "sw_nvs_0x9000.bin")
-
         if not os.path.exists(nvs):
             logging.error(f"❌ NVS-файл не найден: {nvs}")
             return
 
-    # Проверка основных файлов
     for file in [bootloader, firmware, partitions, ota]:
         if not os.path.exists(file):
             logging.error(f"❌ Файл не найден: {file}")
@@ -77,39 +74,36 @@ def flash_firmware(firmware_name):
             "0x8000", partitions,
             "0xe000", ota,
         ]
-
         if use_nvs:
             flash_args += ["0x9000", nvs]
 
-        # Создаем поток для отображения прогресса
-        def update_progress():
-            prev_percent = -1
-            while process.poll() is None:
-                line = process.stdout.readline().strip()
-                logging.info(line)
-                match = re.search(r"\((\d+)%\)", line)
-                if match:
-                    percent = int(match.group(1))
-                    if percent != prev_percent:
-                        prev_percent = percent
-                        draw_progress_bar(percent, message="Flashing...")
-                time.sleep(0.1)  # небольшой интервал между обновлениями
-
-        # Запуск процесса прошивки
         process = subprocess.Popen(
             flash_args,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             bufsize=1,
-            universal_newlines=True
+            universal_newlines=True,
+            env={**os.environ, "PYTHONUNBUFFERED": "1"}
         )
 
-        # Запускаем отдельный поток для обновления прогресса
-        progress_thread = threading.Thread(target=update_progress)
-        progress_thread.start()
+        prev_percent = -1
+        while True:
+            line = process.stdout.readline()
+            if not line:
+                break
+            line = line.strip()
+            logging.info(line)
+            match = re.search(r"\((\d+)%\)", line)
+            if match:
+                percent = int(match.group(1))
+                if percent != prev_percent:
+                    prev_percent = percent
+                    draw_progress_bar(percent, message="Flashing...")
 
         process.wait()
-        progress_thread.join()
+
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode, flash_args)
 
         logging.info("✅ Прошивка завершена, перезагрузка...")
         draw_progress_bar(100, message="Done")
@@ -118,12 +112,12 @@ def flash_firmware(firmware_name):
         exit_bootloader()
 
     except subprocess.CalledProcessError as e:
-        logging.error(f"Прошивка не удалась: {e}")
+        logging.error(f"❌ Прошивка не удалась: {e}")
         show_message("❌ Ошибка прошивки")
         time.sleep(2)
         clear()
     except Exception as e:
-        logging.error(f"Ошибка: {e}")
+        logging.error(f"❌ Ошибка: {e}")
         show_message("❌ Ошибка")
         time.sleep(2)
         clear()
