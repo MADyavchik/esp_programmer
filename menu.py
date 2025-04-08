@@ -39,8 +39,8 @@ def display_mac_address():
 
     with canvas(device) as draw:
         if mac:
-            draw.text((2, 2), "MAC Address:", font=font, fill="white")
-            draw.text((2, 30), mac, font=font, fill="white")
+            draw.text((0, 0), "MAC Address:", font=font, fill="white")
+            draw.text((0, 30), mac, font=font, fill="white")
         else:
             draw.text((10, 10), "Error getting MAC", font=font, fill="white")
 
