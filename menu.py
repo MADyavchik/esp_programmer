@@ -17,7 +17,7 @@ device = ssd1306(serial)
 
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 
-menu_items = ["FLASH", "UPDATE"]
+menu_items = ["FLASH", "UPDATE", "LOG"]
 selected = [0]
 
 def draw_menu():
@@ -74,6 +74,9 @@ def start_main_menu():
             selected_result[0] = "flash"
         elif selected[0] == 1:  # Пункт "UPDATE"
             update_repo()
+        elif selected[0] == 2:  # Пункт "LOG"
+            from serial_log_viewer import show_serial_data
+            show_serial_data()
 
     # Добавляем функцию для зажатия кнопки up на 3 секунды
     def up_hold():

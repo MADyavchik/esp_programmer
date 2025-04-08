@@ -3,11 +3,10 @@ from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from PIL import Image, ImageDraw, ImageFont
 
-# Инициализация экрана
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
-#font = ImageFont.load_default()
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+
 def clear():
     device.clear()
     device.show()
@@ -27,11 +26,20 @@ def draw_progress_bar(percent, message="Flashing..."):
 
     device.display(image)
 
-
 def show_message(text):
     image = Image.new("1", device.size)
     draw = ImageDraw.Draw(image)
     draw.text((0, 0), text, font=font, fill=255)
     device.display(image)
+
+def draw_log_table(data):
+    image = Image.new("1", device.size)
+    draw = ImageDraw.Draw(image)
+
+    draw.text((0, 0), f"Bat: {data['Battery']}", font=font, fill=255)
+    draw.text((80, 0), f"T: {data['Temp']}", font=font, fill=255)
+
+    draw.text((0, 25), f"TOF: {data['TOF']}", font=font, fill=255)
+    draw.text((80, 25), f"W: {data['Weight']}", font=font, fill=255)
 
     device.display(image)
