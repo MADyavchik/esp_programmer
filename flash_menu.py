@@ -30,29 +30,37 @@ def start_flash_menu():
     draw_flash_menu()
 
     next_menu = ["flash"]
+    flashing = [False]  # флаг состояния
 
     def up():
-        if selected[0] > 0:
+        if not flashing[0] and selected[0] > 0:
             selected[0] -= 1
             if selected[0] < scroll[0]:
                 scroll[0] -= 1
-        draw_flash_menu()
+            draw_flash_menu()
 
     def down():
-        if selected[0] < len(items) - 1:
+        if not flashing[0] and selected[0] < len(items) - 1:
             selected[0] += 1
             if selected[0] >= scroll[0] + VISIBLE_LINES:
                 scroll[0] += 1
-        draw_flash_menu()
+            draw_flash_menu()
 
     def back():
-        next_menu[0] = "main"
+        if not flashing[0]:
+            next_menu[0] = "main"
+
+    def flash_and_return(name):
+        result = flash_firmware(name.lower())
+        next_menu[0] = result or "flash"
+        flashing[0] = False
 
     def select():
+        if flashing[0]:
+            return
         name = items[selected[0]]
-        print(f"Выбрано: {name}")
-        result = flash_firmware(name.lower())
-        next_menu[0] = result or "flash"  # если None, останемся
+        flashing[0] = True
+        threading.Thread(target=flash_and_return, args=(name,), daemon=True).start()
 
     setup_buttons(up, down, back, select)
 
