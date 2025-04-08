@@ -134,7 +134,7 @@ def flash_firmware(firmware_name):
 def get_mac_address():
     try:
         logging.info("📡 Получение MAC-адреса...")
-        show_message("MAC address...")
+        show_message("Read MAC...")
 
         # Переводим чип в bootloader
         enter_bootloader()
@@ -161,6 +161,6 @@ def get_mac_address():
 
     except Exception as e:
         logging.error(f"❌ Ошибка получения MAC-адреса: {e}")
-        show_message("❌ Ошибка MAC")
+        show_message("❌ Error MAC")
         time.sleep(2)
         clear()

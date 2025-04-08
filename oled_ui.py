@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw, ImageFont
 # Инициализация экрана
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
-font = ImageFont.load_default()
-
+#font = ImageFont.load_default()
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8)
 def clear():
     device.clear()
     device.show()
