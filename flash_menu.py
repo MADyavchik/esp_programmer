@@ -7,6 +7,7 @@ from buttons import setup_buttons
 from esp_flasher import flash_firmware
 import time
 import threading
+from oled_ui import clear  # Добавь это, если не было
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
@@ -27,6 +28,7 @@ def draw_flash_menu():
             draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
 
 def start_flash_menu():
+    clear()
     draw_flash_menu()
 
     next_menu = ["flash"]
