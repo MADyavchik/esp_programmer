@@ -1,27 +1,22 @@
 # flash_menu.py
 from luma.core.render import canvas
-from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
+from luma.core.interface.serial import i2c
 from PIL import ImageFont
 from buttons import setup_buttons
+from esp_flasher import flash_firmware
 import time
 import threading
-
-from esp_flasher import flash_firmware
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
 
-try:
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-except:
-    font = ImageFont.load_default()
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 
-# МЕНЮ
-items = ["Universal", "Master", "Repeater","Sens_SW", "Sens_OLD"]
+items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 selected = [0]
 scroll = [0]
-VISIBLE_LINES = 3  # Кол-во видимых строк
+VISIBLE_LINES = 3
 
 def draw_flash_menu():
     with canvas(device) as draw:
@@ -31,8 +26,9 @@ def draw_flash_menu():
             prefix = "> " if index == selected[0] else "  "
             draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
 
-def start_flash_menu(go_to_main_menu):
+def start_flash_menu():
     draw_flash_menu()
+    selected_result = [None]
 
     def up():
         if selected[0] > 0:
@@ -49,16 +45,17 @@ def start_flash_menu(go_to_main_menu):
         draw_flash_menu()
 
     def back():
-        go_to_main_menu()
+        selected_result[0] = "main"
 
-    #def select():
-        #name = items[selected[0]]
-        #print(f"Выбрано: {name}")
-        #flash_firmware(name.lower())  # передаём имя папки
     def select():
         name = items[selected[0]]
-        print(f"Выбрано: {name}")
         threading.Thread(target=flash_firmware, args=(name.lower(),), daemon=True).start()
-
+        # После прошивки вернуться назад
+        selected_result[0] = "flash"  # остаёмся в меню
 
     setup_buttons(up, down, back, select)
+
+    while selected_result[0] is None:
+        time.sleep(0.1)
+
+    return selected_result[0]

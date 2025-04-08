@@ -1,3 +1,4 @@
+# buttons.py
 from gpiozero import Button
 
 # Указываем bounce_time=0.1 (100 мс) — это стандартная задержка, можно варьировать
