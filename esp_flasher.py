@@ -133,14 +133,34 @@ def flash_firmware(firmware_name):
 
 def get_mac_address():
     try:
+        logging.info("📡 Получение MAC-адреса...")
+        show_message("MAC address...")
+
+        # Переводим чип в bootloader
+        enter_bootloader()
+
         result = subprocess.run(
             ["esptool.py", "--chip", "esp32", "-p", PORT, "read_mac"],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            check=True
         )
-        output = result.stdout.strip()
-        # Пример вывода: MAC Address: 00:11:22:33:44:55
-        mac_address = output.split(" ")[-1]
-        return mac_address
-    except subprocess.CalledProcessError as e:
+
+        mac_line = next((line for line in result.stdout.splitlines() if "MAC:" in line), None)
+        if mac_line:
+            mac = mac_line.split("MAC:")[1].strip()
+            logging.info(f"✅ MAC-адрес: {mac}")
+            show_message(f"MAC:\n{mac}")
+        else:
+            raise Exception("MAC-адрес не найден в выводе esptool")
+
+        time.sleep(3)
+        clear()
+        exit_bootloader()
+
+    except Exception as e:
         logging.error(f"❌ Ошибка получения MAC-адреса: {e}")
-        return None
+        show_message("❌ Ошибка MAC")
+        time.sleep(2)
+        clear()
