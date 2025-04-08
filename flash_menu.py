@@ -28,7 +28,8 @@ def draw_flash_menu():
 
 def start_flash_menu():
     draw_flash_menu()
-    selected_result = [None]
+
+    next_menu = ["flash"]
 
     def up():
         if selected[0] > 0:
@@ -45,17 +46,17 @@ def start_flash_menu():
         draw_flash_menu()
 
     def back():
-        selected_result[0] = "main"
+        next_menu[0] = "main"
 
     def select():
         name = items[selected[0]]
-        threading.Thread(target=flash_firmware, args=(name.lower(),), daemon=True).start()
-        # После прошивки вернуться назад
-        selected_result[0] = "flash"  # остаёмся в меню
+        print(f"Выбрано: {name}")
+        result = flash_firmware(name.lower())
+        next_menu[0] = result or "flash"  # если None, останемся
 
     setup_buttons(up, down, back, select)
 
-    while selected_result[0] is None:
+    while next_menu[0] == "flash":
         time.sleep(0.1)
 
-    return selected_result[0]
+    return next_menu[0]

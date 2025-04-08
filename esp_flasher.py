@@ -122,3 +122,4 @@ def flash_firmware(firmware_name):
         show_message("❌ Ошибка")
         time.sleep(2)
         clear()
+    return "flash"
