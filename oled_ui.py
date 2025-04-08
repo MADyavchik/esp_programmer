@@ -36,10 +36,10 @@ def draw_log_table(data):
     image = Image.new("1", device.size)
     draw = ImageDraw.Draw(image)
 
-    draw.text((0, 0), f"Bat: {data['Battery']}", font=font, fill=255)
-    draw.text((80, 0), f"T: {data['Temp']}", font=font, fill=255)
+    draw.text((0, 0), f"B: {data['Battery']}", font=font, fill=255)
+    draw.text((40, 0), f"T: {data['Temp']}", font=font, fill=255)
 
-    draw.text((0, 25), f"TOF: {data['TOF']}", font=font, fill=255)
-    draw.text((80, 25), f"W: {data['Weight']}", font=font, fill=255)
+    draw.text((80, 0), f"H: {data['TOF']}", font=font, fill=255)
+    draw.text((0, 25), f"W: {data['Weight']}", font=font, fill=255)
 
     device.display(image)
