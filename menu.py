@@ -6,6 +6,7 @@ from luma.core.interface.serial import i2c
 from PIL import ImageFont
 from buttons import setup_buttons
 from git_update import update_repo
+from esp_flasher import get_mac_address
 import time
 import os
 
@@ -30,22 +31,49 @@ def reboot_pi():
     device.clear()
     os.system("sudo reboot")
 
+def display_mac_address():
+    mac_address = get_mac_address()
+    if mac_address:
+        with canvas(device) as draw:
+            draw.text((10, 10), f"MAC Address:", font=font, fill="white")
+            draw.text((10, 30), mac_address, font=font, fill="white")
+    else:
+        with canvas(device) as draw:
+            draw.text((10, 10), "Error getting MAC", font=font, fill="white")
+    time.sleep(3)  # Показать MAC-адрес в течение 3 секунд
+    draw_menu()  # Вернуться в меню после того, как MAC-адрес был показан
+
 def start_main_menu():
     draw_menu()
     selected_result = [None]
 
-    def up(): selected[0] = (selected[0] - 1) % len(menu_items); draw_menu()
-    def down(): selected[0] = (selected[0] + 1) % len(menu_items); draw_menu()
-    def back(): selected_result[0] = None
+    def up():
+        selected[0] = (selected[0] - 1) % len(menu_items)
+        draw_menu()
+
+    def down():
+        selected[0] = (selected[0] + 1) % len(menu_items)
+        draw_menu()
+
+    def back():
+        selected_result[0] = None
+
     def select():
-        if selected[0] == 0:
+        # Действие при выборе элемента меню
+        if selected[0] == 0:  # Пункт "FLASH"
             selected_result[0] = "flash"
-        else:
+        elif selected[0] == 1:  # Пункт "UPDATE"
             update_repo()
 
-    setup_buttons(up, down, back, select, reboot_pi)
+    # Добавляем функцию для зажатия кнопки select на 3 секунды
+    def select_hold():
+        # Показать MAC-адрес, если кнопка select зажата
+        display_mac_address()
 
-    # Ожидаем, пока пользователь что-то выберет
+    # Устанавливаем обработчики кнопок
+    setup_buttons(up, down, back, select, select_hold_action=select_hold)
+
+    # Ожидаем, пока пользователь не сделает выбор
     while selected_result[0] is None:
         time.sleep(0.1)
 

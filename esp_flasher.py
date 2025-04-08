@@ -130,3 +130,17 @@ def flash_firmware(firmware_name):
         time.sleep(2)
         clear()
     return "flash"
+
+def get_mac_address():
+    try:
+        result = subprocess.run(
+            ["esptool.py", "--chip", "esp32", "-p", PORT, "read_mac"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True
+        )
+        output = result.stdout.strip()
+        # Пример вывода: MAC Address: 00:11:22:33:44:55
+        mac_address = output.split(" ")[-1]
+        return mac_address
+    except subprocess.CalledProcessError as e:
+        logging.error(f"❌ Ошибка получения MAC-адреса: {e}")
+        return None
