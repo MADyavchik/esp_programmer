@@ -36,22 +36,26 @@ def start_flash_menu():
             selected[0] -= 1
             if selected[0] < scroll[0]:
                 scroll[0] -= 1
-            draw_flash_menu()
+        draw_flash_menu()
 
     def down():
         if selected[0] < len(items) - 1:
             selected[0] += 1
             if selected[0] >= scroll[0] + VISIBLE_LINES:
                 scroll[0] += 1
-            draw_flash_menu()
+        draw_flash_menu()
 
     def back():
         next_menu[0] = "main"
 
     def select():
         name = items[selected[0]]
-        print(f"Выбрано: {name}")
-        next_menu[0] = flash_firmware(name.lower()) or "flash"
+        print(f"▶ Выбрана прошивка: {name}")
+        clear()
+        result = flash_firmware(name.lower())
+        print(f"◀ Возвращаемся в меню: {result}")
+        next_menu[0] = result or "flash"
+        draw_flash_menu()
 
     setup_buttons(up, down, back, select)
 
