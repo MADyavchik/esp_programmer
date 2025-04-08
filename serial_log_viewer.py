@@ -6,23 +6,23 @@ from threading import Thread
 from oled_ui import draw_log_table, clear
 from buttons import btn_back
 from menu import draw_menu  # Импортируем функцию для отрисовки меню
+import threading
 
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
-def monitor_serial_data(proc):
+def monitor_serial_data(proc, stop_event):
     """Функция для мониторинга данных в отдельном потоке"""
     try:
         values = {"Battery": "—", "Temp": "—", "TOF": "—", "Weight": "—"}
         for line in proc.stdout:
+            if stop_event.is_set():  # Прерывание потока, если stop_event активирован
+                break
             match = LOG_PATTERN.search(line)
             if match:
                 key, val = match.groups()
                 values[key] = val
                 draw_log_table(values)
 
-            # Проверка выхода по кнопке назад
-            if btn_back.is_pressed:
-                break
     except Exception as e:
         print(f"Ошибка чтения монитора: {e}")
 
@@ -31,6 +31,9 @@ def monitor_serial_data(proc):
 
 def show_serial_data():
     clear()
+
+    # Создаем объект для отслеживания остановки потока
+    stop_event = threading.Event()
 
     # Запускаем subprocess с pio monitor в отдельном потоке
     proc = subprocess.Popen(
@@ -41,20 +44,19 @@ def show_serial_data():
     )
 
     # Запускаем функцию мониторинга в новом потоке
-    monitor_thread = Thread(target=monitor_serial_data, args=(proc,))
+    monitor_thread = Thread(target=monitor_serial_data, args=(proc, stop_event))
     monitor_thread.start()
 
     # Ожидаем нажатия кнопки "Back"
     while not btn_back.is_pressed:
         time.sleep(0.1)
 
-    # Ожидаем, пока кнопка не будет отпущена
-    while btn_back.is_pressed:
-        time.sleep(0.1)
-
-    # Завершаем работу
+    # Как только кнопка нажата, останавливаем поток и прерываем мониторинг
+    stop_event.set()
+    proc.terminate()  # Завершаем процесс
     monitor_thread.join()  # Дожидаемся завершения потока мониторинга
-    proc.terminate()  # Закрываем процесс
+
+    # Очистка экрана
     clear()
 
     # Вызов функции для отрисовки главного меню
