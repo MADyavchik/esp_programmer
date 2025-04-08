@@ -65,13 +65,13 @@ def start_main_menu():
         elif selected[0] == 1:  # Пункт "UPDATE"
             update_repo()
 
-    # Добавляем функцию для зажатия кнопки select на 3 секунды
-    def select_hold():
-        # Показать MAC-адрес, если кнопка select зажата
+    # Добавляем функцию для зажатия кнопки up на 3 секунды
+    def up_hold():
+        # Показать MAC-адрес, если кнопка up зажата
         display_mac_address()
 
     # Устанавливаем обработчики кнопок
-    setup_buttons(up, down, back, select, select_hold_action=select_hold)
+    setup_buttons(up, down, back, select, up_hold_action=up_hold())
 
     # Ожидаем, пока пользователь не сделает выбор
     while selected_result[0] is None:
