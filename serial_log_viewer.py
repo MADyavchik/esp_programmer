@@ -5,6 +5,7 @@ import time
 from threading import Thread
 from oled_ui import draw_log_table, clear
 from buttons import btn_back
+from menu import draw_menu  # Импортируем функцию для отрисовки меню
 
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
@@ -55,3 +56,8 @@ def show_serial_data():
     monitor_thread.join()  # Дожидаемся завершения потока мониторинга
     proc.terminate()  # Закрываем процесс
     clear()
+
+    # Вызов функции для отрисовки главного меню
+    draw_menu()  # Теперь меню будет отрисовано после выхода из режима логирования
+
+
