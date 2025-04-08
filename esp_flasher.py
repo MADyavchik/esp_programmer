@@ -136,7 +136,6 @@ def get_mac_address():
         logging.info("📡 Получение MAC-адреса...")
         show_message("Read MAC...")
 
-        # Переводим чип в bootloader
         enter_bootloader()
 
         result = subprocess.run(
@@ -151,16 +150,12 @@ def get_mac_address():
         if mac_line:
             mac = mac_line.split("MAC:")[1].strip()
             logging.info(f"✅ MAC-адрес: {mac}")
-            show_message(f"MAC:\n{mac}")
+            exit_bootloader()
+            return mac
         else:
             raise Exception("MAC-адрес не найден в выводе esptool")
 
-        time.sleep(3)
-        clear()
-        exit_bootloader()
-
     except Exception as e:
         logging.error(f"❌ Ошибка получения MAC-адреса: {e}")
-        show_message("❌ Error MAC")
-        time.sleep(2)
-        clear()
+        exit_bootloader()
+        return None

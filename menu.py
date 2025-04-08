@@ -9,6 +9,8 @@ from git_update import update_repo
 from esp_flasher import get_mac_address
 import time
 import os
+from oled_ui import clear
+from buttons import btn_back
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
@@ -32,16 +34,24 @@ def reboot_pi():
     os.system("sudo reboot")
 
 def display_mac_address():
-    mac_address = get_mac_address()
-    if mac_address:
-        with canvas(device) as draw:
-            draw.text((10, 10), f"MAC Address:", font=font, fill="white")
-            draw.text((10, 30), mac_address, font=font, fill="white")
-    else:
-        with canvas(device) as draw:
+    clear()
+    mac = get_mac_address()
+
+    with canvas(device) as draw:
+        if mac:
+            draw.text((10, 10), "MAC Address:", font=font, fill="white")
+            draw.text((10, 30), mac, font=font, fill="white")
+        else:
             draw.text((10, 10), "Error getting MAC", font=font, fill="white")
-    time.sleep(3)  # Показать MAC-адрес в течение 3 секунд
-    draw_menu()  # Вернуться в меню после того, как MAC-адрес был показан
+
+    # Ждём, пока пользователь нажмёт "Back"
+    while not btn_back.is_pressed:
+        time.sleep(0.1)
+
+    while btn_back.is_pressed:  # дождись отпускания
+        time.sleep(0.1)
+
+    draw_menu()
 
 def start_main_menu():
     draw_menu()
