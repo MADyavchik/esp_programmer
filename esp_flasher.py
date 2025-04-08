@@ -54,6 +54,13 @@ def flash_firmware(firmware_name):
         show_message("Bootloader...")
         enter_bootloader()
 
+        # Прожигаем фьюзы
+        logging.info("⚡ Прожигаем фьюзы...")
+        show_message("Burning fuse...")
+        subprocess.run([
+            "espefuse.py", "--chip", "esp32", "-p", PORT, "set_flash_voltage", "3.3V", "--do-not-confirm"
+        ], check=True)
+
         logging.info("🧽 Очистка флеша...")
         show_message("Erasing flash...")
         subprocess.run([
