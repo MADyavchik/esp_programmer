@@ -15,4 +15,4 @@ def setup_buttons(up, down, back, select, back_hold_action=None, up_hold_action=
     if back_hold_action:
         btn_back.when_held = back_hold_action
     if up_hold_action:
-        btn_select.when_held = up_hold_action  # Добавляем обработчик для кнопки select при удержании
+        btn_up.when_held = up_hold_action  # Добавляем обработчик для кнопки up при удержании

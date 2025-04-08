@@ -71,7 +71,7 @@ def start_main_menu():
         display_mac_address()
 
     # Устанавливаем обработчики кнопок
-    setup_buttons(up, down, back, select, up_hold_action=up_hold())
+    setup_buttons(up, down, back, select, up_hold_action=up_hold)
 
     # Ожидаем, пока пользователь не сделает выбор
     while selected_result[0] is None:
