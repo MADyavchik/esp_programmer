@@ -2,7 +2,7 @@
 from gpiozero import Button
 
 # Указываем bounce_time=0.1 (100 мс) — это стандартная задержка, можно варьировать
-btn_up = Button(5, hold_time=3, bounce_time=0.1)
+btn_up = Button(5, hold_time=1, bounce_time=0.1)
 btn_down = Button(6, bounce_time=0.1)
 btn_back = Button(19, hold_time=3, bounce_time=0.1)
 btn_select = Button(26, bounce_time=0.1)
