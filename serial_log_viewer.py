@@ -13,7 +13,7 @@ def show_serial_data():
 
     # Запускаем subprocess с pio monitor
     proc = subprocess.Popen(
-        ["platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/cu.usbserial-0001"],
+        ["platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyS0"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True
