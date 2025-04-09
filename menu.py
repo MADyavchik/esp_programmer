@@ -68,6 +68,9 @@ def start_main_menu():
     def back():
         selected_result[0] = None
 
+    def back_hold():
+        reboot_pi()
+
     def select():
         # Действие при выборе элемента меню
         if selected[0] == 0:  # Пункт "FLASH"
@@ -84,7 +87,7 @@ def start_main_menu():
         display_mac_address()
 
     # Устанавливаем обработчики кнопок
-    setup_buttons(up, down, back, select, up_hold_action=up_hold)
+    setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
 
     # Ожидаем, пока пользователь не сделает выбор
     while selected_result[0] is None:
