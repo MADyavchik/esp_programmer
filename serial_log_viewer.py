@@ -37,7 +37,7 @@ def show_serial_data():
 
     # Запускаем subprocess с pio monitor в отдельном потоке
     proc = subprocess.Popen(
-        ["platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyAMA1"],
+        ["platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyS0"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True

@@ -11,7 +11,7 @@ import threading
 logging.basicConfig(level=logging.INFO)
 
 FLASH_DIR = "esp"
-PORT = "/dev/ttyAMA1"
+PORT = "/dev/ttyS0"
 
 # Названия прошивок без NVS
 NO_NVS = ["sens_sw", "sens_old"]
