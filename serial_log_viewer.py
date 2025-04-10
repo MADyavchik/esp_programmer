@@ -14,7 +14,7 @@ LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 def monitor_serial_data(proc, stop_event):
     """Функция для мониторинга данных в отдельном потоке"""
     # Открываем виртуальный терминал
-    master, slave = pty.openpty()
+    #master, slave = pty.openpty()
 
     try:
         values = {"Battery": "—", "Temp": "—", "TOF": "—", "Weight": "—"}
