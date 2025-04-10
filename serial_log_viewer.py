@@ -1,4 +1,5 @@
 # serial_log_viewer.py
+import pty
 import subprocess
 import re
 import time
@@ -12,6 +13,9 @@ LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
 def monitor_serial_data(proc, stop_event):
     """Функция для мониторинга данных в отдельном потоке"""
+    # Открываем виртуальный терминал
+    master, slave = pty.openpty()
+
     try:
         values = {"Battery": "—", "Temp": "—", "TOF": "—", "Weight": "—"}
         for line in proc.stdout:
