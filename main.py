@@ -3,6 +3,7 @@ import time
 import traceback
 from menu_navigation import run_menu_loop
 from oled_ui import clear
+import os
 
 def log_error(e):
     with open("error.log", "a") as f:
@@ -12,6 +13,10 @@ def log_error(e):
 def main():
     while True:
         try:
+            if os.path.exists("exit.flag"):
+                print("🔚 Обнаружен флаг выхода.")
+                os.remove("exit.flag")
+                break
             run_menu_loop()
         except KeyboardInterrupt:
             print("⏹ Выход по Ctrl+C")
