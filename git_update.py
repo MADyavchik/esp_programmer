@@ -26,10 +26,6 @@ def update_repo():
     try:
         # Начало обновления
 
-        #with canvas(device) as draw:
-            #show_message("Updating...")
-            #draw.text((10, 10), "Updating...", font=font, fill="white")
-
         show_message("Updating...")
         print("[GIT] Выполняю git pull...")
         result = subprocess.run(['git', 'pull'], capture_output=True, text=True)
@@ -37,17 +33,14 @@ def update_repo():
 
         if result.returncode == 0:
             # Обновление прошло успешно
-            with canvas(device) as draw:
-                draw.text((10, 10), "Success!", font=font, fill="white")
+            show_message("Success!")
             print("[GIT] Репозиторий успешно обновлен!")
             time.sleep(2)
 
             # Перезапуск программы после успешного обновления
             #reboot()
-            with canvas(device) as draw:
-                draw.text((10, 10), "Rebooting app...", font=font, fill="white")
+            show_message("Rebooting app...")
 
-            device.show()
             time.sleep(1)
 
             os.execv(sys.executable, [sys.executable] + sys.argv)
