@@ -12,14 +12,14 @@ from luma.core.render import canvas
 from PIL import ImageFont
 
 # Настройка дисплея
-serial = i2c(port=1, address=0x3C)
-device = ssd1306(serial)
+#serial = i2c(port=1, address=0x3C)
+#device = ssd1306(serial)
 
 # Подгружаем шрифт
-try:
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-except:
-    font = ImageFont.load_default()
+#try:
+    #font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+#except:
+    #font = ImageFont.load_default()
 
 # Функция для обновления репозитория
 def update_repo():
@@ -46,13 +46,12 @@ def update_repo():
             os.execv(sys.executable, [sys.executable] + sys.argv)
         else:
             # Ошибка при обновлении
-            with canvas(device) as draw:
-                draw.text((10, 10), f"Ошибка: {result.stderr}", font=font, fill="white")
+            show_message(f"Err: {result.stderr}")
             print(f"[GIT] Ошибка при обновлении: {result.stderr}")
             time.sleep(2)
 
     except Exception as e:
         # Общая ошибка
-        with canvas(device) as draw:
-            draw.text((10, 10), f"Ошибка: {e}", font=font, fill="white")
+        show_message(f"Err: {e}")
+
         print(f"[GIT] Ошибка: {e}")
