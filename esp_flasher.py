@@ -121,12 +121,12 @@ def flash_firmware(firmware_name):
 
     except subprocess.CalledProcessError as e:
         logging.error(f"❌ Прошивка не удалась: {e}")
-        show_message("❌ Ошибка прошивки")
+        show_message("Ошибка прошивки")
         time.sleep(2)
         clear()
     except Exception as e:
         logging.error(f"❌ Ошибка: {e}")
-        show_message("❌ Ошибка")
+        show_message("Ошибка")
         time.sleep(2)
         clear()
     return "flash"

@@ -5,6 +5,7 @@ import os
 import sys
 def reboot(): os.system("sudo reboot")
 # init display
+from oled_ui import draw_progress_bar, show_message, clear
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from luma.core.render import canvas
@@ -25,12 +26,14 @@ def update_repo():
     try:
         # Начало обновления
 
-        with canvas(device) as draw:
-            draw.text((10, 10), "Updating...", font=font, fill="white")
-            time.sleep(2)
+        #with canvas(device) as draw:
+            #show_message("Updating...")
+            #draw.text((10, 10), "Updating...", font=font, fill="white")
 
+        show_message("Updating...")
         print("[GIT] Выполняю git pull...")
         result = subprocess.run(['git', 'pull'], capture_output=True, text=True)
+        time.sleep(1)
 
         if result.returncode == 0:
             # Обновление прошло успешно
