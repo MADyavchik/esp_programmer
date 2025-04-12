@@ -28,7 +28,7 @@ def draw_menu():
 
     with canvas(device) as draw:
         # Статусная строка (пример: батарея и Wi-Fi)
-        draw.text((0, 0), f"Batt: {battery_status}  {wifi_status}", font=font, fill="white")
+        draw.text((0, 0), f"{battery_status}  {wifi_status}", font=font, fill="white")
 
         # Меню начинается с Y = 18, чтобы не наезжать на статус
         for i in range(VISIBLE_LINES):
