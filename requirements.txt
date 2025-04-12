@@ -4,3 +4,4 @@ pillow
 luma.oled
 gpiozero
 platformio
+wireless-tools

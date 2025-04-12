@@ -10,7 +10,7 @@ import time
 import os
 from oled_ui import clear
 from buttons import btn_back
-from system_status import get_battery_status
+from system_status import get_battery_status, get_wifi_status
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
@@ -23,10 +23,12 @@ scroll = [0]
 VISIBLE_LINES = 2  # Только 2 пункта меню под статусом
 
 def draw_menu():
-    battery_status = get_battery_status()
+    battery_status = get_battery_status()  # Получаем статус батареи
+    wifi_status = get_wifi_status()  # Получаем статус Wi-Fi
+
     with canvas(device) as draw:
-        # Статусная строка (пример: батарея, можно заменить потом)
-        draw.text((0, 0), f"{battery_status}", font=font, fill="white")
+        # Статусная строка (пример: батарея и Wi-Fi)
+        draw.text((0, 0), f"Batt: {battery_status}  {wifi_status}", font=font, fill="white")
 
         # Меню начинается с Y = 18, чтобы не наезжать на статус
         for i in range(VISIBLE_LINES):
