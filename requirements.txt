@@ -5,3 +5,5 @@ luma.oled
 gpiozero
 platformio
 wireless-tools
+i2c-tools
+adafruit-circuitpython-ina219

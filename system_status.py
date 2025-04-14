@@ -3,11 +3,22 @@ import subprocess
 import time
 from oled_ui import update_status_data
 
+# Добавляем поддержку INA219
+from adafruit_ina219 import INA219
+import board
+import busio
+
+# Настройка I2C и инициализация INA219
+i2c_bus = busio.I2C(board.SCL, board.SDA)
+ina = INA219(i2c_bus)
+
 def get_battery_status():
     try:
-        raise Exception("нет данных")
-    except Exception:
-        return "--%"
+        voltage = ina.bus_voltage + ina.shunt_voltage  # Полное напряжение
+        return f"{voltage:.2f}V"
+    except Exception as e:
+        print(f"[INA219] Ошибка получения данных: {e}")
+        return "--V"
 
 def get_wifi_signal():
     try:
@@ -45,5 +56,4 @@ def status_updater():
         wifi = get_wifi_status()
         update_status_data(battery, wifi)
         time.sleep(20)
-
 
