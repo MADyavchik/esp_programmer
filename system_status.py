@@ -14,11 +14,13 @@ ina = INA219(i2c_bus)
 
 def get_battery_status():
     try:
-        voltage = ina.bus_voltage + ina.shunt_voltage  # Полное напряжение
-        return f"{voltage:.2f}V"
+        voltage = ina.bus_voltage + ina.shunt_voltage
+        percent = (voltage - 3.0) / (4.2 - 3.0) * 100
+        percent = max(0, min(100, percent))
+        return f"{int(percent)}%"
     except Exception as e:
         print(f"[INA219] Ошибка получения данных: {e}")
-        return "--V"
+        return "--%"
 
 def get_wifi_signal():
     try:
@@ -55,5 +57,5 @@ def status_updater():
         battery = get_battery_status()
         wifi = get_wifi_status()
         update_status_data(battery, wifi)
-        time.sleep(20)
+        time.sleep(1)
 
