@@ -13,22 +13,38 @@ i2c_bus = busio.I2C(board.SCL, board.SDA)
 ina = INA219(i2c_bus)
 
 from collections import deque
+import statistics
 
-voltage_history = deque(maxlen=60)  # храним последние 5 измерений
+voltage_history = deque(maxlen=60)
+last_percent = [None]  # Используем список, чтобы изменять внутри функции
+
+MIN_VOLTAGE = 3.0     # Минимальное напряжение (0%)
+MAX_VOLTAGE = 4.2     # Максимальное напряжение (100%)
+CHANGE_THRESHOLD = 1  # Порог отображения изменений (в процентах)
 
 def get_battery_status():
     try:
         voltage = ina.bus_voltage + ina.shunt_voltage
         voltage_history.append(voltage)
-        avg_voltage = sum(voltage_history) / len(voltage_history)
 
-        percent = (avg_voltage - 3.0) / (4.2 - 3.0) * 100
-        percent = max(0, min(100, percent))
-        return f"{int(percent)}%"
+        if len(voltage_history) < voltage_history.maxlen:
+            return "--%"  # Подождем пока наберется достаточно данных
+
+        median_voltage = statistics.median(voltage_history)
+
+        percent = (median_voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE) * 100
+        percent = max(0, min(100, percent))  # Ограничиваем от 0 до 100
+
+        rounded_percent = int(percent)
+
+        # Обновлять, только если процент изменился хотя бы на 1%
+        if last_percent[0] is None or abs(rounded_percent - last_percent[0]) >= CHANGE_THRESHOLD:
+            last_percent[0] = rounded_percent
+
+        return f"{last_percent[0]}%"
     except Exception as e:
         print(f"[INA219] Ошибка получения данных: {e}")
         return "--%"
-
 def get_wifi_signal():
     try:
         result = subprocess.run(['iwconfig', 'wlan0'], capture_output=True, text=True)
