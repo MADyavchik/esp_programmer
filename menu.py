@@ -95,7 +95,7 @@ def start_main_menu():
         if selected[0] == 0:  # FLASH
             selected_result[0] = "flash"
         elif selected[0] == 1:  # UPDATE
-            update_repo()
+            selected_result[0] = "update"
         elif selected[0] == 2:  # LOG
             selected_result[0] = "log"
         draw_menu()
