@@ -12,10 +12,17 @@ import busio
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 ina = INA219(i2c_bus)
 
+from collections import deque
+
+voltage_history = deque(maxlen=5)  # храним последние 5 измерений
+
 def get_battery_status():
     try:
         voltage = ina.bus_voltage + ina.shunt_voltage
-        percent = (voltage - 3.0) / (4.2 - 3.0) * 100
+        voltage_history.append(voltage)
+        avg_voltage = sum(voltage_history) / len(voltage_history)
+
+        percent = (avg_voltage - 3.0) / (4.2 - 3.0) * 100
         percent = max(0, min(100, percent))
         return f"{int(percent)}%"
     except Exception as e:
