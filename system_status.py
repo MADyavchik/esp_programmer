@@ -14,7 +14,7 @@ ina = INA219(i2c_bus)
 
 from collections import deque
 
-voltage_history = deque(maxlen=5)  # храним последние 5 измерений
+voltage_history = deque(maxlen=10)  # храним последние 5 измерений
 
 def get_battery_status():
     try:
