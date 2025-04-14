@@ -22,28 +22,47 @@ MIN_VOLTAGE = 3.0     # Минимальное напряжение (0%)
 MAX_VOLTAGE = 4.2     # Максимальное напряжение (100%)
 CHANGE_THRESHOLD = 1  # Порог отображения изменений (в процентах)
 
+charging_icon = [""]  # Будем обновлять это значение в status_updater
+
+
+def is_charging():
+    try:
+        current = ina.current  # мА
+        return current < -5  # Зарядка: ток входит в батарею (можешь поэкспериментировать с порогом)
+    except Exception as e:
+        print(f"[INA219] Ошибка при чтении тока: {e}")
+        return False
+
+
 def get_battery_status():
     try:
         voltage = ina.bus_voltage + ina.shunt_voltage
+        current = ina.current  # в миллиамперах
+
         voltage_history.append(voltage)
 
         if len(voltage_history) < voltage_history.maxlen:
-            return "--%"  # Подождем пока наберется достаточно данных
+            return "--%"
 
         median_voltage = statistics.median(voltage_history)
 
         percent = (median_voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE) * 100
-        percent = max(0, min(100, percent))  # Ограничиваем от 0 до 100
-
+        percent = max(0, min(100, percent))
         rounded_percent = int(percent)
 
-        # Обновлять, только если процент изменился хотя бы на 1%
         if last_percent[0] is None or abs(rounded_percent - last_percent[0]) >= CHANGE_THRESHOLD:
             last_percent[0] = rounded_percent
+
+        # 🔌 Обновим индикатор зарядки
+        if current < -10:
+            charging_icon[0] = "⚡"
+        else:
+            charging_icon[0] = ""
 
         return f"{last_percent[0]}%"
     except Exception as e:
         print(f"[INA219] Ошибка получения данных: {e}")
+        charging_icon[0] = ""
         return "--%"
 def get_wifi_signal():
     try:
@@ -79,6 +98,7 @@ def status_updater():
     while True:
         battery = get_battery_status()
         wifi = get_wifi_status()
-        update_status_data(battery, wifi)
+        charging = is_charging()
+        update_status_data(battery, wifi, charging)
         time.sleep(1)
 
