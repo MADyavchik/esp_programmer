@@ -34,9 +34,9 @@ def get_wifi_status():
     signal_level = get_wifi_signal()
     if signal_level is not None:
         signal_bars = signal_to_bars(signal_level)
-        return f"{'|' * signal_bars + '.' * (5-signal_bars)} ({signal_level})"
+        return f"{'|' * signal_bars + '-' * (5-signal_bars)} ({signal_level})"
     else:
-        return "Signal: --"
+        return "Signal: -----"
 
 # 🌙 Фоновая функция для обновления данных
 def status_updater():
