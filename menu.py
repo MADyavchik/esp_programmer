@@ -116,3 +116,4 @@ def start_main_menu():
             draw_menu()
             last_redraw[0] = time.time()
 
+    return selected_result[0]
