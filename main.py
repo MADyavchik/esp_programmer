@@ -18,13 +18,14 @@ def start_status_thread():
     t.start()
 
 def main():
-    start_status_thread()
+    #start_status_thread()
     while True:
         try:
             if os.path.exists("exit.flag"):
                 print("🔚 Обнаружен флаг выхода.")
                 os.remove("exit.flag")
                 break
+            start_status_thread()
             run_menu_loop()
         except KeyboardInterrupt:
             print("⏹ Выход по Ctrl+C")
