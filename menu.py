@@ -11,6 +11,8 @@ import os
 from oled_ui import clear
 from buttons import btn_back
 from system_status import get_battery_status, get_wifi_status
+from oled_ui import draw_status_bar
+
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
@@ -28,7 +30,7 @@ def draw_menu():
 
     with canvas(device) as draw:
         # Статусная строка (пример: батарея и Wi-Fi)
-        draw.text((0, 0), f"{battery_status}  {wifi_status}", font=font, fill="white")
+        draw_status_bar(draw)  # 🔁 Используем актуальные данные
 
         # Меню начинается с Y = 18, чтобы не наезжать на статус
         for i in range(VISIBLE_LINES):

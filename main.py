@@ -5,10 +5,17 @@ from menu_navigation import run_menu_loop
 from oled_ui import clear
 import os
 
+from system_status import status_updater
+import threading
+
 def log_error(e):
     with open("error.log", "a") as f:
         f.write(f"{time.ctime()}: {repr(e)}\n")
         traceback.print_exc(file=f)
+
+def start_status_thread():
+    t = threading.Thread(target=status_updater, daemon=True)
+    t.start()
 
 def main():
     while True:

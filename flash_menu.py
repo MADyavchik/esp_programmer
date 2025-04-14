@@ -25,7 +25,7 @@ def draw_flash_menu():
             index = scroll[0] + i
             if index >= len(items): break
             prefix = "> " if index == selected[0] else "  "
-            draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
+            draw.text((10, 18 + i * 20), prefix + items[index], font=font, fill="white")
 
 def start_flash_menu():
     clear()

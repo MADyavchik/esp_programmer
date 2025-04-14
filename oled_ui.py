@@ -7,9 +7,12 @@ serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 
+status_data = {"battery": "--%", "wifi": "Signal: --"}
+
 def clear():
     device.clear()
     device.show()
+
 
 def draw_progress_bar(percent, message="Flashing..."):
     width = device.width
@@ -43,3 +46,14 @@ def draw_log_table(data):
     draw.text((0, 20), f"W: {data['Weight']}", font=font, fill=255)
 
     device.display(image)
+
+
+def update_status_data(battery, wifi):
+    global status_data
+    status_data["battery"] = battery
+    status_data["wifi"] = wifi
+
+
+def draw_status_bar(draw):
+    draw.text((0, 0), status_data["battery"], font=font, fill=255)
+    draw.text((80, 0), status_data["wifi"], font=font, fill=255)
