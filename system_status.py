@@ -37,8 +37,6 @@ def is_charging():
 def get_battery_status():
     try:
         voltage = ina.bus_voltage + ina.shunt_voltage
-        current = ina.current  # в миллиамперах
-
         voltage_history.append(voltage)
 
         if len(voltage_history) < voltage_history.maxlen:
@@ -53,16 +51,9 @@ def get_battery_status():
         if last_percent[0] is None or abs(rounded_percent - last_percent[0]) >= CHANGE_THRESHOLD:
             last_percent[0] = rounded_percent
 
-        # 🔌 Обновим индикатор зарядки
-        if current < -10:
-            charging_icon[0] = "⚡"
-        else:
-            charging_icon[0] = ""
-
         return f"{last_percent[0]}%"
     except Exception as e:
         print(f"[INA219] Ошибка получения данных: {e}")
-        charging_icon[0] = ""
         return "--%"
 def get_wifi_signal():
     try:
