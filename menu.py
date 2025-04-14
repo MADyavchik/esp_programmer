@@ -67,6 +67,7 @@ def display_mac_address():
 def start_main_menu():
     draw_menu()
     selected_result = [None]
+    last_redraw = [time.time()]  # ⏱ используем список, чтобы быть изменяемым в замыканиях, если понадобится
 
     def up():
         if selected[0] > 0:
@@ -74,6 +75,7 @@ def start_main_menu():
             if selected[0] < scroll[0]:
                 scroll[0] -= 1
         draw_menu()
+        last_redraw[0] = time.time()
 
     def down():
         if selected[0] < len(menu_items) - 1:
@@ -81,6 +83,7 @@ def start_main_menu():
             if selected[0] >= scroll[0] + VISIBLE_LINES:
                 scroll[0] += 1
         draw_menu()
+        last_redraw[0] = time.time()
 
     def back():
         selected_result[0] = None
@@ -97,9 +100,23 @@ def start_main_menu():
             from serial_log_viewer import show_serial_data
             show_serial_data()
         draw_menu()
+        last_redraw[0] = time.time()
 
     def up_hold():
         display_mac_address()
+        last_redraw[0] = time.time()
+
+    setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
+
+    while selected_result[0] is None:
+        time.sleep(0.1)
+
+        # 🔁 Автообновление меню каждые 20 секунд
+        if time.time() - last_redraw[0] >= 20:
+            draw_menu()
+            last_redraw[0] = time.time()
+
+    return selected_result[0]
 
     setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
 
