@@ -112,15 +112,7 @@ def start_main_menu():
         time.sleep(0.1)
 
         # 🔁 Автообновление меню каждые 20 секунд
-        if time.time() - last_redraw[0] >= 20:
+        if time.time() - last_redraw[0] >= 3:
             draw_menu()
             last_redraw[0] = time.time()
 
-    return selected_result[0]
-
-    setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
-
-    while selected_result[0] is None:
-        time.sleep(0.1)
-
-    return selected_result[0]
