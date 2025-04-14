@@ -97,8 +97,7 @@ def start_main_menu():
         elif selected[0] == 1:  # UPDATE
             update_repo()
         elif selected[0] == 2:  # LOG
-            from serial_log_viewer import show_serial_data
-            show_serial_data()
+            selected_result[0] = "log"
         draw_menu()
         last_redraw[0] = time.time()
 
