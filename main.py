@@ -18,6 +18,7 @@ def start_status_thread():
     t.start()
 
 def main():
+    start_status_thread()
     while True:
         try:
             if os.path.exists("exit.flag"):
