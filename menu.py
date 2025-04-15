@@ -30,16 +30,7 @@ def reboot_pi():
     device.clear()
     os.system("sudo reboot")
 
-def display_mac_address(draw_callback):
-    mac = get_mac_address()
-    draw_mac_address(mac)
 
-    while not btn_back.is_pressed:
-        time.sleep(0.1)
-    while btn_back.is_pressed:
-        time.sleep(0.1)
-
-    draw_callback()
 
 def start_main_menu():
     menu_items = ["FLASH", "UPDATE", "LOG"]
@@ -85,8 +76,7 @@ def start_main_menu():
         last_redraw[0] = time.time()
 
     def up_hold():
-        display_mac_address(draw)
-        last_redraw[0] = time.time()
+        selected_result[0] = "mac"
 
     setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
 
