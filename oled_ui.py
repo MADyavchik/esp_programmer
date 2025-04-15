@@ -93,5 +93,12 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=3):
     with canvas(device) as draw:
         for i in range(visible_lines):
             index = (scroll + i) % len(items)
-            prefix = "> " if i == visible_lines // 2 else "  "
-            draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
+            is_selected = (i == visible_lines // 2)
+
+            y = 10 + i * 20
+            if is_selected:
+                # Рисуем белый прямоугольник шириной во весь экран, высотой 18px
+                draw.rectangle((0, y - 2, 127, y + 16), fill=255)
+                draw.text((10, y), items[index], font=font, fill=0)  # Чёрный текст
+            else:
+                draw.text((10, y), items[index], font=font, fill=255)  # Белый текст
