@@ -9,6 +9,7 @@ serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 font_select = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
+font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
 
 status_data = {"battery": "--%", "wifi": "--", "charging": False}
 
@@ -99,6 +100,6 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=3):
             if is_selected:
                 # Рисуем белый прямоугольник шириной во весь экран, высотой 18px
                 draw.rectangle((0, y - 2, 127, y + 16), fill=255)
-                draw.text((10, y), items[index], font=font, fill=0)  # Чёрный текст
+                draw.text((10, y), items[index], font=font_bold, fill=0)  # Чёрный текст
             else:
                 draw.text((10, y), items[index], font=font, fill=255)  # Белый текст
