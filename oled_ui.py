@@ -96,4 +96,4 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=3):
             if index >= len(items):
                 break
             prefix = "> " if index == selected_index else "  "
-            draw.text((10, 10 + i * 20), prefix + items[index], font=font_select, fill="white")
+            draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
