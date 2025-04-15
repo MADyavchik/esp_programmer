@@ -12,6 +12,7 @@ from oled_ui import clear
 from buttons import btn_back
 from system_status import get_battery_status, get_wifi_status
 from oled_ui import draw_status_bar
+from oled_ui import draw_main_menu
 
 
 serial = i2c(port=1, address=0x3C)
@@ -25,17 +26,7 @@ scroll = [0]
 VISIBLE_LINES = 2  # Только 2 пункта меню под статусом
 
 def draw_menu():
-    with canvas(device) as draw:
-        draw_status_bar(draw)  # Статусная строка
-
-        for i in range(VISIBLE_LINES):
-            index = scroll[0] + i
-            if index >= len(menu_items):
-                break
-
-            # курсор всегда на первой видимой строке
-            prefix = "> " if i == 0 else "  "
-            draw.text((10, 18 + i * 20), prefix + menu_items[index], font=font, fill="white")
+    draw_main_menu(menu_items, selected[0], scroll[0], VISIBLE_LINES)
 
 def reboot_pi():
     with canvas(device) as draw:

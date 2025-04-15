@@ -2,6 +2,8 @@
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from PIL import Image, ImageDraw, ImageFont
+from luma.core.render import canvas
+
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
@@ -64,3 +66,14 @@ def draw_status_bar(draw):
         draw.line((x+2, y+0, x+4, y+4), fill=255)
         draw.line((x+4, y+4, x+1, y+4), fill=255)
         draw.line((x+1, y+4, x+3, y+9), fill=255)
+
+def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
+    with canvas(device) as draw:
+        draw_status_bar(draw)  # Статусная строка
+
+        for i in range(visible_lines):
+            index = scroll + i
+            if index >= len(menu_items):
+                break
+            prefix = "> " if i == 0 else "  "
+            draw.text((10, 18 + i * 20), prefix + menu_items[index], font=font, fill="white")
