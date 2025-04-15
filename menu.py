@@ -1,10 +1,5 @@
 # menu.py
-from luma.core.render import canvas
-from luma.oled.device import ssd1306
-from luma.core.interface.serial import i2c
-from PIL import ImageFont
 from buttons import setup_buttons
-
 import time
 import os
 from oled_ui import draw_main_menu

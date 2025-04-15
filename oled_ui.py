@@ -88,4 +88,11 @@ def draw_mac_address(mac):
             draw.text((10, 10), "Error getting MAC", font=font, fill="white")
 
 
-
+def draw_flash_menu(items, selected_index, scroll, visible_lines=3):
+    with canvas(device) as draw:
+        for i in range(visible_lines):
+            index = scroll + i
+            if index >= len(items):
+                break
+            prefix = "> " if index == selected_index else "  "
+            draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")

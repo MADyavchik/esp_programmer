@@ -8,6 +8,7 @@ from esp_flasher import flash_firmware
 import time
 import threading
 from oled_ui import clear  # Добавь это, если не было
+from oled_ui import draw_flash_menu  # добавить импорт
 
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
@@ -19,17 +20,11 @@ selected = [0]
 scroll = [0]
 VISIBLE_LINES = 3
 
-def draw_flash_menu():
-    with canvas(device) as draw:
-        for i in range(VISIBLE_LINES):
-            index = scroll[0] + i
-            if index >= len(items): break
-            prefix = "> " if index == selected[0] else "  "
-            draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
+draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
 def start_flash_menu():
     clear()
-    draw_flash_menu()
+    draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     next_menu = ["flash"]
 
@@ -38,14 +33,14 @@ def start_flash_menu():
             selected[0] -= 1
             if selected[0] < scroll[0]:
                 scroll[0] -= 1
-        draw_flash_menu()
+        draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     def down():
         if selected[0] < len(items) - 1:
             selected[0] += 1
             if selected[0] >= scroll[0] + VISIBLE_LINES:
                 scroll[0] += 1
-        draw_flash_menu()
+        draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     def back():
         next_menu[0] = "main"
@@ -57,7 +52,7 @@ def start_flash_menu():
         result = flash_firmware(name.lower())
         print(f"◀ Возвращаемся в меню: {result}")
         next_menu[0] = result or "flash"
-        draw_flash_menu()
+        draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     setup_buttons(up, down, back, select)
 
