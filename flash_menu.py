@@ -22,17 +22,13 @@ def start_flash_menu():
     next_menu = ["flash"]
 
     def up():
-        if selected[0] > 0:
-            selected[0] -= 1
-            if selected[0] < scroll[0]:
-                scroll[0] -= 1
+        selected[0] = (selected[0] - 1) % len(items)
+        scroll[0] = (selected[0] - VISIBLE_LINES // 2) % len(items)
         draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     def down():
-        if selected[0] < len(items) - 1:
-            selected[0] += 1
-            if selected[0] >= scroll[0] + VISIBLE_LINES:
-                scroll[0] += 1
+        selected[0] = (selected[0] + 1) % len(items)
+        scroll[0] = (selected[0] - VISIBLE_LINES // 2) % len(items)
         draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     def back():
