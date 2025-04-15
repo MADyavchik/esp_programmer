@@ -5,29 +5,18 @@ from luma.core.interface.serial import i2c
 from PIL import ImageFont
 from buttons import setup_buttons
 
-from esp_flasher import get_mac_address
 import time
 import os
-from oled_ui import clear
-from buttons import btn_back
-from system_status import get_battery_status, get_wifi_status
-from oled_ui import draw_status_bar
 from oled_ui import draw_main_menu
-from oled_ui import draw_mac_address
+from oled_ui import show_message, clear
 
 
-
-serial = i2c(port=1, address=0x3C)
-device = ssd1306(serial)
-
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 
 
 def reboot_pi():
-    with canvas(device) as draw:
-        draw.text((10, 10), "Перезагрузка...", font=font, fill="white")
+    show_message("Reboot...")
     time.sleep(1)
-    device.clear()
+    clear()
     os.system("sudo reboot")
 
 

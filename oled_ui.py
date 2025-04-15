@@ -86,3 +86,6 @@ def draw_mac_address(mac):
             draw.text((0, 30), mac, font=font, fill="white")
         else:
             draw.text((10, 10), "Error getting MAC", font=font, fill="white")
+
+
+
