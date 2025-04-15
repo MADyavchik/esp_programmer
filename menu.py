@@ -13,6 +13,7 @@ from buttons import btn_back
 from system_status import get_battery_status, get_wifi_status
 from oled_ui import draw_status_bar
 from oled_ui import draw_main_menu
+from oled_ui import draw_mac_address
 
 
 
@@ -30,22 +31,15 @@ def reboot_pi():
     os.system("sudo reboot")
 
 def display_mac_address(draw_callback):
-    clear()
     mac = get_mac_address()
-
-    with canvas(device) as draw:
-        if mac:
-            draw.text((0, 0), "MAC Address:", font=font, fill="white")
-            draw.text((0, 30), mac, font=font, fill="white")
-        else:
-            draw.text((10, 10), "Error getting MAC", font=font, fill="white")
+    draw_mac_address(mac)
 
     while not btn_back.is_pressed:
         time.sleep(0.1)
     while btn_back.is_pressed:
         time.sleep(0.1)
 
-    draw_callback()  # ⬅️ возвращаемся к меню
+    draw_callback()
 
 def start_main_menu():
     menu_items = ["FLASH", "UPDATE", "LOG"]

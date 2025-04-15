@@ -78,4 +78,11 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
             prefix = "> " if i == 0 else "  "
             draw.text((10, 18 + i * 20), prefix + menu_items[index], font=font, fill="white")
 
-
+def draw_mac_address(mac):
+    clear()
+    with canvas(device) as draw:
+        if mac:
+            draw.text((0, 0), "MAC Address:", font=font, fill="white")
+            draw.text((0, 30), mac, font=font, fill="white")
+        else:
+            draw.text((10, 10), "Error getting MAC", font=font, fill="white")
