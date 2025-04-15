@@ -77,3 +77,5 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
                 break
             prefix = "> " if i == 0 else "  "
             draw.text((10, 18 + i * 20), prefix + menu_items[index], font=font, fill="white")
+
+
