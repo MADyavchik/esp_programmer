@@ -1,19 +1,12 @@
 # flash_menu.py
-from luma.core.render import canvas
-from luma.oled.device import ssd1306
-from luma.core.interface.serial import i2c
-from PIL import ImageFont
+
 from buttons import setup_buttons
 from esp_flasher import flash_firmware
 import time
-import threading
+
 from oled_ui import clear  # Добавь это, если не было
 from oled_ui import draw_flash_menu  # добавить импорт
 
-serial = i2c(port=1, address=0x3C)
-device = ssd1306(serial)
-
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
 
 items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 selected = [0]

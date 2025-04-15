@@ -8,6 +8,7 @@ from luma.core.render import canvas
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial)
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+font_select = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
 
 status_data = {"battery": "--%", "wifi": "--", "charging": False}
 
@@ -95,4 +96,4 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=3):
             if index >= len(items):
                 break
             prefix = "> " if index == selected_index else "  "
-            draw.text((10, 10 + i * 20), prefix + items[index], font=font, fill="white")
+            draw.text((10, 10 + i * 20), prefix + items[index], font=font_select, fill="white")
