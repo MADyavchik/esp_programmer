@@ -60,7 +60,7 @@ def draw_status_bar(draw):
     draw.text((60, 0), status_data["wifi"], font=font, fill=255)
 
     if status_data.get("charging"):
-        x, y = 50, 0  # Координаты правее Wi-Fi
+        x, y = 40, 0  # Координаты правее Wi-Fi
         draw.line((x+2, y+0, x+4, y+4), fill=255)
         draw.line((x+4, y+4, x+1, y+4), fill=255)
         draw.line((x+1, y+4, x+3, y+9), fill=255)
