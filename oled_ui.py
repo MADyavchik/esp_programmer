@@ -74,11 +74,16 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
         draw_status_bar(draw)  # Статусная строка
 
         for i in range(visible_lines):
-            index = scroll + i
-            if index >= len(menu_items):
-                break
-            prefix = "> " if i == 0 else "  "
-            draw.text((10, 18 + i * 20), prefix + menu_items[index], font=font, fill="white")
+            index = (scroll + i) % len(menu_items)  # бесконечная прокрутка
+            y = 18 + i * 20  # отступ под статус-бар
+
+            is_selected = (i == visible_lines // 2)  # центральный элемент
+
+            if is_selected:
+                draw.rectangle((0, y - 2, 127, y + 16), fill=255)  # белый прямоугольник
+                draw.text((10, y), menu_items[index], font=font_bold, fill=0)  # чёрный текст
+            else:
+                draw.text((10, y), menu_items[index], font=font_unselect, fill=255)  # белый текст
 
 def draw_mac_address(mac):
     clear()
