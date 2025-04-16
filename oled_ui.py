@@ -60,8 +60,8 @@ def update_status_data(battery, wifi, charging=False):
 
 
 def draw_status_bar(draw):
-    draw.text((0, 0), status_data["battery"], font=font, fill=255)
-    draw.text((60, 0), status_data["wifi"], font=font, fill=255)
+    draw.text((0, 0), status_data["battery"], font=font_unselect, fill=255)
+    draw.text((60, 0), status_data["wifi"], font=font_unselect, fill=255)
 
     if status_data.get("charging"):
         x, y = 40, 0  # Координаты правее Wi-Fi
