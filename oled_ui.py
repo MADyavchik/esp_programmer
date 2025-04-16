@@ -77,7 +77,7 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
             index = (scroll + i) % len(menu_items)  # бесконечная прокрутка
             y = 18 + i * 20  # отступ под статус-бар
 
-            is_selected = (i == visible_lines // 2)  # центральный элемент
+            is_selected = (i == visible_lines // 1)  # центральный элемент
 
             if is_selected:
                 draw.rectangle((0, y - 2, 127, y + 16), fill=255)  # белый прямоугольник
