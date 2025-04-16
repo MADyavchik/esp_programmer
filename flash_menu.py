@@ -11,7 +11,7 @@ from oled_ui import draw_flash_menu  # добавить импорт
 items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 selected = [0]
 scroll = [0]
-VISIBLE_LINES = 3
+VISIBLE_LINES = 2
 
 draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
@@ -23,12 +23,12 @@ def start_flash_menu():
 
     def up():
         selected[0] = (selected[0] - 1) % len(items)
-        scroll[0] = (selected[0] - VISIBLE_LINES // 2) % len(items)
+        scroll[0] = selected[0]
         draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     def down():
         selected[0] = (selected[0] + 1) % len(items)
-        scroll[0] = (selected[0] - VISIBLE_LINES // 2) % len(items)
+        scroll[0] = selected[0]
         draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
     def back():

@@ -92,16 +92,17 @@ def draw_mac_address(mac):
             draw.text((10, 10), "Error getting MAC", font=font, fill="white")
 
 
-def draw_flash_menu(items, selected_index, scroll, visible_lines=3):
+def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
     with canvas(device) as draw:
+        # Заголовок "< menu"
+        draw.text((5, 0), "< menu", font=font_unselect, fill=255)
+
         for i in range(visible_lines):
             index = (scroll + i) % len(items)
-            is_selected = (i == visible_lines // 2)
+            y = 18 + i * 20  # отрисовка начинается ниже заголовка
 
-            y = 10 + i * 20
-            if is_selected:
-                # Рисуем белый прямоугольник шириной во весь экран, высотой 18px
+            if index == selected_index:
                 draw.rectangle((0, y - 2, 127, y + 16), fill=255)
-                draw.text((10, y), items[index], font=font_bold, fill=0)  # Чёрный текст
+                draw.text((10, y), items[index], font=font_bold, fill=0)
             else:
-                draw.text((10, y), items[index], font=font_unselect, fill=255)  # Белый текст
+                draw.text((10, y), items[index], font=font_unselect, fill=255)
