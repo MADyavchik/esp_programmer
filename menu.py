@@ -30,16 +30,15 @@ def start_main_menu():
     last_redraw = [time.time()]
 
     def up():
-        if selected[0] > 0:
-            selected[0] -= 1
-            scroll[0] = selected[0]
+        selected[0] = (selected[0] - 1) % len(menu_items)
+        scroll[0] = selected[0]  # курсор всегда на первом элементе
         draw()
         last_redraw[0] = time.time()
 
+
     def down():
-        if selected[0] < len(menu_items) - 1:
-            selected[0] += 1
-            scroll[0] = selected[0]
+        selected[0] = (selected[0] + 1) % len(menu_items)
+        scroll[0] = selected[0]  # курсор всегда на первом элементе
         draw()
         last_redraw[0] = time.time()
 

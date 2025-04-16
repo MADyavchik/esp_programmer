@@ -71,21 +71,17 @@ def draw_status_bar(draw):
 
 def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
     with canvas(device) as draw:
-        draw_status_bar(draw)  # Статусная строка
+        draw_status_bar(draw)
 
         for i in range(visible_lines):
-            index = scroll + i
-            if index >= len(menu_items):
-                break
+            index = (scroll + i) % len(menu_items)
+            y = 18 + i * 20
 
-            y = 18 + i * 20  # С учётом высоты статус-бара
-
-            if index == selected_index:
-                # Прямоугольник шириной во весь экран, высотой около строки
+            if i == 0:  # Выделяем всегда первый видимый пункт
                 draw.rectangle((0, y - 2, 127, y + 16), fill=255)
-                draw.text((10, y), menu_items[index], font=font_bold, fill=0)  # Чёрный жирный текст
+                draw.text((10, y), menu_items[index], font=font_bold, fill=0)
             else:
-                draw.text((10, y), menu_items[index], font=font_unselect, fill=255)  # Белый обычный текст
+                draw.text((10, y), menu_items[index], font=font_unselect, fill=255)
 def draw_mac_address(mac):
     clear()
     with canvas(device) as draw:
