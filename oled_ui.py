@@ -109,7 +109,6 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
                 draw.text((10, y), items[index], font=font_unselect, fill=255)
 
 def draw_mac_qr(mac):
-    # Генерируем QR-код на основе MAC
     qr = qrcode.QRCode(border=1)
     qr.add_data(mac)
     qr.make(fit=True)
@@ -118,11 +117,14 @@ def draw_mac_qr(mac):
     qr_img = qr_img.resize((50, 50), Image.NEAREST)
 
     with canvas(device) as draw:
-        # Получаем ширину текста
-        text_width, _ = font_unselect.getsize(mac)
-        # Считаем смещение по X, чтобы центр был на X=64
+        # Надёжный способ центрирования текста
+        dummy_img = Image.new("1", (128, 64))
+        dummy_draw = ImageDraw.Draw(dummy_img)
+        bbox = dummy_draw.textbbox((0, 0), mac, font=font_unselect)
+        text_width = bbox[2] - bbox[0]
+
         x = 64 - text_width // 2
         draw.text((x, 0), mac, font=font_unselect, fill=255)
 
-        # Отображаем QR-код ниже
-        draw.bitmap((39, 14), qr_img, fill=1)  # 12 — чтобы не налезло на текст
+        # Отображаем QR-код под текстом
+        draw.bitmap((39, 14), qr_img, fill=1)
