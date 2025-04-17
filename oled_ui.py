@@ -3,6 +3,7 @@ from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 from PIL import Image, ImageDraw, ImageFont
 from luma.core.render import canvas
+import qrcode
 
 
 serial = i2c(port=1, address=0x3C)
@@ -106,3 +107,18 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
                 draw.text((10, y), items[index], font=font_bold, fill=0)
             else:
                 draw.text((10, y), items[index], font=font_unselect, fill=255)
+
+def draw_mac_qr(mac):
+    # Генерируем QR-код на основе MAC
+    qr = qrcode.QRCode(border=1)
+    qr.add_data(mac)
+    qr.make(fit=True)
+
+    qr_img = qr.make_image(fill_color="white", back_color="black").convert("1")
+    qr_img = qr_img.resize((64, 64), Image.NEAREST)
+
+    # Рисуем на OLED
+    with canvas(device) as draw:
+        draw.text((5, 0), "< menu", font=font_unselect, fill=255)
+        # Отображаем QR-код немного ниже, с отступом под заголовок
+        draw.bitmap((32, 16), qr_img, fill=1)
