@@ -115,10 +115,10 @@ def draw_mac_qr(mac):
     qr.make(fit=True)
 
     qr_img = qr.make_image(fill_color="white", back_color="black").convert("1")
-    qr_img = qr_img.resize((64, 64), Image.NEAREST)
+    qr_img = qr_img.resize((60, 60), Image.NEAREST)
 
     # Рисуем на OLED
     with canvas(device) as draw:
-        draw.text((5, 0), "< menu", font=font_unselect, fill=255)
+        #draw.text((5, 0), "< menu", font=font_unselect, fill=255)
         # Отображаем QR-код немного ниже, с отступом под заголовок
-        draw.bitmap((32, 16), qr_img, fill=1)
+        draw.bitmap((32, 4), qr_img, fill=1)
