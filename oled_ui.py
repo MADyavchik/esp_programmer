@@ -119,6 +119,7 @@ def draw_mac_qr(mac):
 
     # Рисуем на OLED
     with canvas(device) as draw:
-        #draw.text((5, 0), "< menu", font=font_unselect, fill=255)
+        # Выводим MAC-адрес в заголовке
+        draw.text((0, 0), mac, font=font_unselect, fill=255)
         # Отображаем QR-код немного ниже, с отступом под заголовок
         draw.bitmap((32, 4), qr_img, fill=1)
