@@ -117,9 +117,12 @@ def draw_mac_qr(mac):
     qr_img = qr.make_image(fill_color="white", back_color="black").convert("1")
     qr_img = qr_img.resize((50, 50), Image.NEAREST)
 
-    # Рисуем на OLED
     with canvas(device) as draw:
-        # Выводим MAC-адрес в заголовке
-        draw.text((0, 0), mac, font=font_unselect, fill=255)
-        # Отображаем QR-код немного ниже, с отступом под заголовок
-        draw.bitmap((32, 14), qr_img, fill=1)
+        # Получаем ширину текста
+        text_width, _ = font_unselect.getsize(mac)
+        # Считаем смещение по X, чтобы центр был на X=64
+        x = 64 - text_width // 2
+        draw.text((x, 0), mac, font=font_unselect, fill=255)
+
+        # Отображаем QR-код ниже
+        draw.bitmap((39, 14), qr_img, fill=1)  # 12 — чтобы не налезло на текст
