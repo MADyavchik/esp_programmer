@@ -86,7 +86,7 @@ async def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    setup_buttons(up, down, back, lambda: asyncio.create_task(select()))
+    setup_buttons(up, down, back, select)
 
     draw()
     while selected_result[0] is None:
