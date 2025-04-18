@@ -49,6 +49,7 @@ async def disconnect_from_printer():
     await asyncio.sleep(1)
 
 async def start_settings_menu():
+    await asyncio.sleep(0.1)
     menu_items = ["Wi-Fi: ?", "Bluetooth: ?", "Print: ?"]
     selected = [0]
     selected_result = [None]
