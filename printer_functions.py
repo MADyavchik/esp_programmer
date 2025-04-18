@@ -19,6 +19,7 @@ async def get_device_by_mac(mac_address):
     return None
 
 # Подключение к принтеру
+# Подключение к принтеру
 async def connect_printer(device):
     printer = PrinterClient(device)
     await printer.connect()
@@ -27,8 +28,28 @@ async def connect_printer(device):
     async def safe_get_print_status(self):
         packet = await self.send_command(RequestCodeEnum.GET_PRINT_STATUS, b"")
         if not packet or not hasattr(packet, "data") or len(packet.data) < 4:
-            return None  # Возвращаем None, если данные отсутствуют или некорректны
-        return struct.unpack(">HBB", packet.data)
+            return {
+                'page': 0,
+                'quantity': 0,
+                'error': True,
+                'raw': packet.data if packet else b''
+            }
+        try:
+            pages_printed, val1, val2 = struct.unpack(">HBB", packet.data)
+            return {
+                'page': pages_printed,
+                'quantity': 1,  # Можешь сделать переменной, если знаешь фактическое количество
+                'error': False,
+                'raw': packet.data
+            }
+        except Exception as e:
+            return {
+                'page': 0,
+                'quantity': 0,
+                'error': True,
+                'raw': packet.data,
+                'exception': str(e)
+            }
 
     # Подставляем наш патч
     printer.get_print_status = MethodType(safe_get_print_status, printer)
@@ -47,51 +68,41 @@ async def print_mac_address(printer, mac_address: str):
     except:
         font = ImageFont.load_default()
 
-    # Текст, который нужно нарисовать
-    text = f"{mac_address}"
+    # Разбиваем MAC на строки по 9 символов
+    max_line_length = 9
+    lines = [mac_address[i:i + max_line_length] for i in range(0, len(mac_address), max_line_length)]
 
-    # Разбиваем текст на строки, например, каждая строка по 9 символов
-    max_line_length = 9  # Максимальная длина строки
-    lines = [text[i:i+max_line_length] for i in range(0, len(text), max_line_length)]
+    # Высота текста
+    text_height = sum([draw.textbbox((0, 0), line, font=font)[3] for line in lines])
 
-    # Вычисляем высоту текста (с учетом нескольких строк)
-    text_height = 0
-    for line in lines:
-        _, line_height = draw.textbbox((0, 0), line, font=font)[2:4]
-        text_height += line_height
-
-    # Вычисляем координаты для центрирования текста
+    # Центрирование текста
     x = (width - max([draw.textbbox((0, 0), line, font=font)[2] for line in lines])) // 2
     y = (height - text_height) // 2
 
-    # Рисуем каждую строку на изображении
+    # Рисуем текст
     y_offset = y
     for line in lines:
         draw.text((x, y_offset), line, font=font, fill=0)
-        _, line_height = draw.textbbox((0, 0), line, font=font)[2:4]
-        y_offset += line_height
+        y_offset += draw.textbbox((0, 0), line, font=font)[3]
 
-    # Повернуть изображение на 90 градусов по часовой стрелке
+    # Повернуть на 270 градусов (по часовой)
     image = image.rotate(270, expand=True)
 
-    # Печать с дополнительной проверкой на None
+    # Отправка на печать
     status = await printer.print_image(image)
 
-    if status is None:
-        print("Ошибка: статус печати не получен или неверный. Проверьте принтер.")
+    # Обработка статуса
+    if not isinstance(status, dict) or status.get("error", False):
+        print(f"❌ Ошибка: статус печати не получен или содержит ошибку. Статус: {status}")
+        return
+
+    printed = status.get("page", 0)
+    expected = status.get("quantity", 1)
+
+    if printed >= expected:
+        print("✅ Изображение успешно отправлено на печать.")
     else:
-        try:
-            # Проверяем, что статус является словарем и содержит нужные ключи
-            if isinstance(status, dict) and 'page' in status:
-                quantity = status.get('quantity', 0)
-                if status['page'] == quantity:
-                    print("Изображение успешно отправлено на печать.")
-                else:
-                    print(f"Не удалось получить корректный статус печати. Статус: {status}")
-            else:
-                print(f"Неизвестный формат статуса: {status}")
-        except Exception as e:
-            print(f"Ошибка при обработке статуса печати: {e}")
+        print(f"⚠️ Печать завершена не полностью. Статус: {status}")
 
 # Пример функции для отключения принтера
 async def disconnect_printer(printer):
