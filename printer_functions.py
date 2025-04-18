@@ -38,12 +38,12 @@ async def connect_printer(device):
 # Печать текста (например, MAC-адреса)
 async def print_mac_address(printer, mac_address: str):
     # Генерация изображения
-    width, height = 175, 120
+    width, height = 175, 125
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
     except:
         font = ImageFont.load_default()
 
@@ -76,14 +76,20 @@ async def print_mac_address(printer, mac_address: str):
 
     # Печать с дополнительной проверкой на None
     status = await printer.print_image(image)
+
     if status is None:
-        print("Ошибка: статус печати не получен или неверный.")
+        print("Ошибка: статус печати не получен или неверный. Проверьте принтер.")
     else:
         try:
-            if 'page' in status and status['page'] == status.get('quantity', 0):
-                print("Изображение успешно отправлено на печать.")
+            # Проверяем, что статус является словарем и содержит нужные ключи
+            if isinstance(status, dict) and 'page' in status:
+                quantity = status.get('quantity', 0)
+                if status['page'] == quantity:
+                    print("Изображение успешно отправлено на печать.")
+                else:
+                    print(f"Не удалось получить корректный статус печати. Статус: {status}")
             else:
-                print("Не удалось получить корректный статус печати.")
+                print(f"Неизвестный формат статуса: {status}")
         except Exception as e:
             print(f"Ошибка при обработке статуса печати: {e}")
 
