@@ -19,7 +19,6 @@ async def get_device_by_mac(mac_address):
     return None
 
 # Подключение к принтеру
-# Подключение к принтеру
 async def connect_printer(device):
     printer = PrinterClient(device)
     await printer.connect()

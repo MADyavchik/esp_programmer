@@ -3,6 +3,15 @@ import os
 import time
 from oled_ui import show_message, clear, draw_main_menu
 from buttons import setup_buttons
+import asyncio
+from printer_functions import get_device_by_mac, connect_printer, disconnect_printer  # твой файл с функциями
+
+printer_connection = {
+    "mac": "01:EC:01:36:C3:86",  # Пропиши свой MAC
+    "device": None,
+    "printer": None,
+    "connected": False,
+}
 
 def toggle_wifi():
     os.system("nmcli radio wifi off" if is_wifi_enabled() else "nmcli radio wifi on")
@@ -19,7 +28,7 @@ def is_bt_enabled():
     return "Soft blocked: yes" not in result
 
 def start_settings_menu():
-    menu_items = ["Wi-Fi: ?", "Bluetooth: ?"]
+    menu_items = ["Wi-Fi: ?", "Bluetooth: ?", "Print: ?"]
     selected = [0]
     selected_result = [None]
     last_redraw = [0]
@@ -27,6 +36,7 @@ def start_settings_menu():
     def refresh_labels():
         menu_items[0] = f"Wi-Fi: {'ON' if is_wifi_enabled() else 'OFF'}"
         menu_items[1] = f"Bluetooth: {'ON' if is_bt_enabled() else 'OFF'}"
+        menu_items[2] = f"Print: {'Connected' if printer_connection['connected'] else 'Disconnected'}"
 
     def draw():
         refresh_labels()
@@ -48,6 +58,11 @@ def start_settings_menu():
             toggle_wifi()
         elif selected[0] == 1:
             toggle_bluetooth()
+        elif selected[0] == 2:
+            if printer_connection["connected"]:
+                disconnect_from_printer()
+            else:
+                connect_to_printer()
         draw()
 
     setup_buttons(up, down, back, select)
@@ -60,3 +75,30 @@ def start_settings_menu():
             last_redraw[0] = time.time()
 
     return selected_result[0]
+
+def connect_to_printer():
+    async def _connect():
+        device = await get_device_by_mac(printer_connection["mac"])
+        if not device:
+            show_message("Printer not found")
+            return
+        printer = await connect_printer(device)
+        printer_connection["device"] = device
+        printer_connection["printer"] = printer
+        printer_connection["connected"] = True
+        show_message("Printer connected")
+        time.sleep(1)
+
+    asyncio.run(_connect())
+
+def disconnect_from_printer():
+    async def _disconnect():
+        if printer_connection["printer"]:
+            await disconnect_printer(printer_connection["printer"])
+        printer_connection["device"] = None
+        printer_connection["printer"] = None
+        printer_connection["connected"] = False
+        show_message("Printer disconnected")
+        time.sleep(1)
+
+    asyncio.run(_disconnect())
