@@ -10,9 +10,6 @@ from NiimPrintX.nimmy.printer import PrinterClient, RequestCodeEnum
 from bleak import BleakScanner
 from PIL import Image, ImageDraw, ImageFont
 
-# Указываем путь к библиотеке NiimPrintX
-
-
 # Поиск устройства по MAC
 async def get_device_by_mac(mac_address):
     devices = await BleakScanner.discover()
@@ -30,7 +27,7 @@ async def connect_printer(device):
     async def safe_get_print_status(self):
         packet = await self.send_command(RequestCodeEnum.GET_PRINT_STATUS, b"")
         if not packet or not hasattr(packet, "data") or len(packet.data) < 4:
-            return None
+            return None  # Возвращаем None, если данные отсутствуют или некорректны
         return struct.unpack(">HBB", packet.data)
 
     # Подставляем наш патч
@@ -46,15 +43,15 @@ async def print_mac_address(printer, mac_address: str):
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
     except:
         font = ImageFont.load_default()
 
     # Текст, который нужно нарисовать
     text = f"{mac_address}"
 
-    # Разбиваем текст на строки, например, каждая строка по 10 символов
-    max_line_length = 10  # Максимальная длина строки
+    # Разбиваем текст на строки, например, каждая строка по 9 символов
+    max_line_length = 9  # Максимальная длина строки
     lines = [text[i:i+max_line_length] for i in range(0, len(text), max_line_length)]
 
     # Вычисляем высоту текста (с учетом нескольких строк)
@@ -78,7 +75,11 @@ async def print_mac_address(printer, mac_address: str):
     image = image.rotate(270, expand=True)
 
     # Печать
-    await printer.print_image(image)
+    status = await printer.print_image(image)
+    if status is None:
+        print("Ошибка при получении статуса печати.")
+    else:
+        print("Изображение отправлено на печать.")
 
 # Пример функции для отключения принтера
 async def disconnect_printer(printer):
