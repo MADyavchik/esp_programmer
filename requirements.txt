@@ -7,3 +7,5 @@ platformio
 wireless-tools
 i2c-tools
 adafruit-circuitpython-ina219
+qrcode[pil]
+pybluez
