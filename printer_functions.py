@@ -25,32 +25,43 @@ async def get_device_by_mac(mac_address):
 async def connect_printer(device):
     printer = PrinterClient(device)
     await printer.connect()
+
+    # Monkey patch для безопасного получения статуса печати
+    async def safe_get_print_status(self):
+        packet = await self.send_command(RequestCodeEnum.GET_PRINT_STATUS, b"")
+        if not packet or not hasattr(packet, "data") or len(packet.data) < 4:
+            return None
+        return struct.unpack(">HBB", packet.data)
+
+    # Подставляем наш патч
+    printer.get_print_status = MethodType(safe_get_print_status, printer)
+
     return printer
 
 # Печать текста (например, MAC-адреса)
 async def print_mac_address(printer, mac_address: str):
-    # Monkey patch get_print_status
-    async def patched_get_print_status(self):
-        packet = await self._transport.read()
-        if len(packet.data) < 4:
-            return (0, 0, 0)
-        page, progress1, progress2 = struct.unpack(">HBB", packet.data)
-        return (page, progress1, progress2)
-
-    printer.get_print_status = MethodType(patched_get_print_status, printer)
-
     # Генерация изображения
-    width, height = 384, 100
+    width, height = 175, 120
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
     except:
         font = ImageFont.load_default()
 
+    # Текст, который нужно нарисовать
     text = f"{mac_address}"
-    draw.multiline_text((10, 10), text, font=font, fill=0)
+
+    # Получаем размеры текста
+    text_width, text_height = draw.textsize(text, font=font)
+
+    # Вычисляем координаты для центрирования текста
+    x = (width - text_width) // 2
+    y = (height - text_height) // 2
+
+    # Рисуем текст по вычисленным координатам
+    draw.text((x, y), text, font=font, fill=0)
 
     # Повернуть изображение на 90 градусов по часовой стрелке
     image = image.rotate(270, expand=True)
@@ -62,3 +73,20 @@ async def print_mac_address(printer, mac_address: str):
 async def disconnect_printer(printer):
     await printer.disconnect()
     print("Printer disconnected")
+
+# Пример использования
+async def main():
+    mac = "01:EC:01:36:C3:86"  # Пример MAC-адреса
+    device = await get_device_by_mac(mac)
+
+    if device:
+        print(f"Устройство найдено: {device.name} ({device.address})")
+        printer = await connect_printer(device)  # Подключаемся к принтеру
+        await print_mac_address(printer, mac)   # Печатаем MAC-адрес
+        await disconnect_printer(printer)       # Отключаем принтер
+    else:
+        print("Устройство не найдено.")
+
+# Запуск
+if __name__ == "__main__":
+    asyncio.run(main())
