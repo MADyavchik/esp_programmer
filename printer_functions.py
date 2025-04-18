@@ -53,8 +53,10 @@ async def print_mac_address(printer, mac_address: str):
     # Текст, который нужно нарисовать
     text = f"{mac_address}"
 
-    # Получаем размеры текста
-    text_width, text_height = draw.textsize(text, font=font)
+    # Получаем размеры текста с использованием textbbox
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]  # Ширина текста
+    text_height = bbox[3] - bbox[1]  # Высота текста
 
     # Вычисляем координаты для центрирования текста
     x = (width - text_width) // 2
