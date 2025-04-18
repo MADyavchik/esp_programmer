@@ -1,5 +1,7 @@
 import sys
 import os
+import struct
+from types import MethodType
 
 sys.path.append(os.path.abspath('/home/pauro/NiimPrintX'))
 
@@ -27,22 +29,33 @@ async def connect_printer(device):
 
 # Печать текста (например, MAC-адреса)
 async def print_mac_address(printer, mac_address: str):
-    # Создаем белое изображение
-    width, height = 384, 100  # Ширина зависит от модели принтера
+    # Monkey patch get_print_status
+    async def patched_get_print_status(self):
+        packet = await self._transport.read()
+        if len(packet.data) < 4:
+            return (0, 0, 0)
+        page, progress1, progress2 = struct.unpack(">HBB", packet.data)
+        return (page, progress1, progress2)
+
+    printer.get_print_status = MethodType(patched_get_print_status, printer)
+
+    # Генерация изображения
+    width, height = 384, 100
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
 
-    # Шрифт: можно заменить на кастомный путь, если нужно
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)
     except:
         font = ImageFont.load_default()
 
-    # Текст
-    text = f"MAC Address:\n{mac_address}"
+    text = f"{mac_address}"
     draw.multiline_text((10, 10), text, font=font, fill=0)
 
-    # Отправка изображения в принтер
+    # Повернуть изображение на 90 градусов по часовой стрелке
+    image = image.rotate(270, expand=True)
+
+    # Печать
     await printer.print_image(image)
 
 # Пример функции для отключения принтера
