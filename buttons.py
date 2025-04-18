@@ -7,13 +7,13 @@ btn_back = Button(6, hold_time=3, bounce_time=0.1)
 btn_select = Button(19, bounce_time=0.1)
 
 def safe_async(func):
-    """Запускает асинхронную функцию безопасно даже из другого потока."""
+    """Вызывает асинхронную функцию из синхронного контекста (например, GPIO callback)."""
     try:
-        loop = asyncio.get_event_loop()
-        loop.call_soon_threadsafe(lambda: asyncio.create_task(func()))
+        loop = asyncio.get_running_loop()
     except RuntimeError:
-        # Если нет текущего лупа — ничего не делаем
         print("⚠️ Нет активного event loop для safe_async")
+        return
+    loop.call_soon_threadsafe(lambda: asyncio.create_task(func()))
 
 def setup_buttons(up, down, back, select, back_hold_action=None, up_hold_action=None):
     def wrap(func):
