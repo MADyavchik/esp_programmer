@@ -6,8 +6,6 @@ from oled_ui import draw_main_menu
 from oled_ui import show_message, clear
 
 
-
-
 def reboot_pi():
     show_message("Reboot...")
     time.sleep(1)
@@ -17,7 +15,7 @@ def reboot_pi():
 
 
 def start_main_menu():
-    menu_items = ["FLASH", "UPDATE", "LOG"]
+    menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
     selected = [0]
     scroll = [0]
     VISIBLE_LINES = 2
@@ -55,6 +53,8 @@ def start_main_menu():
             selected_result[0] = "update"
         elif selected[0] == 2:
             selected_result[0] = "log"
+        elif selected[0] == 3:
+            selected_result[0] = "settings"  # <--- новый пункт
         draw()
         last_redraw[0] = time.time()
 
