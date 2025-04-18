@@ -1,13 +1,12 @@
-# settings.py
 import os
+import asyncio
 import time
 from oled_ui import show_message, clear, draw_main_menu
 from buttons import setup_buttons
-import asyncio
-from printer_functions import get_device_by_mac, connect_printer, disconnect_printer  # твой файл с функциями
+from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
 
 printer_connection = {
-    "mac": "01:EC:01:36:C3:86",  # Пропиши свой MAC
+    "mac": "01:EC:01:36:C3:86",
     "device": None,
     "printer": None,
     "connected": False,
@@ -27,7 +26,29 @@ def is_bt_enabled():
     result = os.popen("rfkill list bluetooth").read()
     return "Soft blocked: yes" not in result
 
-def start_settings_menu():
+async def connect_to_printer():
+    device = await get_device_by_mac(printer_connection["mac"])
+    if not device:
+        show_message("Printer not found")
+        await asyncio.sleep(1)
+        return
+    printer = await connect_printer(device)
+    printer_connection["device"] = device
+    printer_connection["printer"] = printer
+    printer_connection["connected"] = True
+    show_message("Printer connected")
+    await asyncio.sleep(1)
+
+async def disconnect_from_printer():
+    if printer_connection["printer"]:
+        await disconnect_printer(printer_connection["printer"])
+    printer_connection["device"] = None
+    printer_connection["printer"] = None
+    printer_connection["connected"] = False
+    show_message("Printer disconnected")
+    await asyncio.sleep(1)
+
+async def start_settings_menu():
     menu_items = ["Wi-Fi: ?", "Bluetooth: ?", "Print: ?"]
     selected = [0]
     selected_result = [None]
@@ -42,6 +63,18 @@ def start_settings_menu():
         refresh_labels()
         draw_main_menu(menu_items, selected[0], selected[0], visible_lines=2)
 
+    async def select():
+        if selected[0] == 0:
+            toggle_wifi()
+        elif selected[0] == 1:
+            toggle_bluetooth()
+        elif selected[0] == 2:
+            if printer_connection["connected"]:
+                await disconnect_from_printer()
+            else:
+                await connect_to_printer()
+        draw()
+
     def up():
         selected[0] = (selected[0] - 1) % len(menu_items)
         draw()
@@ -53,52 +86,14 @@ def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    def select():
-        if selected[0] == 0:
-            toggle_wifi()
-        elif selected[0] == 1:
-            toggle_bluetooth()
-        elif selected[0] == 2:
-            if printer_connection["connected"]:
-                disconnect_from_printer()
-            else:
-                connect_to_printer()
-        draw()
-
-    setup_buttons(up, down, back, select)
+    # Подключаем асинхронные версии кнопок
+    setup_buttons(up, down, back, lambda: asyncio.create_task(select()))
 
     draw()
     while selected_result[0] is None:
-        time.sleep(0.1)
+        await asyncio.sleep(0.1)
         if time.time() - last_redraw[0] > 3:
             draw()
             last_redraw[0] = time.time()
 
     return selected_result[0]
-
-def connect_to_printer():
-    async def _connect():
-        device = await get_device_by_mac(printer_connection["mac"])
-        if not device:
-            show_message("Printer not found")
-            return
-        printer = await connect_printer(device)
-        printer_connection["device"] = device
-        printer_connection["printer"] = printer
-        printer_connection["connected"] = True
-        show_message("Printer connected")
-        time.sleep(1)
-
-    asyncio.run(_connect())
-
-def disconnect_from_printer():
-    async def _disconnect():
-        if printer_connection["printer"]:
-            await disconnect_printer(printer_connection["printer"])
-        printer_connection["device"] = None
-        printer_connection["printer"] = None
-        printer_connection["connected"] = False
-        show_message("Printer disconnected")
-        time.sleep(1)
-
-    asyncio.run(_disconnect())
