@@ -5,6 +5,7 @@ from esp_flasher import get_mac_address
 from buttons import btn_back
 from printer_functions import connect_printer, print_mac_address, disconnect_printer, get_device_by_mac
 
+
 def show_mac_address():
     clear()
     mac = get_mac_address()
