@@ -43,7 +43,7 @@ async def print_mac_address(printer, mac_address: str):
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
     except:
         font = ImageFont.load_default()
 
@@ -74,12 +74,18 @@ async def print_mac_address(printer, mac_address: str):
     # Повернуть изображение на 90 градусов по часовой стрелке
     image = image.rotate(270, expand=True)
 
-    # Печать
+    # Печать с дополнительной проверкой на None
     status = await printer.print_image(image)
     if status is None:
-        print("Ошибка при получении статуса печати.")
+        print("Ошибка: статус печати не получен или неверный.")
     else:
-        print("Изображение отправлено на печать.")
+        try:
+            if 'page' in status and status['page'] == status.get('quantity', 0):
+                print("Изображение успешно отправлено на печать.")
+            else:
+                print("Не удалось получить корректный статус печати.")
+        except Exception as e:
+            print(f"Ошибка при обработке статуса печати: {e}")
 
 # Пример функции для отключения принтера
 async def disconnect_printer(printer):
