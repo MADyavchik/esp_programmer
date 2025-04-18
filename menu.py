@@ -4,6 +4,7 @@ import time
 import os
 from oled_ui import draw_main_menu
 from oled_ui import show_message, clear
+import asyncio
 
 
 def reboot_pi():
@@ -14,7 +15,7 @@ def reboot_pi():
 
 
 
-def start_main_menu():
+async def start_main_menu():
     menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
     selected = [0]
     scroll = [0]
@@ -64,7 +65,7 @@ def start_main_menu():
     setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
 
     while selected_result[0] is None:
-        time.sleep(0.1)
+        await asyncio.sleep(0.1)
 
         if time.time() - last_redraw[0] >= 3:
             draw()

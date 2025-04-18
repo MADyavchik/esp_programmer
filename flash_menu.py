@@ -3,6 +3,7 @@
 from buttons import setup_buttons
 from esp_flasher import flash_firmware
 import time
+import asyncio
 
 from oled_ui import clear  # Добавь это, если не было
 from oled_ui import draw_flash_menu  # добавить импорт
@@ -15,7 +16,7 @@ VISIBLE_LINES = 2
 
 draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
-def start_flash_menu():
+async def start_flash_menu():
     clear()
     draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
 
@@ -46,6 +47,6 @@ def start_flash_menu():
     setup_buttons(up, down, back, select)
 
     while next_menu[0] == "flash":
-        time.sleep(0.1)
+        await asyncio.sleep(0.1)
 
     return next_menu[0]
