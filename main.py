@@ -1,9 +1,9 @@
-# main.py
 import time
 import traceback
 from menu_navigation import run_menu_loop
 from oled_ui import clear
 import os
+import asyncio
 
 from system_status import status_updater
 import threading
@@ -17,7 +17,7 @@ def start_status_thread():
     t = threading.Thread(target=status_updater, daemon=True)
     t.start()
 
-def main():
+async def main():
     start_status_thread()
     while True:
         try:
@@ -26,7 +26,7 @@ def main():
                 os.remove("exit.flag")
                 break
 
-            run_menu_loop()
+            await run_menu_loop()
         except KeyboardInterrupt:
             print("⏹ Выход по Ctrl+C")
             clear()
@@ -35,7 +35,7 @@ def main():
             print("💥 Программа упала с ошибкой, перезапуск через 2 секунды")
             traceback.print_exc()
             log_error(e)
-            time.sleep(2)
+            await asyncio.sleep(2)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

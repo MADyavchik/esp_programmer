@@ -86,7 +86,6 @@ async def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    # Подключаем асинхронные версии кнопок
     setup_buttons(up, down, back, lambda: asyncio.create_task(select()))
 
     draw()
