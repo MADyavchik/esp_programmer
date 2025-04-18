@@ -46,24 +46,33 @@ async def print_mac_address(printer, mac_address: str):
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
     except:
         font = ImageFont.load_default()
 
     # Текст, который нужно нарисовать
     text = f"{mac_address}"
 
-    # Получаем размеры текста с использованием textbbox
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = bbox[2] - bbox[0]  # Ширина текста
-    text_height = bbox[3] - bbox[1]  # Высота текста
+    # Разбиваем текст на строки, например, каждая строка по 10 символов
+    max_line_length = 10  # Максимальная длина строки
+    lines = [text[i:i+max_line_length] for i in range(0, len(text), max_line_length)]
+
+    # Вычисляем высоту текста (с учетом нескольких строк)
+    text_height = 0
+    for line in lines:
+        _, line_height = draw.textbbox((0, 0), line, font=font)[2:4]
+        text_height += line_height
 
     # Вычисляем координаты для центрирования текста
-    x = (width - text_width) // 2
+    x = (width - max([draw.textbbox((0, 0), line, font=font)[2] for line in lines])) // 2
     y = (height - text_height) // 2
 
-    # Рисуем текст по вычисленным координатам
-    draw.text((x, y), text, font=font, fill=0)
+    # Рисуем каждую строку на изображении
+    y_offset = y
+    for line in lines:
+        draw.text((x, y_offset), line, font=font, fill=0)
+        _, line_height = draw.textbbox((0, 0), line, font=font)[2:4]
+        y_offset += line_height
 
     # Повернуть изображение на 90 градусов по часовой стрелке
     image = image.rotate(270, expand=True)
