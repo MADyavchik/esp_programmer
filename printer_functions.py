@@ -5,7 +5,7 @@ from NiimPrintX.nimmy.printer import PrinterClient, RequestCodeEnum
 from bleak import BleakScanner
 
 # Указываем путь к библиотеке NiimPrintX
-sys.path.append(os.path.abspath('/path/to/NiimPrintX'))
+sys.path.append(os.path.abspath('/home/pauro/NiimPrintX'))
 
 # Поиск устройства по MAC
 async def get_device_by_mac(mac_address):
