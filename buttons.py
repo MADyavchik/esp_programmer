@@ -2,6 +2,7 @@ import asyncio
 import threading
 from gpiozero import Button
 from main import main_loop
+from loop_reference import main_loop
 
 btn_up = Button(26, hold_time=1, bounce_time=0.1)
 btn_down = Button(13, bounce_time=0.1)

@@ -4,6 +4,7 @@ import traceback
 import os
 import asyncio
 import threading
+import loop_reference
 
 from menu_navigation import run_menu_loop
 from oled_ui import clear
@@ -19,8 +20,7 @@ def start_status_thread():
 
 async def main():
 
-    global main_loop
-    main_loop = asyncio.get_running_loop()
+    loop_reference.main_loop = asyncio.get_running_loop()
 
     start_status_thread()
     while True:
