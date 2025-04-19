@@ -36,11 +36,11 @@ async def start_flash_menu():
     def back():
         next_menu[0] = "main"
 
-    def select():
+    async def select():
         name = items[selected[0]]
         print(f"▶ Выбрана прошивка: {name}")
         clear()
-        result = flash_firmware(name.lower())
+        result = await flash_firmware(name.lower())
         print(f"◀ Возвращаемся в меню: {result}")
         next_menu[0] = result or "flash"
         draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)

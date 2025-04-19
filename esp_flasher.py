@@ -16,7 +16,7 @@ PORT = "/dev/ttyS0"
 # Названия прошивок без NVS
 NO_NVS = ["sens_sw", "sens_old"]
 
-def flash_firmware(firmware_name):
+async def flash_firmware(firmware_name):
     firmware_name = firmware_name.lower()
     logging.info(f"🚀 Начинаем прошивку: {firmware_name}")
 
