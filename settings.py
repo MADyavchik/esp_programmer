@@ -76,9 +76,9 @@ async def start_settings_menu():
 
     async def select():
         if selected[0] == 0:
-            toggle_wifi()
+            await toggle_wifi()
         elif selected[0] == 1:
-            toggle_bluetooth()
+            await toggle_bluetooth()
         elif selected[0] == 2:
             if printer_connection["connected"]:
                 # Асинхронный вызов для отключения принтера
