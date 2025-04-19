@@ -14,18 +14,6 @@ printer_connection = {
     "connected": False,
 }
 
-async def toggle_wifi():
-    process = await asyncio.create_subprocess_exec(
-        "nmcli", "radio", "wifi", "off" if is_wifi_enabled() else "on"
-    )
-    await process.communicate()
-
-async def toggle_bluetooth():
-    process = await asyncio.create_subprocess_exec(
-        "rfkill", "block", "bluetooth" if is_bt_enabled() else "unblock", "bluetooth"
-    )
-    await process.communicate()
-
 def is_wifi_enabled():
     result = os.popen("nmcli radio wifi").read().strip()
     return result == "enabled"
@@ -33,6 +21,23 @@ def is_wifi_enabled():
 def is_bt_enabled():
     result = os.popen("rfkill list bluetooth").read()
     return "Soft blocked: yes" not in result
+
+async def toggle_wifi():
+    env = os.environ.copy()
+    if "DBUS_SESSION_BUS_ADDRESS" not in env:
+        env["DBUS_SESSION_BUS_ADDRESS"] = f"/run/user/{os.getuid()}/bus"
+    cmd = ["nmcli", "radio", "wifi", "off" if is_wifi_enabled() else "on"]
+    process = await asyncio.create_subprocess_exec(*cmd, env=env)
+    await process.communicate()
+
+async def toggle_bluetooth():
+    cmd = (
+        ["rfkill", "block", "bluetooth"]
+        if is_bt_enabled()
+        else ["rfkill", "unblock", "bluetooth"]
+    )
+    process = await asyncio.create_subprocess_exec(*cmd)
+    await process.communicate()
 
 async def connect_to_printer():
     device = await get_device_by_mac(printer_connection["mac"])
@@ -55,7 +60,6 @@ async def disconnect_from_printer():
     printer_connection["connected"] = False
     show_message("Printer disconnected")
     await asyncio.sleep(1)
-
 
 @log_async
 async def start_settings_menu():
@@ -81,10 +85,8 @@ async def start_settings_menu():
             await toggle_bluetooth()
         elif selected[0] == 2:
             if printer_connection["connected"]:
-                # Асинхронный вызов для отключения принтера
                 await disconnect_from_printer()
             else:
-                # Асинхронный вызов для подключения принтера
                 await connect_to_printer()
         draw()
 
@@ -99,8 +101,8 @@ async def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    # Обработка кнопок, все кнопки используют безопасный асинхронный вызов
-    setup_buttons(up, down, back, safe_async(select))  # safe_async для select
+    # Назначаем кнопки
+    setup_buttons(up, down, back, safe_async(select))
 
     draw()
     while selected_result[0] is None:
