@@ -10,11 +10,18 @@ from oled_ui import clear
 from system_status import status_updater
 from utils import log_error  # ✅ теперь используем версию из utils
 
+main_loop = None
+
+
 def start_status_thread():
     t = threading.Thread(target=status_updater, daemon=True)
     t.start()
 
 async def main():
+
+    global main_loop
+    main_loop = asyncio.get_running_loop()
+
     start_status_thread()
     while True:
         try:

@@ -1,6 +1,7 @@
 import asyncio
 import threading
 from gpiozero import Button
+from main import main_loop
 
 btn_up = Button(26, hold_time=1, bounce_time=0.1)
 btn_down = Button(13, bounce_time=0.1)
@@ -9,8 +10,9 @@ btn_select = Button(19, bounce_time=0.1)
 
 def safe_async(coro_func):
     try:
-        loop = asyncio.get_event_loop()  # Получаем текущий активный event loop
-        asyncio.run_coroutine_threadsafe(coro_func(), loop)  # Запуск задачи в главном loop
+        if main_loop is None:
+            raise RuntimeError("Главный event loop ещё не готов.")
+        asyncio.run_coroutine_threadsafe(coro_func(), main_loop)
     except Exception as e:
         print(f"⚠️ Ошибка в safe_async: {e}")
 
