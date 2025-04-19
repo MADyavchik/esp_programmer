@@ -49,6 +49,8 @@ def flash_firmware(firmware_name):
             logging.error(f"❌ Файл не найден: {file}")
             return
 
+    mac_address = None  # Добавляем переменную для MAC-адреса
+
     try:
         logging.info("🔌 Перевод ESP32 в режим bootloader...")
         show_message("Bootloader...")
@@ -101,6 +103,13 @@ def flash_firmware(firmware_name):
             line = line.strip()
             print(f"💬 {line}")
             logging.info(line)
+
+            # Проверяем, не содержит ли строка MAC-адрес
+            mac_match = re.search(r"MAC:\s*([0-9a-fA-F:]{17})", line)
+            if mac_match and not mac_address:
+                mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
+                logging.info(f"📡 Обнаружен MAC-адрес: {mac_address}")  # Выводим в лог
+
             match = re.search(r"\((\d+)\s*%\)", line)
             if match:
                 percent = int(match.group(1))

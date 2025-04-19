@@ -9,7 +9,7 @@ import loop_reference
 from menu_navigation import run_menu_loop
 from oled_ui import clear
 from system_status import status_updater
-from utils import log_error  # ✅ теперь используем версию из utils
+from utils import log_error
 
 main_loop = None
 
