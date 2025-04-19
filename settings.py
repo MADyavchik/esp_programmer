@@ -5,6 +5,7 @@ from oled_ui import show_message, clear, draw_main_menu
 from buttons import setup_buttons
 from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
 from utils import log_async
+from buttons import safe_async  # Подключаем безопасный вызов async функций
 
 printer_connection = {
     "mac": "01:EC:01:36:C3:86",
@@ -74,8 +75,10 @@ async def start_settings_menu():
             toggle_bluetooth()
         elif selected[0] == 2:
             if printer_connection["connected"]:
+                # Асинхронный вызов для отключения принтера
                 await disconnect_from_printer()
             else:
+                # Асинхронный вызов для подключения принтера
                 await connect_to_printer()
         draw()
 
@@ -90,7 +93,8 @@ async def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    setup_buttons(up, down, back, select)
+    # Обработка кнопок, все кнопки используют безопасный асинхронный вызов
+    setup_buttons(up, down, back, safe_async(select))  # safe_async для select
 
     draw()
     while selected_result[0] is None:
