@@ -1,18 +1,32 @@
 # utils.py
 import time
 import traceback
-from your_error_logger import log_error  # если есть логгер, иначе пиши прямо тут
+import asyncio
+import functools
+import inspect
+
+def log_error(e):
+    with open("error.log", "a") as f:
+        f.write(f"{time.ctime()}: {repr(e)}\n")
+        traceback.print_exc(file=f)
+
+def safe_async(coro_func):
+    try:
+        loop = asyncio.get_running_loop()
+        loop.call_soon_threadsafe(lambda: asyncio.create_task(coro_func()))
+    except RuntimeError:
+        print("⚠️ Нет активного event loop для safe_async")
 
 def log_async(func):
-    async def wrapper(*args, **kwargs):
-        print(f"🟢 START {func.__name__}")
+    @functools.wraps(func)
+    async def async_wrapper(*args, **kwargs):
+        print(f"🚀 Старт async: {func.__name__}")
         try:
-            result = await func(*args, **kwargs)
-            print(f"✅ END {func.__name__}")
-            return result
+            return await func(*args, **kwargs)
         except Exception as e:
-            print(f"❌ ERROR in {func.__name__}: {e}")
-            traceback.print_exc()
+            print(f"💥 Ошибка в {func.__name__}: {e}")
             log_error(e)
             raise
-    return wrapper
+        finally:
+            print(f"✅ Завершено: {func.__name__}")
+    return async_wrapper

@@ -1,17 +1,14 @@
+#main.py
 import time
 import traceback
-from menu_navigation import run_menu_loop
-from oled_ui import clear
 import os
 import asyncio
-
-from system_status import status_updater
 import threading
 
-def log_error(e):
-    with open("error.log", "a") as f:
-        f.write(f"{time.ctime()}: {repr(e)}\n")
-        traceback.print_exc(file=f)
+from menu_navigation import run_menu_loop
+from oled_ui import clear
+from system_status import status_updater
+from utils import log_error  # ✅ теперь используем версию из utils
 
 def start_status_thread():
     t = threading.Thread(target=status_updater, daemon=True)
