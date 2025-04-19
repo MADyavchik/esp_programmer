@@ -151,6 +151,15 @@ def flash_firmware(firmware_name):
         #clear()
         exit_bootloader()
 
+        # 📤 Печать MAC-адреса, если принтер подключен
+        from settings import printer_connection
+        if printer_connection["connected"] and printer_connection.get("printer"):
+            from printer_functions import print_mac_address
+            logging.info("🖨️ Отправляем MAC на печать...")
+            await print_mac_address(printer_connection["printer"], mac_address)
+        else:
+            logging.warning("⚠️ Принтер не подключен — печать пропущена.")
+
     except subprocess.CalledProcessError as e:
         logging.error(f"❌ Прошивка не удалась: {e}")
         show_message("Ошибка прошивки")
