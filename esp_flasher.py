@@ -86,10 +86,14 @@ def flash_firmware(firmware_name):
                 mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
                 logging.info(f"📡 Обнаружен MAC-адрес: {mac_address}")  # Выводим в лог
 
-                # 🔍 Проверка статуса подключения принтера
+               # 🔍 Проверка статуса подключения принтера
                 from settings import printer_connection  # импортируем только когда нужен
                 if printer_connection["connected"]:
                     logging.info("🖨️ Принтер уже подключен.")
+                    if printer_connection.get("device"):
+                        logging.info(f"🔧 Device: {printer_connection['device']}")
+                    else:
+                        logging.info("⚠️ Устройство не найдено в printer_connection.")
                 else:
                     logging.info("🖨️ Принтер не подключен.")
         process.wait()
