@@ -14,11 +14,17 @@ printer_connection = {
     "connected": False,
 }
 
-def toggle_wifi():
-    os.system("nmcli radio wifi off" if is_wifi_enabled() else "nmcli radio wifi on")
+async def toggle_wifi():
+    process = await asyncio.create_subprocess_exec(
+        "nmcli", "radio", "wifi", "off" if is_wifi_enabled() else "on"
+    )
+    await process.communicate()
 
-def toggle_bluetooth():
-    os.system("rfkill block bluetooth" if is_bt_enabled() else "rfkill unblock bluetooth")
+async def toggle_bluetooth():
+    process = await asyncio.create_subprocess_exec(
+        "rfkill", "block", "bluetooth" if is_bt_enabled() else "unblock", "bluetooth"
+    )
+    await process.communicate()
 
 def is_wifi_enabled():
     result = os.popen("nmcli radio wifi").read().strip()
