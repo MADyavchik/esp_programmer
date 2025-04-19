@@ -10,19 +10,11 @@ btn_select = Button(19, bounce_time=0.1)
 def safe_async(coro_func):
     try:
         loop = asyncio.get_running_loop()
+        if loop.is_running():
+            loop.call_soon_threadsafe(lambda: asyncio.create_task(coro_func()))
     except RuntimeError:
-        loop = None
-
-    if loop and loop.is_running():
-        loop.call_soon_threadsafe(lambda: asyncio.create_task(coro_func()))
-    else:
-        # Если event loop не запущен — запускаем в отдельном потоке с новым loop
-        def run():
-            new_loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(new_loop)
-            new_loop.run_until_complete(coro_func())
-            new_loop.close()
-        threading.Thread(target=run, daemon=True).start()
+        # Не запускаем корутину в новом loop'е — это опасно (особенно с bleak/dbus!)
+        print("⚠️ Нет активного event loop для safe_async — пропускаем вызов")
 
 def setup_buttons(up, down, back, select, back_hold_action=None, up_hold_action=None):
     def wrap(func):
