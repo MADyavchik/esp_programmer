@@ -4,6 +4,7 @@ import time
 from oled_ui import show_message, clear, draw_main_menu
 from buttons import setup_buttons
 from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
+from utils import log_async
 
 printer_connection = {
     "mac": "01:EC:01:36:C3:86",
@@ -48,6 +49,8 @@ async def disconnect_from_printer():
     show_message("Printer disconnected")
     await asyncio.sleep(1)
 
+
+@log_async
 async def start_settings_menu():
     await asyncio.sleep(0.1)
     menu_items = ["Wi-Fi: ?", "Bluetooth: ?", "Print: ?"]
