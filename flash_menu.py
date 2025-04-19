@@ -7,6 +7,7 @@ import asyncio
 
 from oled_ui import clear  # Добавь это, если не было
 from oled_ui import draw_flash_menu  # добавить импорт
+from utils import log_async
 
 
 items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
@@ -15,7 +16,7 @@ scroll = [0]
 VISIBLE_LINES = 2
 
 draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
-
+@log_async
 async def start_flash_menu():
     clear()
     draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)

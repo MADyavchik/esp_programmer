@@ -5,6 +5,7 @@ import os
 from oled_ui import draw_main_menu
 from oled_ui import show_message, clear
 import asyncio
+from utils import log_async
 
 
 def reboot_pi():
@@ -14,7 +15,7 @@ def reboot_pi():
     os.system("sudo reboot")
 
 
-
+@log_async
 async def start_main_menu():
     menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
     selected = [0]
