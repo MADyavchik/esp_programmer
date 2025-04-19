@@ -65,9 +65,28 @@ def flash_firmware(firmware_name):
 
         logging.info("🧽 Очистка флеша...")
         show_message("Erasing flash...")
-        subprocess.run([
+
+        # Запускаем процесс очистки флеша, чтобы парсить MAC-адрес
+        process = subprocess.Popen([
             "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT, "erase_flash"
-        ], check=True)
+        ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+
+        # Парсим вывод команды очистки флеша
+        while True:
+            line = process.stdout.readline()
+            if not line:
+                break
+            line = line.strip()
+            print(f"💬 {line}")
+            logging.info(line)
+
+            # Проверяем, не содержит ли строка MAC-адрес
+            mac_match = re.search(r"MAC:\s*([0-9a-fA-F:]{17})", line)
+            if mac_match and not mac_address:
+                mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
+                logging.info(f"📡 Обнаружен MAC-адрес: {mac_address}")  # Выводим в лог
+
+        process.wait()
 
         logging.info("🔁 Повторный вход в bootloader...")
         enter_bootloader()
@@ -103,12 +122,6 @@ def flash_firmware(firmware_name):
             line = line.strip()
             print(f"💬 {line}")
             logging.info(line)
-
-            # Проверяем, не содержит ли строка MAC-адрес
-            mac_match = re.search(r"MAC:\s*([0-9a-fA-F:]{17})", line)
-            if mac_match and not mac_address:
-                mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
-                logging.info(f"📡 Обнаружен MAC-адрес: {mac_address}")  # Выводим в лог
 
             match = re.search(r"\((\d+)\s*%\)", line)
             if match:
