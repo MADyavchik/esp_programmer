@@ -14,21 +14,6 @@ printer_connection = {
     "connected": False,
 }
 
-# --- СТАРЫЕ СТАБИЛЬНЫЕ ФУНКЦИИ ---
-def toggle_wifi():
-    os.system("nmcli radio wifi off" if is_wifi_enabled() else "nmcli radio wifi on")
-
-def toggle_bluetooth():
-    os.system("rfkill block bluetooth" if is_bt_enabled() else "rfkill unblock bluetooth")
-
-def is_wifi_enabled():
-    result = os.popen("nmcli radio wifi").read().strip()
-    return result == "enabled"
-
-def is_bt_enabled():
-    result = os.popen("rfkill list bluetooth").read()
-    return "Soft blocked: yes" not in result
-
 # --- ПРИНТЕР ---
 async def connect_to_printer():
     device = await get_device_by_mac(printer_connection["mac"])
@@ -56,30 +41,23 @@ async def disconnect_from_printer():
 @log_async
 async def start_settings_menu():
     await asyncio.sleep(0.1)
-    menu_items = ["Wi-Fi: ?", "Bluetooth: ?", "Print: ?"]
+    menu_items = ["Print: ?"]
     selected = [0]
     selected_result = [None]
     last_redraw = [0]
 
     def refresh_labels():
-        menu_items[0] = f"Wi-Fi: {'ON' if is_wifi_enabled() else 'OFF'}"
-        menu_items[1] = f"Bluetooth: {'ON' if is_bt_enabled() else 'OFF'}"
-        menu_items[2] = f"Print: {'Connected' if printer_connection['connected'] else 'Disconnected'}"
+        menu_items[0] = f"Print: {'Connected' if printer_connection['connected'] else 'Disconnected'}"
 
     def draw():
         refresh_labels()
-        draw_main_menu(menu_items, selected[0], selected[0], visible_lines=2)
+        draw_main_menu(menu_items, selected[0], selected[0], visible_lines=1)
 
     async def select():
-        if selected[0] == 0:
-            toggle_wifi()  # СИНХРОННО
-        elif selected[0] == 1:
-            toggle_bluetooth()  # СИНХРОННО
-        elif selected[0] == 2:
-            if printer_connection["connected"]:
-                await disconnect_from_printer()
-            else:
-                await connect_to_printer()
+        if printer_connection["connected"]:
+            await disconnect_from_printer()
+        else:
+            await connect_to_printer()
         draw()
 
     def up():
@@ -94,8 +72,8 @@ async def start_settings_menu():
         selected_result[0] = "main"
 
     setup_buttons(up, down, back, safe_async(select))
-
     draw()
+
     while selected_result[0] is None:
         await asyncio.sleep(0.1)
         if time.time() - last_redraw[0] > 3:
