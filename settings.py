@@ -14,6 +14,13 @@ printer_connection = {
     "connected": False,
 }
 
+# --- СТАРЫЕ СТАБИЛЬНЫЕ ФУНКЦИИ ---
+def toggle_wifi():
+    os.system("nmcli radio wifi off" if is_wifi_enabled() else "nmcli radio wifi on")
+
+def toggle_bluetooth():
+    os.system("rfkill block bluetooth" if is_bt_enabled() else "rfkill unblock bluetooth")
+
 def is_wifi_enabled():
     result = os.popen("nmcli radio wifi").read().strip()
     return result == "enabled"
@@ -22,23 +29,7 @@ def is_bt_enabled():
     result = os.popen("rfkill list bluetooth").read()
     return "Soft blocked: yes" not in result
 
-async def toggle_wifi():
-    env = os.environ.copy()
-    if "DBUS_SESSION_BUS_ADDRESS" not in env:
-        env["DBUS_SESSION_BUS_ADDRESS"] = f"/run/user/{os.getuid()}/bus"
-    cmd = ["nmcli", "radio", "wifi", "off" if is_wifi_enabled() else "on"]
-    process = await asyncio.create_subprocess_exec(*cmd, env=env)
-    await process.communicate()
-
-async def toggle_bluetooth():
-    cmd = (
-        ["rfkill", "block", "bluetooth"]
-        if is_bt_enabled()
-        else ["rfkill", "unblock", "bluetooth"]
-    )
-    process = await asyncio.create_subprocess_exec(*cmd)
-    await process.communicate()
-
+# --- ПРИНТЕР ---
 async def connect_to_printer():
     device = await get_device_by_mac(printer_connection["mac"])
     if not device:
@@ -61,6 +52,7 @@ async def disconnect_from_printer():
     show_message("Printer disconnected")
     await asyncio.sleep(1)
 
+# --- МЕНЮ ---
 @log_async
 async def start_settings_menu():
     await asyncio.sleep(0.1)
@@ -80,9 +72,9 @@ async def start_settings_menu():
 
     async def select():
         if selected[0] == 0:
-            await toggle_wifi()
+            toggle_wifi()  # СИНХРОННО
         elif selected[0] == 1:
-            await toggle_bluetooth()
+            toggle_bluetooth()  # СИНХРОННО
         elif selected[0] == 2:
             if printer_connection["connected"]:
                 await disconnect_from_printer()
@@ -101,7 +93,6 @@ async def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    # Назначаем кнопки
     setup_buttons(up, down, back, safe_async(select))
 
     draw()
