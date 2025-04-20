@@ -5,18 +5,10 @@ from oled_ui import show_message, clear, draw_main_menu
 from buttons import setup_buttons
 from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
 from utils import log_async
-from dataclasses import dataclass
+from print_config import DEFAULT_PRINTER_CONFIG
 
 from buttons import safe_async  # Подключаем безопасный вызов async функций
 
-@dataclass
-class PrinterConfig:
-    width: int = 176
-    height: int = 112
-    quantity: int = 1
-    density: int = 3
-
-DEFAULT_PRINTER_CONFIG = PrinterConfig()
 
 
 printer_connection = {
