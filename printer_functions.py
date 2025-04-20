@@ -81,7 +81,6 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     except:
         font = ImageFont.load_default()
 
-    # Разбиваем MAC на строки по 9 символов
     max_line_length = 9
     lines = [mac_address[i:i + max_line_length] for i in range(0, len(mac_address), max_line_length)]
 
@@ -95,7 +94,15 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
         y_offset += draw.textbbox((0, 0), line, font=font)[3]
 
     image = image.rotate(270, expand=True)
-    status = await printer.print_image(image)
+
+    await printer.print_image(image)  # Отправили на печать
+
+    # Явно запрашиваем статус
+    if hasattr(printer, "get_print_status"):
+        status = await printer.get_print_status()
+    else:
+        print("⚠️ Принтер не поддерживает получение статуса.")
+        return
 
     if not isinstance(status, dict) or status.get("error", False):
         print(f"❌ Ошибка: статус печати не получен или содержит ошибку. Статус: {status}")
