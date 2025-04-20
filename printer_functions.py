@@ -9,7 +9,7 @@ import asyncio
 from NiimPrintX.nimmy.printer import PrinterClient, RequestCodeEnum
 from bleak import BleakScanner
 from PIL import Image, ImageDraw, ImageFont
-from settings import DEFAULT_PRINTER_CONFIG
+
 
 # Поиск устройства по MAC
 async def get_device_by_mac(mac_address):
