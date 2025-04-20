@@ -5,7 +5,19 @@ from oled_ui import show_message, clear, draw_main_menu
 from buttons import setup_buttons
 from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
 from utils import log_async
+from dataclasses import dataclass
+
 from buttons import safe_async  # Подключаем безопасный вызов async функций
+
+@dataclass
+class PrinterConfig:
+    width: int = 176
+    height: int = 112
+    quantity: int = 1
+    density: int = 3
+
+DEFAULT_PRINTER_CONFIG = PrinterConfig()
+
 
 printer_connection = {
     "mac": "01:EC:01:36:C3:86",
@@ -15,16 +27,25 @@ printer_connection = {
 }
 
 # --- ПРИНТЕР ---
-async def connect_to_printer():
+async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
     device = await get_device_by_mac(printer_connection["mac"])
     if not device:
         show_message("Printer not found")
         await asyncio.sleep(1)
         return
-    printer = await connect_printer(device)
+
+    printer = await connect_printer(
+        device,
+        sticker_width=config.width,
+        sticker_height=config.height,
+        quantity=config.quantity,
+        density=config.density
+    )
+
     printer_connection["device"] = device
     printer_connection["printer"] = printer
     printer_connection["connected"] = True
+    printer_connection["config"] = config  # <-- запомним
     show_message("Printer connected")
     await asyncio.sleep(1)
 

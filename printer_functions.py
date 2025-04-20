@@ -9,6 +9,7 @@ import asyncio
 from NiimPrintX.nimmy.printer import PrinterClient, RequestCodeEnum
 from bleak import BleakScanner
 from PIL import Image, ImageDraw, ImageFont
+from settings import DEFAULT_PRINTER_CONFIG
 
 # Поиск устройства по MAC
 async def get_device_by_mac(mac_address):
@@ -19,7 +20,7 @@ async def get_device_by_mac(mac_address):
     return None
 
 # Подключение к принтеру
-async def connect_printer(device):
+async def connect_printer(device, sticker_width=None, sticker_height=None, quantity=1, density=3):
     printer = PrinterClient(device)
     await printer.connect()
 
@@ -53,12 +54,25 @@ async def connect_printer(device):
     # Подставляем наш патч
     printer.get_print_status = MethodType(safe_get_print_status, printer)
 
+    # Установка размеров стикера, если они были переданы
+    if sticker_width and sticker_height:
+        await printer.set_dimension(sticker_width, sticker_height)
+
+    # Установка плотности печати
+    await printer.set_label_density(density)
+
+    # Установка количества копий
+    await printer.set_quantity(quantity)
+
     return printer
 
 # Печать текста (например, MAC-адреса)
-async def print_mac_address(printer, mac_address: str):
-    # Генерация изображения
-    width, height = 175, 125
+from settings import DEFAULT_PRINTER_CONFIG
+
+async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CONFIG):
+    width = config.width
+    height = config.height
+
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
 
@@ -71,26 +85,18 @@ async def print_mac_address(printer, mac_address: str):
     max_line_length = 9
     lines = [mac_address[i:i + max_line_length] for i in range(0, len(mac_address), max_line_length)]
 
-    # Высота текста
     text_height = sum([draw.textbbox((0, 0), line, font=font)[3] for line in lines])
-
-    # Центрирование текста
     x = (width - max([draw.textbbox((0, 0), line, font=font)[2] for line in lines])) // 2
     y = (height - text_height) // 2
 
-    # Рисуем текст
     y_offset = y
     for line in lines:
         draw.text((x, y_offset), line, font=font, fill=0)
         y_offset += draw.textbbox((0, 0), line, font=font)[3]
 
-    # Повернуть на 270 градусов (по часовой)
     image = image.rotate(270, expand=True)
-
-    # Отправка на печать
     status = await printer.print_image(image)
 
-    # Обработка статуса
     if not isinstance(status, dict) or status.get("error", False):
         print(f"❌ Ошибка: статус печати не получен или содержит ошибку. Статус: {status}")
         return
