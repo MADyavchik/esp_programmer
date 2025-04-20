@@ -95,7 +95,11 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
 
     image = image.rotate(270, expand=True)
 
-    await printer.print_image(image)  # Отправили на печать
+    await printer.print_image(
+        image,
+        density=config.density,
+        quantity=config.quantity
+    )  # Отправили на печать
 
     # Явно запрашиваем статус
     if hasattr(printer, "get_print_status"):

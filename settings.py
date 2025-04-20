@@ -27,11 +27,11 @@ async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
         return
 
     printer = await connect_printer(
-        device,
-        sticker_width=config.width,
-        sticker_height=config.height,
-        quantity=config.quantity,
-        density=config.density
+        device
+        #sticker_width=config.width,
+        #sticker_height=config.height,
+        #quantity=config.quantity,
+        #density=config.density
     )
 
     printer_connection["device"] = device
