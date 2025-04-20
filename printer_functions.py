@@ -67,7 +67,7 @@ async def connect_printer(device, sticker_width=None, sticker_height=None, quant
     return printer
 
 # Печать текста (например, MAC-адреса)
-from settings import DEFAULT_PRINTER_CONFIG
+from print_config import DEFAULT_PRINTER_CONFIG
 
 async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CONFIG):
     width = config.width
