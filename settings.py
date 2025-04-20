@@ -26,13 +26,8 @@ async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
         await asyncio.sleep(1)
         return
 
-    printer = await connect_printer(
-        device
-        #sticker_width=config.width,
-        #sticker_height=config.height,
-        #quantity=config.quantity,
-        #density=config.density
-    )
+    printer = await connect_printer(device)
+
 
     printer_connection["device"] = device
     printer_connection["printer"] = printer

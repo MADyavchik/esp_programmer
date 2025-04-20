@@ -20,11 +20,11 @@ async def get_device_by_mac(mac_address):
     return None
 
 # Подключение к принтеру
-async def connect_printer(device, sticker_width=None, sticker_height=None, quantity=1, density=3):
+async def connect_printer(device):
     printer = PrinterClient(device)
     await printer.connect()
 
-    # Monkey patch для безопасного получения статуса печати
+    # Патч для безопасного получения статуса печати
     async def safe_get_print_status(self):
         packet = await self.send_command(RequestCodeEnum.GET_PRINT_STATUS, b"")
         if not packet or not hasattr(packet, "data") or len(packet.data) < 4:
@@ -38,7 +38,7 @@ async def connect_printer(device, sticker_width=None, sticker_height=None, quant
             pages_printed, val1, val2 = struct.unpack(">HBB", packet.data)
             return {
                 'page': pages_printed,
-                'quantity': 1,  # Можешь сделать переменной, если знаешь фактическое количество
+                'quantity': 1,
                 'error': False,
                 'raw': packet.data
             }
@@ -54,16 +54,6 @@ async def connect_printer(device, sticker_width=None, sticker_height=None, quant
     # Подставляем наш патч
     printer.get_print_status = MethodType(safe_get_print_status, printer)
 
-    # Установка размеров стикера, если они были переданы
-    if sticker_width and sticker_height:
-        await printer.set_dimension(sticker_width, sticker_height)
-
-    # Установка плотности печати
-    await printer.set_label_density(density)
-
-    # Установка количества копий
-    await printer.set_quantity(quantity)
-
     return printer
 
 # Печать текста (например, MAC-адреса)
@@ -72,6 +62,8 @@ from print_config import DEFAULT_PRINTER_CONFIG
 async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CONFIG):
     width = config.width
     height = config.height
+    quantity = config.quantity  # Количество копий
+    density = config.density    # Плотность
 
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
@@ -95,11 +87,7 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
 
     image = image.rotate(270, expand=True)
 
-    await printer.print_image(
-        image,
-        density=config.density,
-        quantity=config.quantity
-    )  # Отправили на печать
+    await printer.print_image(image, sticker_width=width, sticker_height=height, quantity=quantity, density=density)
 
     # Явно запрашиваем статус
     if hasattr(printer, "get_print_status"):
