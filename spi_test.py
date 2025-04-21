@@ -74,13 +74,17 @@ def color565(r, g, b):
     return rgb565_to_bgr565(rgb)
 
 
-def fill_color_direct(hex_color):
+def fill_color_test(color_565, label=""):
+    print(f"Цвет: {hex(color_565)} -> {label}")
     GPIO.output(DC, GPIO.HIGH)
-    buf = [hex_color >> 8, hex_color & 0xFF] * (240 * 240)  # big-endian
-    CHUNK = 4096
-    for i in range(0, len(buf), CHUNK):
-        spi.writebytes(buf[i:i+CHUNK])
+    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
+    for i in range(0, len(buf), 4096):
+        spi.writebytes(buf[i:i+4096])
+    time.sleep(3)
 
-# Пример цвета: чёрный = 0x0000, красный = 0xF800, зелёный = 0x07E0, синий = 0x001F
 init_display()
-fill_color_direct(0xF800)
+
+fill_color_test(0xF800, "ДОЛЖЕН БЫТЬ КРАСНЫЙ")
+fill_color_test(0x07E0, "ДОЛЖЕН БЫТЬ ЗЕЛЁНЫЙ")
+fill_color_test(0x001F, "ДОЛЖЕН БЫТЬ СИНИЙ")
+fill_color_test(0xFFFF, "ДОЛЖЕН БЫТЬ БЕЛЫЙ")
