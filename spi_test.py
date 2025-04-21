@@ -56,12 +56,15 @@ def init_display(use_bgr=False):
 
     write_command(0x2C)  # RAM Write (start writing)
 
-def color565(r, g, b):
-    """Создать 16-битный цвет (RGB565) из обычных RGB 0–255"""
+def color565(r, g, b, use_bgr=False):
+    """Создать 16-битный цвет (RGB565 или BGR565) из обычных RGB 0–255"""
     r5 = r >> 3      # 5 бит красного
     g6 = g >> 2      # 6 бит зелёного
     b5 = b >> 3      # 5 бит синего
-    return (r5 << 11) | (g6 << 5) | b5  # RRRRR GGGGGG BBBBB
+    if use_bgr:
+        return (b5 << 11) | (g6 << 5) | r5  # BGR565
+    else:
+        return (r5 << 11) | (g6 << 5) | b5  # RGB565
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
@@ -76,31 +79,31 @@ init_display(use_bgr=False)  # Попробуй BGR=False, чтобы прове
 
 # Заливаем разные цвета
 print("Заливаю голубым...")
-fill_color(color565(0, 255, 255))  # ГОЛУБОЙ: синий + зелёный
+fill_color(color565(0, 255, 255, use_bgr=False))  # ГОЛУБОЙ: синий + зелёный
 time.sleep(1)
 
 print("Заливаю красным...")
-fill_color(color565(255, 0, 0))  # КРАСНЫЙ: только красный
+fill_color(color565(255, 0, 0, use_bgr=False))  # КРАСНЫЙ: только красный
 time.sleep(1)
 
 print("Заливаю зелёным...")
-fill_color(color565(0, 255, 0))  # ЗЕЛЕНЫЙ: только зелёный
+fill_color(color565(0, 255, 0, use_bgr=False))  # ЗЕЛЕНЫЙ: только зелёный
 time.sleep(1)
 
 print("Заливаю темно-синим...")
-fill_color(color565(0, 0, 139))  # ТЕМНО-СИНИЙ
+fill_color(color565(0, 0, 139, use_bgr=False))  # ТЕМНО-СИНИЙ
 time.sleep(1)
 
 print("Заливаю светло-зеленым...")
-fill_color(color565(144, 238, 144))  # СВЕТЛО-ЗЕЛЕНЫЙ
+fill_color(color565(144, 238, 144, use_bgr=False))  # СВЕТЛО-ЗЕЛЕНЫЙ
 time.sleep(1)
 
 print("Заливаю сиреневым...")
-fill_color(color565(255, 0, 255))  # СИРЕНЕВЫЙ: красный + синий
+fill_color(color565(255, 0, 255, use_bgr=False))  # СИРЕНЕВЫЙ: красный + синий
 time.sleep(1)
 
 print("Заливаю голубым...")
-fill_color(color565(0, 255, 255))  # ГОЛУБОЙ
+fill_color(color565(0, 255, 255, use_bgr=False))  # ГОЛУБОЙ
 time.sleep(1)
 
 print("Готово!")
