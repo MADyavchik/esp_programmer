@@ -65,7 +65,8 @@ def color565(r, g, b):
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
+    # !!! МЕНЯЕМ порядок байт !!!
+    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
