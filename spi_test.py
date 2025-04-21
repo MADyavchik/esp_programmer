@@ -55,16 +55,15 @@ def init_display():
     write_command(0x2C)
 
 def color565(r, g, b):
-    """RGB → RGB565 с исправленным порядком (G и R перепутаны!)"""
-    # Поменяем R и G местами при создании
-    g5 = r >> 3  # теперь g5 — это на самом деле красный
-    r6 = g >> 2  # r6 — это на самом деле зелёный
+    r5 = r >> 3
+    g6 = g >> 2
     b5 = b >> 3
-    return (g5 << 11) | (r6 << 5) | b5
+    return (r5 << 11) | (g6 << 5) | b5
 
-def fill_color(color):
+def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    buf = [color >> 8, color & 0xFF] * (240 * 240)
+    # !!! Поменяли порядок: сначала младший, потом старший
+    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
