@@ -42,7 +42,7 @@ def init_display():
     write_data(0x55)     # 16-bit/pixel (RGB565)
 
     write_command(0x36)
-    write_data(0x00)     # RGB порядок (BGR отключен)
+    write_data(0x00)     # RGB порядок
 
     write_command(0x29)  # Display ON
     time.sleep(0.100)
@@ -54,20 +54,20 @@ def init_display():
     write_command(0x2B)  # Row Address Set
     write_data([0x00, 0, 0x00, 239])  # Y: 0–239
 
-    write_command(0x2C)  # RAM Write (start writing)
+    write_command(0x2C)  # RAM Write
 
-def color565_fixed(r, g, b):
-    """RGB → RGB565, c перепутанными R и G битами"""
-    r5 = r >> 3      # 5 бит
-    g6 = g >> 2      # 6 бит
-    b5 = b >> 3      # 5 бит
-
-    # ПЕРЕКРУЧИВАЕМ: GGGGG RRRRR BBBBB — как на твоем дисплее
-    return (g6 << 11) | (r5 << 6) | b5
+def color565_rotated(r, g, b):
+    """Циклический сдвиг: R → G, G → B, B → R"""
+    new_r = b
+    new_g = r
+    new_b = g
+    r5 = new_r >> 3
+    g6 = new_g >> 2
+    b5 = new_b >> 3
+    return (r5 << 11) | (g6 << 5) | b5
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    # Порядок байтов: старший, потом младший
     buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
@@ -76,13 +76,13 @@ def fill_color(color_565):
 init_display()
 
 print("RED")
-fill_color(color565_fixed(255, 0, 0))
+fill_color(color565_rotated(255, 0, 0))
 time.sleep(2)
 
 print("GREEN")
-fill_color(color565_fixed(0, 255, 0))
+fill_color(color565_rotated(0, 255, 0))
 time.sleep(2)
 
 print("BLUE")
-fill_color(color565_fixed(0, 0, 255))
+fill_color(color565_rotated(0, 0, 255))
 time.sleep(2)
