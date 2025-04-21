@@ -31,7 +31,7 @@ def write_data(data):
     GPIO.output(DC, GPIO.HIGH)
     spi.writebytes(data if isinstance(data, list) else [data])
 
-def init_display(use_bgr=False):
+def init_display():
     write_command(0x01)  # Software Reset
     time.sleep(0.150)
 
@@ -42,7 +42,7 @@ def init_display(use_bgr=False):
     write_data(0x55)     # 16-bit/pixel (RGB565)
 
     write_command(0x36)  # Memory Access Control
-    write_data(0x08 if use_bgr else 0x00)  # BGR or RGB order
+    write_data(0x08)     # 0x08 = BGR, 0x00 = RGB
 
     write_command(0x29)  # Display ON
     time.sleep(0.100)
@@ -56,54 +56,48 @@ def init_display(use_bgr=False):
 
     write_command(0x2C)  # RAM Write (start writing)
 
-def color565(r, g, b, use_bgr=False):
-    """Создать 16-битный цвет (RGB565 или BGR565) из обычных RGB 0–255"""
-    r5 = r >> 3      # 5 бит красного
-    g6 = g >> 2      # 6 бит зелёного
-    b5 = b >> 3      # 5 бит синего
-    if use_bgr:
-        return (b5 << 11) | (g6 << 5) | r5  # BGR565
-    else:
-        return (r5 << 11) | (g6 << 5) | b5  # RGB565
+def color565(r, g, b):
+    """Создать 16-битный цвет (BGR565) из обычных RGB 0–255"""
+    r5 = r >> 3
+    g6 = g >> 2
+    b5 = b >> 3
+    return (b5 << 11) | (g6 << 5) | r5  # BGR565!
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    # поменяли порядок байт: MSB first — как ST7789 и хочет
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)  # Растягиваем на весь экран
+    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
 # ---------------- MAIN ----------------
-# Выбери True если нужно BGR, False — RGB
-init_display(use_bgr=False)  # Попробуй BGR=False, чтобы проверить стандартное RGB
+init_display()  # теперь use_bgr включён по умолчанию
 
-# Заливаем разные цвета
 print("Заливаю голубым...")
-fill_color(color565(0, 255, 255, use_bgr=False))  # ГОЛУБОЙ: синий + зелёный
+fill_color(color565(0, 255, 255))
 time.sleep(1)
 
 print("Заливаю красным...")
-fill_color(color565(255, 0, 0, use_bgr=False))  # КРАСНЫЙ: только красный
+fill_color(color565(255, 0, 0))
 time.sleep(1)
 
 print("Заливаю зелёным...")
-fill_color(color565(0, 255, 0, use_bgr=False))  # ЗЕЛЕНЫЙ: только зелёный
+fill_color(color565(0, 255, 0))
 time.sleep(1)
 
 print("Заливаю темно-синим...")
-fill_color(color565(0, 0, 139, use_bgr=False))  # ТЕМНО-СИНИЙ
+fill_color(color565(0, 0, 139))
 time.sleep(1)
 
 print("Заливаю светло-зеленым...")
-fill_color(color565(144, 238, 144, use_bgr=False))  # СВЕТЛО-ЗЕЛЕНЫЙ
+fill_color(color565(144, 238, 144))
 time.sleep(1)
 
 print("Заливаю сиреневым...")
-fill_color(color565(255, 0, 255, use_bgr=False))  # СИРЕНЕВЫЙ: красный + синий
+fill_color(color565(255, 0, 255))
 time.sleep(1)
 
 print("Заливаю голубым...")
-fill_color(color565(0, 255, 255, use_bgr=False))  # ГОЛУБОЙ
+fill_color(color565(0, 255, 255))
 time.sleep(1)
 
 print("Готово!")
