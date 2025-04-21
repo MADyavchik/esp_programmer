@@ -57,6 +57,23 @@ def init_display():
 
     write_command(0x2C)  # RAMWR (Memory Write)
 
+
+def rgb565_to_bgr565(color):
+    r = (color >> 11) & 0x1F
+    g = (color >> 5) & 0x3F
+    b = color & 0x1F
+    bgr = (b << 11) | (g << 5) | r
+    return bgr
+
+def color565(r, g, b):
+    """Создать 16-битный цвет (BGR565) из обычных RGB 0–255"""
+    r5 = r >> 3
+    g6 = g >> 2
+    b5 = b >> 3
+    rgb = (r5 << 11) | (g6 << 5) | b5
+    return rgb565_to_bgr565(rgb)
+
+
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
     # 240x240 = 57600 пикселей. Каждый пиксель — 2 байта
@@ -67,4 +84,4 @@ def fill_color(color_565):
 
 # Пример цвета: чёрный = 0x0000, красный = 0xF800, зелёный = 0x07E0, синий = 0x001F
 init_display()
-fill_color(0xF800)
+fill_color(rgb565_to_bgr565(0xF800))
