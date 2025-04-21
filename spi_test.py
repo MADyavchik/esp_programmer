@@ -66,17 +66,16 @@ def rgb565_to_bgr565(color):
     return bgr
 
 def color565(r, g, b):
-    """Формирует BGR565, а не RGB565"""
+    """Стандартный RGB565"""
     r5 = r >> 3
     g6 = g >> 2
     b5 = b >> 3
-    bgr = (b5 << 11) | (g6 << 5) | r5
-    return bgr
+    return (r5 << 11) | (g6 << 5) | b5
 
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)  # Big endian
+    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)  # Little endian
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
