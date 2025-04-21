@@ -1,37 +1,44 @@
-import st7789
-from PIL import Image
+import spidev
+import RPi.GPIO as GPIO
 import time
 
-WIDTH = 240
-HEIGHT = 240
+DC = 23
+RST = 24
 
-disp = st7789.ST7789(
-    port=0,
-    cs=0,
-    dc=23,
-    rst=24,
-    width=WIDTH,
-    height=HEIGHT,
-    rotation=90,
-    spi_speed_hz=40000000
-)
+# Настройка GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(DC, GPIO.OUT)
+GPIO.setup(RST, GPIO.OUT)
 
-disp.begin()
+# Сброс дисплея
+GPIO.output(RST, GPIO.LOW)
+time.sleep(0.1)
+GPIO.output(RST, GPIO.HIGH)
+time.sleep(0.1)
 
-# Простой экран - красный цвет
-img = Image.new("RGB", (WIDTH, HEIGHT), (255, 0, 0))
-disp.display(img)
+# Настройка SPI
+spi = spidev.SpiDev()
+spi.open(0, 0)  # bus 0, device 0
+spi.max_speed_hz = 40000000
+spi.mode = 3  # ВОТ ТУТ МЕНЯЕМ РЕЖИМ: mode 3 = CPOL=1, CPHA=1
 
-time.sleep(5)
+# Пример команды инициализации дисплея ST7789
+def send_command(cmd):
+    GPIO.output(DC, GPIO.LOW)
+    spi.writebytes([cmd])
 
-# Потом зелёный
-img = Image.new("RGB", (WIDTH, HEIGHT), (0, 255, 0))
-disp.display(img)
+def send_data(data):
+    GPIO.output(DC, GPIO.HIGH)
+    if isinstance(data, list):
+        spi.writebytes(data)
+    else:
+        spi.writebytes([data])
 
-time.sleep(5)
+# Попробуем отправить команды инициализации (неполные, просто для теста)
+send_command(0x01)  # Software reset
+time.sleep(0.15)
+send_command(0x11)  # Sleep out
+time.sleep(0.5)
+send_command(0x29)  # Display ON
 
-# Потом синий
-img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 255))
-disp.display(img)
-
-time.sleep(5)
+print("Команды отправлены. Есть изменения на экране?")
