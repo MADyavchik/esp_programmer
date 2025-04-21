@@ -74,14 +74,13 @@ def color565(r, g, b):
     return rgb565_to_bgr565(rgb)
 
 
-def fill_color(color_565):
+def fill_color_direct(hex_color):
     GPIO.output(DC, GPIO.HIGH)
-    # 240x240 = 57600 пикселей. Каждый пиксель — 2 байта
-    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)
+    buf = [hex_color >> 8, hex_color & 0xFF] * (240 * 240)  # big-endian
     CHUNK = 4096
     for i in range(0, len(buf), CHUNK):
         spi.writebytes(buf[i:i+CHUNK])
 
 # Пример цвета: чёрный = 0x0000, красный = 0xF800, зелёный = 0x07E0, синий = 0x001F
 init_display()
-fill_color(color565(255, 0, 0))
+fill_color_direct(0xF800)
