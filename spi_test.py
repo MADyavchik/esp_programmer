@@ -60,7 +60,7 @@ def init_display():
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
     # 240x240 = 57600 пикселей. Каждый пиксель — 2 байта
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
+    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)
     CHUNK = 4096
     for i in range(0, len(buf), CHUNK):
         spi.writebytes(buf[i:i+CHUNK])
