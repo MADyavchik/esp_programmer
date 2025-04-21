@@ -66,20 +66,21 @@ def rgb565_to_bgr565(color):
     return bgr
 
 def color565(r, g, b):
-    """Формат GRB565: G (6 бит) → B (5 бит) → R (5 бит)"""
-    g6 = g >> 2
-    b5 = b >> 3
-    r5 = r >> 3
-    return (g6 << 10) | (b5 << 5) | r5
+    """Создать 16-битный цвет (BGR565) из обычных RGB 0–255"""
+    r5 = r >> 3      # 5 бит
+    g6 = g >> 2      # 6 бит
+    b5 = b >> 3      # 5 бит
+    return (b5 << 11) | (g6 << 5) | r5  # BGR565
 
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)  # MSB first
+    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
 
-init_display()
 
-fill_color(color565(255, 0, 0))  # ДОЛЖЕН БЫТЬ КРАСНЫЙ!
+
+init_display()
+fill_color(color565(255, 0, 0))  # ДОЛЖЕН быть красный
