@@ -17,9 +17,12 @@ printer_connection = {
     "printer": None,
     "connected": False,
 }
+monitoring_task = None
 
 # --- ПРИНТЕР ---
 async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
+    global monitoring_task  # Чтобы можно было остановить потом
+
     device = await get_device_by_mac(printer_connection["mac"])
     if not device:
         show_message("Printer not found")
@@ -28,22 +31,62 @@ async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
 
     printer = await connect_printer(device)
 
-
     printer_connection["device"] = device
     printer_connection["printer"] = printer
     printer_connection["connected"] = True
-    printer_connection["config"] = config  # <-- запомним
+    printer_connection["config"] = config
     show_message("Printer connected")
     await asyncio.sleep(1)
 
+    # Запускаем мониторинг
+    if not monitoring_task or monitoring_task.done():
+        monitoring_task = asyncio.create_task(monitor_printer_connection())
+
 async def disconnect_from_printer():
+    global monitoring_task
+
     if printer_connection["printer"]:
         await disconnect_printer(printer_connection["printer"])
+
     printer_connection["device"] = None
     printer_connection["printer"] = None
     printer_connection["connected"] = False
     show_message("Printer disconnected")
     await asyncio.sleep(1)
+
+    # Остановим мониторинг
+    if monitoring_task and not monitoring_task.done():
+        monitoring_task.cancel()
+        try:
+            await monitoring_task
+        except asyncio.CancelledError:
+            pass
+
+
+async def monitor_printer_connection(interval=5):
+    while True:
+        printer = printer_connection.get("printer")
+        if not printer:
+            break  # выходим, если принтера уже нет
+
+        try:
+            if hasattr(printer, "get_print_status"):
+                status = await printer.get_print_status()
+                if not status or status.get("error", False):
+                    raise Exception("Printer not responding")
+            else:
+                raise Exception("get_print_status not supported")
+
+        except Exception as e:
+            print(f"⚠️ Принтер отключён: {e}")
+            printer_connection["connected"] = False
+            printer_connection["printer"] = None
+            printer_connection["device"] = None
+            show_message("Printer disconnected")
+            break  # Остановим мониторинг, ждём переподключения
+
+        await asyncio.sleep(interval)
+
 
 # --- МЕНЮ ---
 @log_async
