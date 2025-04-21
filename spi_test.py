@@ -1,14 +1,13 @@
+import st7789
+from PIL import Image
 import time
-import ST7789 as st7789
-from PIL import Image, ImageDraw, ImageFont
 
 WIDTH = 240
 HEIGHT = 240
 
-# Инициализация дисплея (CS можно не подключать вообще физически)
 disp = st7789.ST7789(
     port=0,
-    cs=0,  # даже если CS нет, оставляем 0 — библиотека всё равно требует
+    cs=0,
     dc=23,
     rst=24,
     width=WIDTH,
@@ -19,11 +18,20 @@ disp = st7789.ST7789(
 
 disp.begin()
 
-# Отрисовка картинки
-image = Image.new("RGB", (WIDTH, HEIGHT), "black")
-draw = ImageDraw.Draw(image)
-font = ImageFont.load_default()
-draw.text((10, 10), "Привет, мир!", font=font, fill=(255, 255, 255))
+# Простой экран - красный цвет
+img = Image.new("RGB", (WIDTH, HEIGHT), (255, 0, 0))
+disp.display(img)
 
-disp.display(image)
-time.sleep(10)
+time.sleep(5)
+
+# Потом зелёный
+img = Image.new("RGB", (WIDTH, HEIGHT), (0, 255, 0))
+disp.display(img)
+
+time.sleep(5)
+
+# Потом синий
+img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 255))
+disp.display(img)
+
+time.sleep(5)
