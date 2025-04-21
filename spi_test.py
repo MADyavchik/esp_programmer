@@ -74,28 +74,29 @@ def fill_color(color_565):
 # Выбери True если нужно BGR, False — RGB
 init_display(use_bgr=False)  # Попробуй BGR=False, чтобы проверить стандартное RGB
 
-print("Заливаю красным...")
-fill_color(color565(255, 0, 0))  # ДОЛЖЕН быть красный
-time.sleep(1)
-
-print("Заливаю зелёным...")
-fill_color(color565(0, 255, 0))  # ДОЛЖЕН быть зелёный
-time.sleep(1)
-
-print("Заливаю синим...")
-fill_color(color565(0, 0, 255))  # ДОЛЖЕН быть синий
-time.sleep(1)
-
-print("Заливаю желтым...")
-fill_color(color565(255, 255, 0))  # ЖЕЛТЫЙ: красный + зелёный
+# Заливаем разные цвета
+print("Заливаю голубым...")
+fill_color(color565(0, 255, 255))  # ГОЛУБОЙ: зелёный + синий
 time.sleep(1)
 
 print("Заливаю сиреневым...")
 fill_color(color565(255, 0, 255))  # СИРЕНЕВЫЙ: красный + синий
 time.sleep(1)
 
-print("Заливаю голубым...")
-fill_color(color565(0, 255, 255))  # ГОЛУБОЙ: зелёный + синий
+print("Заливаю светло-зеленым...")
+fill_color(color565(144, 238, 144))  # СВЕТЛО-ЗЕЛЕНЫЙ: RGB(144, 238, 144)
+time.sleep(1)
+
+print("Заливаю синим...")
+fill_color(color565(0, 0, 255))  # СИНИЙ: только синий
+time.sleep(1)
+
+print("Заливаю зелёным...")
+fill_color(color565(0, 255, 0))  # ЗЕЛЕНЫЙ: только зелёный
+time.sleep(1)
+
+print("Заливаю красным...")
+fill_color(color565(255, 0, 0))  # КРАСНЫЙ: только красный
 time.sleep(1)
 
 print("Готово!")
