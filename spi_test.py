@@ -5,23 +5,22 @@ import time
 DC = 23
 RST = 24
 
-# Настройка GPIO
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(DC, GPIO.OUT)
 GPIO.setup(RST, GPIO.OUT)
 
-# Сброс дисплея
+# Reset
 GPIO.output(RST, GPIO.LOW)
 time.sleep(0.1)
 GPIO.output(RST, GPIO.HIGH)
 time.sleep(0.1)
 
-# Настройка SPI
+# SPI init
 spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = 40000000
-spi.mode = 3  # CPOL=1, CPHA=1
+spi.mode = 3
 
 def write_command(cmd):
     GPIO.output(DC, GPIO.LOW)
@@ -32,73 +31,56 @@ def write_data(data):
     spi.writebytes(data if isinstance(data, list) else [data])
 
 def init_display():
-    write_command(0x01)  # Software Reset
+    write_command(0x01)
     time.sleep(0.150)
 
-    write_command(0x11)  # Sleep Out
+    write_command(0x11)
     time.sleep(0.500)
 
-    write_command(0x3A)  # Interface Pixel Format
-    write_data(0x55)     # 16-bit/pixel (RGB565)
+    write_command(0x3A)
+    write_data(0x55)  # RGB565
 
-    write_command(0x36)  # Memory Access Control
-    write_data(0x08)     # 0x08 = BGR, 0x00 = RGB
+    write_command(0x36)
+    write_data(0x00)  # RGB
 
-    write_command(0x29)  # Display ON
+    write_command(0x29)
     time.sleep(0.100)
 
-    # Установка окна (весь экран)
-    write_command(0x2A)  # Column Address Set
-    write_data([0x00, 0, 0x00, 239])  # X: 0–239
+    # window
+    write_command(0x2A)
+    write_data([0x00, 0, 0x00, 239])
 
-    write_command(0x2B)  # Row Address Set
-    write_data([0x00, 0, 0x00, 239])  # Y: 0–239
+    write_command(0x2B)
+    write_data([0x00, 0, 0x00, 239])
 
-    write_command(0x2C)  # RAM Write (start writing)
+    write_command(0x2C)
 
 def color565(r, g, b):
-    """Создать 16-битный цвет (BGR565) из обычных RGB 0–255"""
     r5 = r >> 3
     g6 = g >> 2
     b5 = b >> 3
-    return (b5 << 11) | (g6 << 5) | r5  # BGR565!
+    return (r5 << 11) | (g6 << 5) | b5  # RGB565
 
-def fill_color(color_565):
+def fill_color(color):
     GPIO.output(DC, GPIO.HIGH)
-    # !!! МЕНЯЕМ порядок байт !!!
-    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)
+    buf = [color >> 8, color & 0xFF] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
-# ---------------- MAIN ----------------
-init_display()  # теперь use_bgr включён по умолчанию
+# MAIN
+init_display()
 
-print("Заливаю голубым...")
-fill_color(color565(0, 255, 255))
-time.sleep(1)
-
-print("Заливаю красным...")
+# 🔴 RED
+print("RED")
 fill_color(color565(255, 0, 0))
-time.sleep(1)
+time.sleep(2)
 
-print("Заливаю зелёным...")
+# 🟢 GREEN
+print("GREEN")
 fill_color(color565(0, 255, 0))
-time.sleep(1)
+time.sleep(2)
 
-print("Заливаю темно-синим...")
-fill_color(color565(0, 0, 139))
-time.sleep(1)
-
-print("Заливаю светло-зеленым...")
-fill_color(color565(144, 238, 144))
-time.sleep(1)
-
-print("Заливаю сиреневым...")
-fill_color(color565(255, 0, 255))
-time.sleep(1)
-
-print("Заливаю голубым...")
-fill_color(color565(0, 255, 255))
-time.sleep(1)
-
-print("Готово!")
+# 🔵 BLUE
+print("BLUE")
+fill_color(color565(0, 0, 255))
+time.sleep(2)
