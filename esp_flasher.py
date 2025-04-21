@@ -156,6 +156,8 @@ async def flash_firmware(firmware_name):
         if printer_connection["connected"] and printer_connection.get("printer"):
             from printer_functions import print_mac_address
             logging.info("🖨️ Отправляем MAC на печать...")
+            show_message("Printing MAC...")
+            #time.sleep(2)
             await print_mac_address(printer_connection["printer"], mac_address, config=printer_connection["config"])
         else:
             logging.warning("⚠️ Принтер не подключен — печать пропущена.")
