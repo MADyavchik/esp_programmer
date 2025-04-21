@@ -86,7 +86,7 @@ def fill_color(color_565):
 
 # ---------------- MAIN ----------------
 # Выбери True если нужно BGR, False — RGB
-init_display(use_bgr=False)
+init_display(use_bgr=True)
 
 print("Заливаю красным...")
 fill_color(color565(255, 0, 0))
