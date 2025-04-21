@@ -41,8 +41,8 @@ def init_display():
     write_command(0x3A)  # Interface Pixel Format
     write_data(0x55)     # 16-bit/pixel (RGB565)
 
-    write_command(0x36)  # Memory Access Control
-    write_data(0x08)     # BGR порядок (важно!)
+    write_command(0x36)
+    write_data(0x00)     # ❗ Отключаем BGR (используем чистый RGB)
 
     write_command(0x29)  # Display ON
     time.sleep(0.100)
@@ -57,15 +57,19 @@ def init_display():
     write_command(0x2C)  # RAM Write (start writing)
 
 def color565(r, g, b):
-    """RGB → RGB565"""
+    """Преобразуем RGB в RGB565"""
     r5 = r >> 3
     g6 = g >> 2
     b5 = b >> 3
     return (r5 << 11) | (g6 << 5) | b5
 
+def color565_swapped(r, g, b):
+    """Меняем местами R и B"""
+    return color565(b, g, r)  # Из-за особенностей экрана
+
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    # Порядок байтов: сначала старший, потом младший (MSB first)
+    # Порядок: сначала старший байт, потом младший
     buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
@@ -74,13 +78,13 @@ def fill_color(color_565):
 init_display()
 
 print("RED")
-fill_color(color565(255, 0, 0))
+fill_color(color565_swapped(255, 0, 0))
 time.sleep(2)
 
 print("GREEN")
-fill_color(color565(0, 255, 0))
+fill_color(color565_swapped(0, 255, 0))
 time.sleep(2)
 
 print("BLUE")
-fill_color(color565(0, 0, 255))
+fill_color(color565_swapped(0, 0, 255))
 time.sleep(2)
