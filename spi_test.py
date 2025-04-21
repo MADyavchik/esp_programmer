@@ -6,21 +6,6 @@ DC = 23
 RST = 24
 
 # Настройка GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(DC, GPIO.OUT)
-GPIO.setup(RST, GPIO.OUT)
-
-# Сброс дисплея
-GPIO.output(RST, GPIO.LOW)
-time.sleep(0.1)
-GPIO.output(RST, GPIO.HIGH)
-import spidev
-import RPi.GPIO as GPIO
-import time
-
-DC = 23
-RST = 24
-
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(DC, GPIO.OUT)
@@ -63,13 +48,13 @@ def init_display(use_bgr=False):
     time.sleep(0.100)
 
     # Установка окна (весь экран)
-    write_command(0x2A)
+    write_command(0x2A)  # Column Address Set
     write_data([0x00, 0, 0x00, 239])  # X: 0–239
 
-    write_command(0x2B)
+    write_command(0x2B)  # Row Address Set
     write_data([0x00, 0, 0x00, 239])  # Y: 0–239
 
-    write_command(0x2C)  # RAM Write
+    write_command(0x2C)  # RAM Write (start writing)
 
 def color565(r, g, b):
     """Создать 16-битный цвет (RGB565) из обычных RGB 0–255"""
@@ -80,8 +65,8 @@ def color565(r, g, b):
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    # поменяли порядок байт
-    buf = [color_565 >> 8, color_565 & 0xFF]  # MSB first — как ST7789 и хочет
+    # поменяли порядок байт: MSB first — как ST7789 и хочет
+    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)  # Растягиваем на весь экран
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
@@ -90,15 +75,15 @@ def fill_color(color_565):
 init_display(use_bgr=True)
 
 print("Заливаю красным...")
-fill_color(color565(255, 0, 0))
+fill_color(color565(255, 0, 0))  # ДОЛЖЕН быть красный
 time.sleep(1)
 
 print("Заливаю зелёным...")
-fill_color(color565(0, 255, 0))
+fill_color(color565(0, 255, 0))  # ДОЛЖЕН быть зелёный
 time.sleep(1)
 
 print("Заливаю синим...")
-fill_color(color565(0, 0, 255))
+fill_color(color565(0, 0, 255))  # ДОЛЖЕН быть синий
 time.sleep(1)
 
 print("Готово!")
