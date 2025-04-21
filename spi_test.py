@@ -38,15 +38,14 @@ def init_display():
     time.sleep(0.500)
 
     write_command(0x3A)
-    write_data(0x55)  # RGB565
+    write_data(0x55)  # RGB565 формат
 
     write_command(0x36)
-    write_data(0x00)  # RGB
+    write_data(0x08)  # ВКЛЮЧАЕМ BGR! Было 0x00
 
     write_command(0x29)
     time.sleep(0.100)
 
-    # window
     write_command(0x2A)
     write_data([0x00, 0, 0x00, 239])
 
