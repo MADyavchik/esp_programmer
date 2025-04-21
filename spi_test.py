@@ -66,25 +66,21 @@ def rgb565_to_bgr565(color):
     return bgr
 
 def color565(r, g, b):
-    """Создать 16-битный цвет (BGR565) из обычных RGB 0–255"""
+    """Формирует BGR565, а не RGB565"""
     r5 = r >> 3
     g6 = g >> 2
     b5 = b >> 3
-    rgb = (r5 << 11) | (g6 << 5) | b5
-    return rgb565_to_bgr565(rgb)
+    bgr = (b5 << 11) | (g6 << 5) | r5
+    return bgr
 
 
-def fill_color_test(color_565, label=""):
-    print(f"Цвет: {hex(color_565)} -> {label}")
+def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
+    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)  # Big endian
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
-    time.sleep(3)
+
 
 init_display()
 
-fill_color_test(0xF800, "ДОЛЖЕН БЫТЬ КРАСНЫЙ")
-fill_color_test(0x07E0, "ДОЛЖЕН БЫТЬ ЗЕЛЁНЫЙ")
-fill_color_test(0x001F, "ДОЛЖЕН БЫТЬ СИНИЙ")
-fill_color_test(0xFFFF, "ДОЛЖЕН БЫТЬ БЕЛЫЙ")
+fill_color(color565(255, 0, 0))  # ДОЛЖЕН БЫТЬ КРАСНЫЙ!
