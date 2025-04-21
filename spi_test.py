@@ -84,4 +84,4 @@ def fill_color(color_565):
 
 # Пример цвета: чёрный = 0x0000, красный = 0xF800, зелёный = 0x07E0, синий = 0x001F
 init_display()
-fill_color(rgb565_to_bgr565(0xF800))
+fill_color(color565(255, 0, 0))
