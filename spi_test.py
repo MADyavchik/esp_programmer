@@ -5,18 +5,19 @@ import time
 DC = 23
 RST = 24
 
+# Настройка GPIO
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(DC, GPIO.OUT)
 GPIO.setup(RST, GPIO.OUT)
 
-# Reset
+# Сброс дисплея
 GPIO.output(RST, GPIO.LOW)
 time.sleep(0.1)
 GPIO.output(RST, GPIO.HIGH)
 time.sleep(0.1)
 
-# SPI init
+# Настройка SPI
 spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = 40000000
@@ -31,30 +32,32 @@ def write_data(data):
     spi.writebytes(data if isinstance(data, list) else [data])
 
 def init_display():
-    write_command(0x01)
+    write_command(0x01)  # Software Reset
     time.sleep(0.150)
 
-    write_command(0x11)
+    write_command(0x11)  # Sleep Out
     time.sleep(0.500)
 
-    write_command(0x3A)
-    write_data(0x55)  # RGB565 формат
+    write_command(0x3A)  # Interface Pixel Format
+    write_data(0x55)     # 16-bit/pixel (RGB565)
 
-    write_command(0x36)
-    write_data(0x08)  # ВКЛЮЧАЕМ BGR! Было 0x00
+    write_command(0x36)  # Memory Access Control
+    write_data(0x08)     # BGR порядок (важно!)
 
-    write_command(0x29)
+    write_command(0x29)  # Display ON
     time.sleep(0.100)
 
-    write_command(0x2A)
-    write_data([0x00, 0, 0x00, 239])
+    # Установка окна (весь экран)
+    write_command(0x2A)  # Column Address Set
+    write_data([0x00, 0, 0x00, 239])  # X: 0–239
 
-    write_command(0x2B)
-    write_data([0x00, 0, 0x00, 239])
+    write_command(0x2B)  # Row Address Set
+    write_data([0x00, 0, 0x00, 239])  # Y: 0–239
 
-    write_command(0x2C)
+    write_command(0x2C)  # RAM Write (start writing)
 
 def color565(r, g, b):
+    """RGB → RGB565"""
     r5 = r >> 3
     g6 = g >> 2
     b5 = b >> 3
@@ -62,25 +65,22 @@ def color565(r, g, b):
 
 def fill_color(color_565):
     GPIO.output(DC, GPIO.HIGH)
-    # !!! Поменяли порядок: сначала младший, потом старший
-    buf = [color_565 & 0xFF, color_565 >> 8] * (240 * 240)
+    # Порядок байтов: сначала старший, потом младший (MSB first)
+    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
     for i in range(0, len(buf), 4096):
         spi.writebytes(buf[i:i+4096])
 
-# MAIN
+# ---------------- MAIN ----------------
 init_display()
 
-# 🔴 RED
 print("RED")
 fill_color(color565(255, 0, 0))
 time.sleep(2)
 
-# 🟢 GREEN
 print("GREEN")
 fill_color(color565(0, 255, 0))
 time.sleep(2)
 
-# 🔵 BLUE
 print("BLUE")
 fill_color(color565(0, 0, 255))
 time.sleep(2)
