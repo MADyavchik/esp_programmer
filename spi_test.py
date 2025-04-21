@@ -72,7 +72,7 @@ def fill_color(color_565):
 
 # ---------------- MAIN ----------------
 # Выбери True если нужно BGR, False — RGB
-init_display(use_bgr=True)
+init_display(use_bgr=False)  # Попробуй BGR=False, чтобы проверить стандартное RGB
 
 print("Заливаю красным...")
 fill_color(color565(255, 0, 0))  # ДОЛЖЕН быть красный
@@ -84,6 +84,18 @@ time.sleep(1)
 
 print("Заливаю синим...")
 fill_color(color565(0, 0, 255))  # ДОЛЖЕН быть синий
+time.sleep(1)
+
+print("Заливаю желтым...")
+fill_color(color565(255, 255, 0))  # ЖЕЛТЫЙ: красный + зелёный
+time.sleep(1)
+
+print("Заливаю сиреневым...")
+fill_color(color565(255, 0, 255))  # СИРЕНЕВЫЙ: красный + синий
+time.sleep(1)
+
+print("Заливаю голубым...")
+fill_color(color565(0, 255, 255))  # ГОЛУБОЙ: зелёный + синий
 time.sleep(1)
 
 print("Готово!")
