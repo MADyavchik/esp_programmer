@@ -87,7 +87,7 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
             )
             draw.text((30, y), menu_items[index], font=font_bold, fill="black")
         else:
-            draw.text((30, y), menu_items[index], font=font_unselect, fill="white")
+            draw.text((30, y), menu_items[index], font=font_unselect, fill="grey")
     display_on_all(image)
 
 def draw_mac_address(mac):
