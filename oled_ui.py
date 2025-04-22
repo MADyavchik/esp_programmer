@@ -36,8 +36,8 @@ def draw_progress_bar(percent, message="Flashing..."):
     draw = ImageDraw.Draw(image)
     bar_width = int((240 - 10) * percent / 100)
     draw.text((0, 0), f"{message} {percent}%", font=font, fill="white")
-    draw.rectangle((5, 40, 240 - 5, 35), outline="white", fill=None)
-    draw.rectangle((5, 44, 5 + bar_width, 35), outline="white", fill="yellow")
+    draw.rectangle((5, 40, 240 - 5, 70), outline="white", fill=None)
+    draw.rectangle((5, 40, 5 + bar_width, 70), outline="white", fill="yellow")
     display_on_all(image)
 
 def show_message(text):
