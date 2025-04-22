@@ -50,9 +50,9 @@ def draw_log_table(data):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
     draw.text((0, 0), f"B: {data['Battery']}", font=font, fill="white")
-    draw.text((0, 40), f"T: {data['Temp']}", font=font, fill="white")
-    draw.text((64, 0), f"H: {data['TOF']}", font=font, fill="white")
-    draw.text((0, 20), f"W: {data['Weight']}", font=font, fill="white")
+    draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
+    draw.text((0, 80), f"T: {data['Temp']}", font=font, fill="white")
+    draw.text((0, 120), f"H: {data['TOF']}", font=font, fill="white")
     display_on_all(image)
 
 def update_status_data(battery, wifi, charging=False):
@@ -65,7 +65,7 @@ def draw_status_bar(draw):
     draw.text((0, 0), status_data["battery"], font=font_unselect, fill="white")
     draw.text((120, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
-        x, y = 40, 0
+        x, y = 70, 0
         draw.line((x+2, y+0, x+4, y+4), fill="white")
         draw.line((x+4, y+4, x+1, y+4), fill="white")
         draw.line((x+1, y+4, x+3, y+9), fill="white")
@@ -74,9 +74,10 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
     draw_status_bar(draw)
+    line_height = 42  # учитывая крупный шрифт
     for i in range(visible_lines):
         index = (scroll + i) % len(menu_items)
-        y = 18 + i * 20
+        y = 40 + i * line_height
         if i == 0:
             draw.rectangle((0, y - 2, 240, y + 16), fill="white")
             draw.text((10, y), menu_items[index], font=font_bold, fill="black")
@@ -98,9 +99,10 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
     draw.text((5, 0), "< menu", font=font_unselect, fill="white")
+    line_height = 42
     for i in range(visible_lines):
         index = (scroll + i) % len(items)
-        y = 18 + i * 20
+        y = 40 + i * line_height
         if index == selected_index:
             draw.rectangle((0, y - 2, 240, y + 16), fill="white")
             draw.text((10, y), items[index], font=font_bold, fill="black")
