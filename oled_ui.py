@@ -79,7 +79,7 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
         index = (scroll + i) % len(menu_items)
         y = 40 + i * line_height
         if i == 0:
-            draw.rectangle((0, y - 2, 240, y + 40), fill="white")
+            draw.rectangle((0, y - 2, 240, y + 30), fill="white")
             draw.text((10, y), menu_items[index], font=font_bold, fill="black")
         else:
             draw.text((10, y), menu_items[index], font=font_unselect, fill="white")
@@ -104,7 +104,7 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
         index = (scroll + i) % len(items)
         y = 40 + i * line_height
         if index == selected_index:
-            draw.rectangle((0, y - 2, 240, y + 40), fill="white")
+            draw.rectangle((0, y - 2, 240, y + 30), fill="white")
             draw.text((10, y), items[index], font=font_bold, fill="black")
         else:
             draw.text((10, y), items[index], font=font_unselect, fill="white")
