@@ -30,12 +30,17 @@ status_data = {"battery": "--%", "wifi": "--", "charging": False}
 
 def display_on_all(image):
     """Показываем картинку на всех экранах"""
+
+    # Приводим картинку к размеру OLED экрана, если он подключен
     if oled_device:
         try:
-            oled_device.display(image.convert("1"))
+            # Приводим к нужному размеру для OLED и преобразуем в формат "1" (черно-белый)
+            image_oled = image.resize(oled_device.size).convert("1")
+            oled_device.display(image_oled)
         except Exception as e:
-            import traceback
-            print("OLED display error:", traceback.format_exc())
+            print("OLED display error:", e)
+
+    # Для ST7789 экрана, преобразуем картинку в RGB и отображаем
     if st_device:
         try:
             st_device.display_image(image)
