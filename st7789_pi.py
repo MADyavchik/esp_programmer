@@ -4,6 +4,7 @@ import spidev
 import RPi.GPIO as GPIO
 import time
 import array
+import numpy as np
 
 class ST7789:
     def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=25, width=240, height=240):
@@ -80,3 +81,20 @@ class ST7789:
 
     def color565(self, r, g, b):
         return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+
+    def display_image(self, image):
+        image = image.resize((self.width, self.height))  # на всякий случай
+        rgb565 = self.convert_image_to_rgb565(image)
+        self.set_window(0, 0, self.width, self.height)
+        self.write_cmd(0x2C)
+        self.write_data(rgb565)
+
+    def convert_image_to_rgb565(self, image):
+        image = image.convert("RGB")
+        arr = np.array(image)
+        r = (arr[:, :, 0] >> 3).astype(np.uint16)
+        g = (arr[:, :, 1] >> 2).astype(np.uint16)
+        b = (arr[:, :, 2] >> 3).astype(np.uint16)
+        rgb565 = (r << 11) | (g << 5) | b
+        result = np.dstack(((rgb565 >> 8) & 0xFF, rgb565 & 0xFF)).flatten().tolist()
+        return result
