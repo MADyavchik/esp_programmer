@@ -10,9 +10,9 @@ except Exception as e:
     print("ST7789 init failed:", e)
 
 # Шрифты
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-font_unselect = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 12)
-font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+font_unselect = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)
 
 status_data = {"battery": "--%", "wifi": "--", "charging": False}
 
@@ -63,7 +63,7 @@ def update_status_data(battery, wifi, charging=False):
 
 def draw_status_bar(draw):
     draw.text((0, 0), status_data["battery"], font=font_unselect, fill="white")
-    draw.text((60, 0), status_data["wifi"], font=font_unselect, fill="white")
+    draw.text((120, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
         x, y = 40, 0
         draw.line((x+2, y+0, x+4, y+4), fill="white")
