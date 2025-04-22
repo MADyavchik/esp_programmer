@@ -13,6 +13,7 @@ except Exception as e:
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
 font_unselect = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
 font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)
+font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
 
 status_data = {"battery": "--%", "wifi": "--", "charging": False}
 
@@ -45,7 +46,7 @@ def show_message(text):
     draw = ImageDraw.Draw(image)
 
     # Размер текста через textbbox
-    bbox = draw.textbbox((0, 0), text, font=font)
+    bbox = draw.textbbox((0, 0), text, font=font_message)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
 
