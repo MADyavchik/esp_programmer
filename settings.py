@@ -39,8 +39,8 @@ async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
     await asyncio.sleep(1)
 
     # Запускаем мониторинг
-    if not monitoring_task or monitoring_task.done():
-        monitoring_task = asyncio.create_task(monitor_printer_connection())
+    #if not monitoring_task or monitoring_task.done():
+        #monitoring_task = asyncio.create_task(monitor_printer_connection())
 
 async def disconnect_from_printer():
     global monitoring_task
