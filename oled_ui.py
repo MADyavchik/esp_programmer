@@ -70,24 +70,27 @@ def draw_status_bar(draw):
         draw.line((x+8, y+8, x+2, y+8), fill="yellow")
         draw.line((x+2, y+8, x+8, y+16), fill="yellow")
 
-def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
+def draw_main_menu(menu_items, selected_index):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
     draw_status_bar(draw)
-    line_height = 42  # учитывая крупный шрифт
+
+    line_height = 42
     radius = line_height // 2
-    for i in range(visible_lines):
-        index = (scroll + i) % len(menu_items)
-        y = 40 + i * line_height
-        if i == 0:
+    top_margin = 40
+
+    for i, item in enumerate(menu_items):
+        y = top_margin + i * line_height
+        if i == selected_index:
             draw.rounded_rectangle(
-                (5, y - 2, 235, y + line_height - 10),  # немножко внутрь от краёв
+                (5, y - 2, 235, y + line_height - 10),
                 radius=radius,
                 fill="yellow"
             )
-            draw.text((30, y), menu_items[index], font=font_bold, fill="black")
+            draw.text((30, y), item, font=font_bold, fill="black")
         else:
-            draw.text((30, y), menu_items[index], font=font_unselect, fill="grey")
+            draw.text((30, y), item, font=font_unselect, fill="grey")
+
     display_on_all(image)
 
 def draw_mac_address(mac):

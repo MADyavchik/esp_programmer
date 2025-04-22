@@ -19,26 +19,19 @@ def reboot_pi():
 async def start_main_menu():
     menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
     selected = [0]
-    scroll = [0]
-    VISIBLE_LINES = 2
-
-    def draw():
-        draw_main_menu(menu_items, selected[0], scroll[0], VISIBLE_LINES)
-
-    draw()
     selected_result = [None]
     last_redraw = [time.time()]
 
+    def draw():
+        draw_main_menu(menu_items, selected[0])
+
     def up():
         selected[0] = (selected[0] - 1) % len(menu_items)
-        scroll[0] = selected[0]  # курсор всегда на первом элементе
         draw()
         last_redraw[0] = time.time()
 
-
     def down():
         selected[0] = (selected[0] + 1) % len(menu_items)
-        scroll[0] = selected[0]  # курсор всегда на первом элементе
         draw()
         last_redraw[0] = time.time()
 
@@ -49,14 +42,7 @@ async def start_main_menu():
         reboot_pi()
 
     def select():
-        if selected[0] == 0:
-            selected_result[0] = "flash"
-        elif selected[0] == 1:
-            selected_result[0] = "update"
-        elif selected[0] == 2:
-            selected_result[0] = "log"
-        elif selected[0] == 3:
-            selected_result[0] = "settings"  # <--- новый пункт
+        selected_result[0] = menu_items[selected[0]].lower()
         draw()
         last_redraw[0] = time.time()
 
@@ -65,9 +51,10 @@ async def start_main_menu():
 
     setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
 
+    draw()
+
     while selected_result[0] is None:
         await asyncio.sleep(0.1)
-
         if time.time() - last_redraw[0] >= 3:
             draw()
             last_redraw[0] = time.time()
