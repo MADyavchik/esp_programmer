@@ -98,7 +98,7 @@ async def start_settings_menu():
     last_redraw = [0]
 
     def refresh_labels():
-        menu_items[0] = f"Print: {'Connected' if printer_connection['connected'] else 'Disconnected'}"
+        menu_items[0] = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
 
     def draw():
         refresh_labels()
