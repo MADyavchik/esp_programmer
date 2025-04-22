@@ -35,7 +35,7 @@ def display_on_all(image):
     if oled_device:
         try:
             # Для OLED, 128x64 - это стандартный размер экрана, поэтому мы уменьшаем картинку до этих размеров
-            image_oled = image.resize(oled_device.size, Image.ANTIALIAS).convert("1")  # Уменьшаем с сглаживанием
+            image_oled = image.resize(oled_device.size, Image.Resampling.LANCZOS).convert("1")  # Уменьшаем с сглаживанием
             oled_device.display(image_oled)
         except Exception as e:
             print("OLED display error:", e)
@@ -44,7 +44,7 @@ def display_on_all(image):
     if st_device:
         try:
             # Для ST7789 экранов (например 240x240) подгоняем картинку к разрешению экрана
-            image_st = image.resize((240, 240), Image.ANTIALIAS)  # Уменьшаем картинку с сглаживанием
+            image_st = image.resize((240, 240), Image.Resampling.LANCZOS)  # Уменьшаем картинку с сглаживанием
             st_device.display_image(image_st)
         except Exception as e:
             print("ST7789 display error:", e)
