@@ -85,7 +85,7 @@ def show_message(text):
         radius=15,
         outline="yellow",
         width=3,
-        fill=None
+        fill="yellow"
     )
 
     # Центровка текста по вертикали внутри прямоугольника
@@ -96,7 +96,7 @@ def show_message(text):
         line_width = bbox[2] - bbox[0]
         x = rect_x1 + (rect_w - line_width) // 2
         y = y_text_start + i * line_height
-        draw.text((x, y), line, font=font_message, fill="yellow")
+        draw.text((x, y), line, font=font_message, fill="black")
 
     display_on_all(image)
 
