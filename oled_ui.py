@@ -47,24 +47,9 @@ def show_message(text):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
 
-    # Размер фиксированного прямоугольника
-    rect_w, rect_h = 220, 220
-    rect_x1 = (240 - rect_w) // 2
-    rect_y1 = (240 - rect_h) // 2
-    rect_x2 = rect_x1 + rect_w
-    rect_y2 = rect_y1 + rect_h
-
-    # Нарисовать прямоугольник
-    draw.rounded_rectangle(
-        [(rect_x1, rect_y1), (rect_x2, rect_y2)],
-        radius=15,
-        outline="yellow",
-        width=3,
-        fill=None
-    )
-
-    # Максимальная ширина текста в пикселях
-    max_text_width = rect_w - 20  # по 10px отступа с каждой стороны
+    # Фиксированная ширина прямоугольника
+    rect_w = 220
+    max_text_width = rect_w - 20  # по 10 пикселей отступа с каждой стороны
 
     # Разбивка текста на строки с учётом ширины
     words = text.split()
@@ -83,12 +68,29 @@ def show_message(text):
     if current_line:
         lines.append(current_line)
 
-    # Центровка текста по вертикали
-    line_height = font_message.getbbox("Ay")[3] + 4  # чуть больше для межстрочного интервала
+    # Подсчёт высоты текста
+    line_height = font_message.getbbox("Ay")[3] + 4
     total_text_height = line_height * len(lines)
-    y_text_start = rect_y1 + (rect_h - total_text_height) // 2
+    rect_h = total_text_height + 20  # отступ сверху и снизу по 10px
 
-    # Отрисовка строк
+    # Центровка прямоугольника по экрану
+    rect_x1 = (240 - rect_w) // 2
+    rect_y1 = (240 - rect_h) // 2
+    rect_x2 = rect_x1 + rect_w
+    rect_y2 = rect_y1 + rect_h
+
+    # Нарисовать прямоугольник
+    draw.rounded_rectangle(
+        [(rect_x1, rect_y1), (rect_x2, rect_y2)],
+        radius=15,
+        outline="yellow",
+        width=3,
+        fill=None
+    )
+
+    # Центровка текста по вертикали внутри прямоугольника
+    y_text_start = rect_y1 + 10  # отступ сверху
+
     for i, line in enumerate(lines):
         bbox = draw.textbbox((0, 0), line, font=font_message)
         line_width = bbox[2] - bbox[0]
