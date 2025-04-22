@@ -70,7 +70,7 @@ def draw_status_bar(draw):
         draw.line((x+8, y+8, x+2, y+8), fill="yellow")
         draw.line((x+2, y+8, x+8, y+16), fill="yellow")
 
-def draw_main_menu(menu_items, selected_index):
+def draw_main_menu(menu_items, selected_index, scroll=None, visible_lines=None):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
     draw_status_bar(draw)
