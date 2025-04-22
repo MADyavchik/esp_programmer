@@ -34,7 +34,8 @@ def display_on_all(image):
         try:
             oled_device.display(image.convert("1"))
         except Exception as e:
-            print("OLED display error:", e)
+            import traceback
+            print("OLED display error:", traceback.format_exc())
     if st_device:
         try:
             st_device.display_image(image)
