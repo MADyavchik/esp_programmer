@@ -43,7 +43,33 @@ def draw_progress_bar(percent, message="Flashing..."):
 def show_message(text):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
-    draw.text((10, 10), text, font=font, fill="white")
+
+    # Размер текста через textbbox
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+
+    # Центровка текста
+    x_text = (240 - text_width) // 2
+    y_text = (240 - text_height) // 2
+
+    # Прямоугольник с отступами
+    padding_x = 20
+    padding_y = 10
+    rect_x1 = x_text - padding_x
+    rect_y1 = y_text - padding_y
+    rect_x2 = x_text + text_width + padding_x
+    rect_y2 = y_text + text_height + padding_y
+
+    draw.rounded_rectangle(
+        [(rect_x1, rect_y1), (rect_x2, rect_y2)],
+        radius=15,
+        outline="yellow",
+        width=3,
+        fill=None
+    )
+
+    draw.text((x_text, y_text), text, font=font, fill="yellow")
     display_on_all(image)
 
 def draw_log_table(data):
