@@ -42,26 +42,19 @@ def draw_progress_bar(percent, message="Flashing..."):
     display_on_all(image)
 
 def show_message(text):
+    from textwrap import wrap
+
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
 
-    # Размер текста через textbbox
-    bbox = draw.textbbox((0, 0), text, font=font_message)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
+    # Размер фиксированного прямоугольника
+    rect_w, rect_h = 220, 220
+    rect_x1 = (240 - rect_w) // 2
+    rect_y1 = (240 - rect_h) // 2
+    rect_x2 = rect_x1 + rect_w
+    rect_y2 = rect_y1 + rect_h
 
-    # Центровка текста
-    x_text = (240 - text_width) // 2
-    y_text = (240 - text_height) // 2
-
-    # Прямоугольник с отступами
-    padding_x = 20
-    padding_y = 10
-    rect_x1 = x_text - padding_x
-    rect_y1 = y_text - padding_y
-    rect_x2 = x_text + text_width + padding_x
-    rect_y2 = y_text + text_height + padding_y
-
+    # Нарисовать прямоугольник
     draw.rounded_rectangle(
         [(rect_x1, rect_y1), (rect_x2, rect_y2)],
         radius=15,
@@ -70,7 +63,39 @@ def show_message(text):
         fill=None
     )
 
-    draw.text((x_text, y_text), text, font=font, fill="yellow")
+    # Максимальная ширина текста в пикселях
+    max_text_width = rect_w - 20  # по 10px отступа с каждой стороны
+
+    # Разбивка текста на строки с учётом ширины
+    words = text.split()
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = current_line + " " + word if current_line else word
+        bbox = draw.textbbox((0, 0), test_line, font=font_message)
+        line_width = bbox[2] - bbox[0]
+        if line_width <= max_text_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+
+    # Центровка текста по вертикали
+    line_height = font_message.getbbox("Ay")[3] + 4  # чуть больше для межстрочного интервала
+    total_text_height = line_height * len(lines)
+    y_text_start = rect_y1 + (rect_h - total_text_height) // 2
+
+    # Отрисовка строк
+    for i, line in enumerate(lines):
+        bbox = draw.textbbox((0, 0), line, font=font_message)
+        line_width = bbox[2] - bbox[0]
+        x = rect_x1 + (rect_w - line_width) // 2
+        y = y_text_start + i * line_height
+        draw.text((x, y), line, font=font_message, fill="yellow")
+
     display_on_all(image)
 
 def draw_log_table(data):
