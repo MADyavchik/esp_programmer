@@ -1,88 +1,34 @@
-import spidev
-import RPi.GPIO as GPIO
 import time
+import st7789
+import RPi.GPIO as GPIO
 
-DC = 23
-RST = 24
+# Пины для подключения дисплея
+DC = 9
+RST = 8
+BL = 7  # Пин подсветки, если есть
 
-# Настройка GPIO
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(DC, GPIO.OUT)
-GPIO.setup(RST, GPIO.OUT)
+# Инициализация дисплея
+disp = st7789.ST7789(
+    port=0,
+    cs=st7789.CS0,
+    dc=DC,
+    rst=RST,
+    bl=BL,
+    width=240,
+    height=240,
+    rotation=0  # Повернуть дисплей, если нужно
+)
 
-# Сброс дисплея
-GPIO.output(RST, GPIO.LOW)
-time.sleep(0.1)
-GPIO.output(RST, GPIO.HIGH)
-time.sleep(0.1)
+disp.begin()
 
-# Настройка SPI
-spi = spidev.SpiDev()
-spi.open(0, 0)
-spi.max_speed_hz = 40000000
-spi.mode = 3
+# Очищаем экран
+disp.fill(0)  # Черный фон
 
-def write_command(cmd):
-    GPIO.output(DC, GPIO.LOW)
-    spi.writebytes([cmd])
+# Выводим текст на экран
+disp.text('Hello, World!', 50, 50, st7789.WHITE)
 
-def write_data(data):
-    GPIO.output(DC, GPIO.HIGH)
-    spi.writebytes(data if isinstance(data, list) else [data])
+# Ждем 5 секунд
+time.sleep(5)
 
-def init_display():
-    write_command(0x01)  # Software Reset
-    time.sleep(0.150)
-
-    write_command(0x11)  # Sleep Out
-    time.sleep(0.500)
-
-    write_command(0x3A)  # Interface Pixel Format
-    write_data(0x55)     # 16-bit/pixel (RGB565)
-
-    write_command(0x36)
-    write_data(0x00)     # RGB порядок
-
-    write_command(0x29)  # Display ON
-    time.sleep(0.100)
-
-    # Установка окна (весь экран)
-    write_command(0x2A)  # Column Address Set
-    write_data([0x00, 0, 0x00, 239])  # X: 0–239
-
-    write_command(0x2B)  # Row Address Set
-    write_data([0x00, 0, 0x00, 239])  # Y: 0–239
-
-    write_command(0x2C)  # RAM Write
-
-def color565_rotated(r, g, b):
-    """Циклический сдвиг: R → G, G → B, B → R"""
-    new_r = b
-    new_g = r
-    new_b = g
-    r5 = new_r >> 3
-    g6 = new_g >> 2
-    b5 = new_b >> 3
-    return (r5 << 11) | (g6 << 5) | b5
-
-def fill_color(color_565):
-    GPIO.output(DC, GPIO.HIGH)
-    buf = [color_565 >> 8, color_565 & 0xFF] * (240 * 240)
-    for i in range(0, len(buf), 4096):
-        spi.writebytes(buf[i:i+4096])
-
-# ---------------- MAIN ----------------
-init_display()
-
-print("RED")
-fill_color(color565_rotated(255, 0, 0))
-time.sleep(2)
-
-print("GREEN")
-fill_color(color565_rotated(0, 255, 0))
-time.sleep(2)
-
-print("BLUE")
-fill_color(color565_rotated(0, 0, 255))
-time.sleep(2)
+# Выключаем дисплей
+disp.fill(0)  # Очищаем экран
