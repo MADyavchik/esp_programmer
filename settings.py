@@ -63,7 +63,7 @@ async def disconnect_from_printer():
             pass
 
 
-async def monitor_printer_connection(interval=1):
+async def monitor_printer_connection(interval=10):
     while True:
         printer = printer_connection.get("printer")
         if not printer:
