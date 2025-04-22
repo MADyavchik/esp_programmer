@@ -66,9 +66,9 @@ def draw_status_bar(draw):
     draw.text((120, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
         x, y = 70, 0
-        draw.line((x+2, y+0, x+4, y+4), fill="white")
-        draw.line((x+4, y+4, x+1, y+4), fill="white")
-        draw.line((x+1, y+4, x+3, y+9), fill="white")
+        draw.line((x+2, y+0, x+8, y+8), fill="yellow")
+        draw.line((x+8, y+8, x+2, y+8), fill="yellow")
+        draw.line((x+2, y+8, x+6, y+18), fill="yellow")
 
 def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
     image = Image.new("RGB", (240, 240), "black")
