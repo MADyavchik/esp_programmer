@@ -68,7 +68,7 @@ def draw_status_bar(draw):
         x, y = 70, 0
         draw.line((x+2, y+0, x+8, y+8), fill="yellow")
         draw.line((x+8, y+8, x+2, y+8), fill="yellow")
-        draw.line((x+2, y+8, x+6, y+18), fill="yellow")
+        draw.line((x+2, y+8, x+8, y+16), fill="yellow")
 
 def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
     image = Image.new("RGB", (240, 240), "black")
