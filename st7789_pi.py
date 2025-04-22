@@ -43,7 +43,9 @@ class ST7789:
         GPIO.output(self.dc, GPIO.HIGH)
         if isinstance(data, int):
             data = [data]
-        self.spi.writebytes(data)
+        max_chunk = 4096
+        for i in range(0, len(data), max_chunk):
+            self.spi.writebytes(data[i:i + max_chunk])
 
     def set_backlight(self, on=True):
         GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
