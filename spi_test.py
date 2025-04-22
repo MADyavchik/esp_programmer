@@ -1,34 +1,18 @@
+# spi_test.py
+
+from st7789_pi import ST7789
 import time
-import st7789
-import RPi.GPIO as GPIO
 
-# Пины для подключения дисплея
-DC = 9
-RST = 8
-BL = 7  # Пин подсветки, если есть
+disp = ST7789(width=240, height=240, dc=23, reset=24, bl=25)
 
-# Инициализация дисплея
-disp = st7789.ST7789(
-    port=0,
-    cs=st7789.CS0,
-    dc=DC,
-    rst=RST,
-    bl=BL,
-    width=240,
-    height=240,
-    rotation=0  # Повернуть дисплей, если нужно
-)
+# Заполни экран синим
+blue = disp.color565(0, 0, 255)
+disp.fill_color(blue)
 
-disp.begin()
-
-# Очищаем экран
-disp.fill(0)  # Черный фон
-
-# Выводим текст на экран
-disp.text('Hello, World!', 50, 50, st7789.WHITE)
-
-# Ждем 5 секунд
 time.sleep(5)
 
-# Выключаем дисплей
-disp.fill(0)  # Очищаем экран
+# Заполни экран красным
+red = disp.color565(255, 0, 0)
+disp.fill_color(red)
+
+time.sleep(5)
