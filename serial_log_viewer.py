@@ -4,6 +4,7 @@ import time
 from threading import Thread, Event
 from oled_ui import draw_log_table, clear
 from buttons import btn_back
+import asyncio
 
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
@@ -25,7 +26,7 @@ def monitor_serial_data(proc, stop_event):
     proc.terminate()
     clear()
 
-def show_serial_data():
+async def show_serial_data():
     clear()
 
     stop_event = Event()
@@ -41,7 +42,7 @@ def show_serial_data():
     monitor_thread.start()
 
     while not btn_back.is_pressed:
-        time.sleep(0.1)
+        await asyncio.sleep(0.1)  # ← заменили на async-версию
 
     stop_event.set()
     proc.terminate()
@@ -49,6 +50,6 @@ def show_serial_data():
 
     clear()
 
-    return "main"  # ⚡ Возвращаемся в главное меню
+    return "main"
 
 
