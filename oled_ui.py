@@ -34,8 +34,8 @@ def display_on_all(image):
     # Приводим картинку к нужному размеру для OLED
     if oled_device:
         try:
-            # Приводим к нужному размеру для OLED экрана (128x64 по умолчанию)
-            image_oled = image.resize(oled_device.size).convert("1")
+            # Для OLED, 128x64 - это стандартный размер экрана, поэтому мы уменьшаем картинку до этих размеров
+            image_oled = image.resize(oled_device.size, Image.ANTIALIAS).convert("1")  # Уменьшаем с сглаживанием
             oled_device.display(image_oled)
         except Exception as e:
             print("OLED display error:", e)
@@ -43,8 +43,8 @@ def display_on_all(image):
     # Для ST7789 экрана, преобразуем картинку в RGB и отображаем
     if st_device:
         try:
-            # Приводим изображение к размеру экрана ST7789 (240x240 или иной размер)
-            image_st = image.resize((240, 240))  # Здесь можно указать свой размер экрана для ST7789
+            # Для ST7789 экранов (например 240x240) подгоняем картинку к разрешению экрана
+            image_st = image.resize((240, 240), Image.ANTIALIAS)  # Уменьшаем картинку с сглаживанием
             st_device.display_image(image_st)
         except Exception as e:
             print("ST7789 display error:", e)
