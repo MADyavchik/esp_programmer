@@ -75,14 +75,19 @@ def draw_main_menu(menu_items, selected_index, scroll, visible_lines=2):
     draw = ImageDraw.Draw(image)
     draw_status_bar(draw)
     line_height = 42  # учитывая крупный шрифт
+    radius = line_height // 2
     for i in range(visible_lines):
         index = (scroll + i) % len(menu_items)
         y = 40 + i * line_height
         if i == 0:
-            draw.rectangle((0, y - 2, 240, y + 30), fill="white")
-            draw.text((10, y), menu_items[index], font=font_bold, fill="black")
+            draw.rounded_rectangle(
+                (5, y - 2, 235, y + line_height - 10),  # немножко внутрь от краёв
+                radius=radius,
+                fill="yellow"
+            )
+            draw.text((30, y), menu_items[index], font=font_bold, fill="black")
         else:
-            draw.text((10, y), menu_items[index], font=font_unselect, fill="white")
+            draw.text((30, y), menu_items[index], font=font_unselect, fill="white")
     display_on_all(image)
 
 def draw_mac_address(mac):
@@ -121,8 +126,4 @@ def draw_mac_qr(mac):
     dummy = Image.new("RGB", (240, 240))
     dummy_draw = ImageDraw.Draw(dummy)
     bbox = dummy_draw.textbbox((0, 0), mac, font=font_unselect)
-    text_width = bbox[2] - bbox[0]
-    x = 120 - text_width // 2
-    draw.text((x, 10), mac, font=font_unselect, fill="white")
-    image.paste(qr_img, (80, 60))
-    display_on_all(image)
+    text_
