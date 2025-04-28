@@ -1,37 +1,118 @@
 # menu.py
-import time
+
 import os
 import sys
+import time
 import asyncio
 
-from buttons import setup_buttons
+from buttons import setup_buttons, safe_async
 from oled_ui import draw_menu, clear, show_message
 from utils import log_async
 from esp_flasher import flash_firmware
+from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
+from print_config import DEFAULT_PRINTER_CONFIG
 
-# --- Переменные ---
-menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
+# --- Глобальные переменные ---
+
+# Главное меню
+MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
 
+# Принтер
+printer_connection = {
+    "mac": "01:EC:01:36:C3:86",
+    "device": None,
+    "printer": None,
+    "connected": False,
+}
+monitoring_task = None
+
 # --- Вспомогательные функции ---
+
 def reboot_pi():
     show_message("Reboot...")
     time.sleep(1)
     clear()
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
-# --- Главное меню ---
+async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
+    global monitoring_task
+
+    device = await get_device_by_mac(printer_connection["mac"])
+    if not device:
+        show_message("Printer not found")
+        await asyncio.sleep(1)
+        return
+
+    printer = await connect_printer(device)
+
+    printer_connection.update({
+        "device": device,
+        "printer": printer,
+        "connected": True,
+        "config": config,
+    })
+    show_message("Printer connected")
+    await asyncio.sleep(1)
+
+async def disconnect_from_printer():
+    global monitoring_task
+
+    if printer_connection["printer"]:
+        await disconnect_printer(printer_connection["printer"])
+
+    printer_connection.update({
+        "device": None,
+        "printer": None,
+        "connected": False,
+    })
+    show_message("Printer disconnected")
+    await asyncio.sleep(1)
+
+    if monitoring_task and not monitoring_task.done():
+        monitoring_task.cancel()
+        try:
+            await monitoring_task
+        except asyncio.CancelledError:
+            pass
+
+async def monitor_printer_connection(interval=10):
+    while True:
+        printer = printer_connection.get("printer")
+        if not printer:
+            break
+
+        try:
+            if hasattr(printer, "get_print_status"):
+                status = await printer.get_print_status()
+                if not status or status.get("error", False):
+                    raise Exception("Printer not responding")
+            else:
+                raise Exception("get_print_status not supported")
+        except Exception as e:
+            print(f"⚠️ Принтер отключён: {e}")
+            printer_connection.update({
+                "connected": False,
+                "printer": None,
+                "device": None,
+            })
+            show_message("Printer disconnected")
+            break
+
+        await asyncio.sleep(interval)
+
+# --- Меню: Главное ---
+
 @log_async
 async def start_main_menu():
-    #menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
     selected = [0]
     selected_result = [None]
     last_redraw = [time.time()]
 
     def draw():
         draw_menu(
-            items=menu_items,
+            items=MAIN_MENU_ITEMS,
             selected_index=selected[0],
             scroll=0,
             visible_lines=None,
@@ -40,12 +121,12 @@ async def start_main_menu():
         )
 
     def up():
-        selected[0] = (selected[0] - 1) % len(menu_items)
+        selected[0] = (selected[0] - 1) % len(MAIN_MENU_ITEMS)
         draw()
         last_redraw[0] = time.time()
 
     def down():
-        selected[0] = (selected[0] + 1) % len(menu_items)
+        selected[0] = (selected[0] + 1) % len(MAIN_MENU_ITEMS)
         draw()
         last_redraw[0] = time.time()
 
@@ -56,7 +137,7 @@ async def start_main_menu():
         reboot_pi()
 
     def select():
-        selected_result[0] = menu_items[selected[0]].lower()
+        selected_result[0] = MAIN_MENU_ITEMS[selected[0]].lower()
         draw()
         last_redraw[0] = time.time()
 
@@ -75,7 +156,8 @@ async def start_main_menu():
 
     return selected_result[0]
 
-# --- Меню прошивки ---
+# --- Меню: Прошивка ---
+
 @log_async
 async def start_flash_menu():
     selected = [0]
@@ -129,3 +211,58 @@ async def start_flash_menu():
             last_redraw[0] = time.time()
 
     return next_menu[0]
+
+# --- Меню: Настройки (Принтер) ---
+
+@log_async
+async def start_settings_menu():
+    await asyncio.sleep(0.1)
+    menu_items = ["Print: ?"]
+    selected = [0]
+    selected_result = [None]
+    last_redraw = [0]
+
+    def refresh_labels():
+        menu_items[0] = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
+
+    def draw():
+        refresh_labels()
+        draw_menu(
+            items=menu_items,
+            selected_index=selected[0],
+            scroll=selected[0],
+            visible_lines=1,
+            highlight_color="yellow",
+            show_back_button=False
+        )
+
+    async def select():
+        if printer_connection["connected"]:
+            await disconnect_from_printer()
+        else:
+            await connect_to_printer()
+        draw()
+
+    def up():
+        selected[0] = (selected[0] - 1) % len(menu_items)
+        draw()
+
+    def down():
+        selected[0] = (selected[0] + 1) % len(menu_items)
+        draw()
+
+    def back():
+        selected_result[0] = "main"
+
+    setup_buttons(up, down, back, lambda: safe_async(select))
+
+    draw()
+    last_redraw[0] = time.time()
+
+    while selected_result[0] is None:
+        await asyncio.sleep(0.1)
+        if time.time() - last_redraw[0] > 3:
+            draw()
+            last_redraw[0] = time.time()
+
+    return selected_result[0]
