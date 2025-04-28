@@ -195,8 +195,23 @@ def draw_menu(
     y_offset = 40  # статус-бар занимает 40 пикселей
 
     if show_back_button:
-        draw.text((5, y_offset), "< menu", font=font_unselect, fill="white")
-        y_offset += 40  # ещё отступ после надписи "< menu"
+        # Рисуем жёлтый круг
+        center_x, center_y = 24, y_offset + 24  # Центр круга (подгонишь, если надо)
+        radius = 18
+        draw.ellipse(
+            (center_x - radius, center_y - radius, center_x + radius, center_y + radius),
+            fill="yellow"
+        )
+
+        # Рисуем стрелочку "назад" (примерно "<")
+        arrow_size = 10
+        draw.line(
+            [(center_x + 4, center_y - arrow_size), (center_x - 6, center_y), (center_x + 4, center_y + arrow_size)],
+            fill="black",
+            width=4
+        )
+
+        y_offset += 48  # чуть больше отступ, чтобы ниже меню не налезло
 
     line_height = 42
     radius = line_height // 2
