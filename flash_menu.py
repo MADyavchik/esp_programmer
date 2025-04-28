@@ -12,7 +12,7 @@ from utils import log_async
 items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 selected = [0]
 scroll = [0]
-VISIBLE_LINES = 2
+VISIBLE_LINES = 4
 
 def draw_flash():
     draw_menu(
@@ -20,7 +20,7 @@ def draw_flash():
         selected_index=selected[0],
         scroll=scroll[0],
         visible_lines=VISIBLE_LINES,
-        highlight_color="yellow",
+        highlight_color="red",
         show_back_button=True
     )
 

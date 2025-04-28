@@ -1,7 +1,7 @@
 import os
 import asyncio
 import time
-from oled_ui import show_message, clear, draw_main_menu
+from oled_ui import show_message, clear, draw_menu
 from buttons import setup_buttons
 from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
 from utils import log_async
@@ -102,7 +102,14 @@ async def start_settings_menu():
 
     def draw():
         refresh_labels()
-        draw_main_menu(menu_items, selected[0], selected[0], visible_lines=1)
+        draw_menu(
+            items=menu_items,
+            selected_index=selected[0],
+            scroll=selected[0],
+            visible_lines=1,
+            highlight_color="yellow",
+            show_back_button=True
+        )
 
     async def select():
         if printer_connection["connected"]:
@@ -122,7 +129,9 @@ async def start_settings_menu():
     def back():
         selected_result[0] = "main"
 
-    setup_buttons(up, down, back, select)
+    # Привязываем кнопки
+    setup_buttons(up, down, back, safe_async(select))  # Важно: select — async, обернули через safe_async
+
     draw()
 
     while selected_result[0] is None:
