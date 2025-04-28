@@ -130,7 +130,7 @@ async def start_settings_menu():
         selected_result[0] = "main"
 
     # Привязываем кнопки
-    setup_buttons(up, down, back, safe_async(select))  # Важно: select — async, обернули через safe_async
+    setup_buttons(up, down, back, lambda: safe_async(select))  # Важно: select — async, обернули через safe_async
 
     draw()
 
