@@ -23,6 +23,7 @@ async def start_main_menu():
 
 
     def draw():
+        clear()
         draw_menu(
             items=menu_items,
             selected_index=selected[0],
