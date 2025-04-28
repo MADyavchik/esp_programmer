@@ -106,16 +106,17 @@ async def monitor_printer_connection(interval=10):
 
 @log_async
 async def start_main_menu():
-    selected = [0]
-    scroll = [0]
+    selected = [0]    # выбранный пункт в полном списке
+    cursor = [0]      # положение курсора на экране (0..visible_lines-1)
+    scroll = [0]      # откуда начинается отображение
     selected_result = [None]
     last_redraw = [time.time()]
-    visible_lines = 4  # Например
+    visible_lines = 4  # например
 
     def draw():
         draw_menu(
             items=MAIN_MENU_ITEMS,
-            selected_index=selected[0],
+            selected_index=scroll[0] + cursor[0],  # передаем реальный индекс
             scroll=scroll[0],
             visible_lines=visible_lines,
             highlight_color="yellow",
@@ -124,15 +125,29 @@ async def start_main_menu():
 
     def up():
         selected[0] = (selected[0] - 1) % len(MAIN_MENU_ITEMS)
-        if selected[0] < scroll[0]:
-            scroll[0] = selected[0]
+
+        if cursor[0] > 0:
+            cursor[0] -= 1
+        else:
+            scroll[0] -= 1
+            if scroll[0] < 0:
+                scroll[0] = max(0, len(MAIN_MENU_ITEMS) - visible_lines)
+                cursor[0] = min(visible_lines - 1, len(MAIN_MENU_ITEMS) - 1)
+
         draw()
         last_redraw[0] = time.time()
 
     def down():
         selected[0] = (selected[0] + 1) % len(MAIN_MENU_ITEMS)
-        if selected[0] >= scroll[0] + visible_lines:
-            scroll[0] = selected[0] - visible_lines + 1
+
+        if cursor[0] < min(visible_lines - 1, len(MAIN_MENU_ITEMS) - 1):
+            cursor[0] += 1
+        else:
+            scroll[0] += 1
+            if scroll[0] > len(MAIN_MENU_ITEMS) - visible_lines:
+                scroll[0] = 0
+                cursor[0] = 0
+
         draw()
         last_redraw[0] = time.time()
 
