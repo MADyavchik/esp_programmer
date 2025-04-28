@@ -184,15 +184,21 @@ async def start_flash_menu():
 
     def up():
         selected[0] = (selected[0] - 1) % len(FLASH_ITEMS)
+
+        # Двигаем скролл только если выделение ушло выше видимого окна
         if selected[0] < scroll[0]:
             scroll[0] = selected[0]
+
         draw_flash()
         last_redraw[0] = time.time()
 
     def down():
         selected[0] = (selected[0] + 1) % len(FLASH_ITEMS)
+
+        # Двигаем скролл только если выделение ушло ниже видимого окна
         if selected[0] >= scroll[0] + visible_lines:
             scroll[0] = selected[0] - visible_lines + 1
+
         draw_flash()
         last_redraw[0] = time.time()
 
