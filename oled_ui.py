@@ -200,18 +200,18 @@ def draw_menu(
         radius = 15
         draw.ellipse(
             (center_x - radius, center_y - radius, center_x + radius, center_y + radius),
-            fill="yellow"
+            fill="black"
         )
 
         # Рисуем стрелочку "назад" (примерно "<")
         arrow_size = 10
         draw.line(
             [(center_x + 4, center_y - arrow_size), (center_x - 6, center_y), (center_x + 4, center_y + arrow_size)],
-            fill="black",
+            fill="yellow",
             width=4
         )
 
-        y_offset += 48  # чуть больше отступ, чтобы ниже меню не налезло
+        y_offset += 45  # чуть больше отступ, чтобы ниже меню не налезло
 
     line_height = 42
     radius = line_height // 2
