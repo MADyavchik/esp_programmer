@@ -3,6 +3,7 @@ import subprocess
 import re
 from oled_ui import draw_log_table, clear
 from buttons import btn_back
+from buttons import setup_buttons
 
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
@@ -27,6 +28,10 @@ async def monitor_serial_data(proc, stop_event):
 async def show_serial_data():
     """Функция для отображения серийных данных"""
     clear()
+
+    # Оставляем только кнопку "назад", остальные отключаем
+    setup_buttons(None, None, None, None)
+
 
     stop_event = asyncio.Event()
 
