@@ -6,7 +6,7 @@ import time
 import asyncio
 
 from oled_ui import clear
-from oled_ui import draw_menu  # вместо draw_flash_menu
+from oled_ui import draw_menu
 from utils import log_async
 
 items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
