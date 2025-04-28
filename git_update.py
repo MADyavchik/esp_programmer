@@ -5,6 +5,7 @@ import os
 import sys
 from oled_ui import draw_progress_bar, show_message, clear
 from buttons import btn_back
+from buttons import setup_buttons
 
 def reboot():
     os.system("sudo reboot")
@@ -38,6 +39,7 @@ def update_repo():
 # Обёртка для вызова из меню
 def start_git_update():
     clear()
+    setup_buttons(None, None, None, None)
     update_repo()
 
     # Ждём нажатия кнопки Назад
