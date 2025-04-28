@@ -184,7 +184,7 @@ def draw_mac_qr(mac):
     dummy = Image.new("RGB", (240, 240))
     dummy_draw = ImageDraw.Draw(dummy)
     bbox = dummy_draw.textbbox((0, 0), mac, font=font_unselect)
-    text_
+
 
 def draw_menu(
     items,
