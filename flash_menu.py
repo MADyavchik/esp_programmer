@@ -26,6 +26,7 @@ def draw_flash():
 
 @log_async
 async def start_flash_menu():
+    last_redraw = [time.time()]
     #clear()
     draw_flash()
 
@@ -35,11 +36,13 @@ async def start_flash_menu():
         selected[0] = (selected[0] - 1) % len(items)
         scroll[0] = selected[0]
         draw_flash()
+        last_redraw[0] = time.time()
 
     def down():
         selected[0] = (selected[0] + 1) % len(items)
         scroll[0] = selected[0]
         draw_flash()
+        last_redraw[0] = time.time()
 
     def back():
         next_menu[0] = "main"
@@ -52,11 +55,14 @@ async def start_flash_menu():
         print(f"◀ Возвращаемся в меню: {result}")
         next_menu[0] = result or "flash"
         draw_flash()
+        last_redraw[0] = time.time()
 
     setup_buttons(up, down, back, select)
 
     while next_menu[0] == "flash":
         await asyncio.sleep(0.1)
-        draw_flash()
+        if time.time() - last_redraw[0] >= 0.1:
+            draw_flash()
+            last_redraw[0] = time.time()
 
     return next_menu[0]
