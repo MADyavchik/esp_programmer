@@ -21,13 +21,12 @@ status_data = {"battery": "--%", "wifi": "--", "charging": False}
 def display_on_all(image):
     if st_device:
         try:
-            print("Запускаем ресайз изображения.")
+            clear()
+            print("хуй")
             image_st = image.resize((240, 240), Image.Resampling.LANCZOS)
-            print("Ресайз завершен.")
 
-            print("Попытка отобразить изображение.")
             st_device.display_image(image_st)
-            print("Изображение успешно отображено.")
+
         except Exception as e:
             print("ST7789 display error:", e)
 
