@@ -166,8 +166,9 @@ async def start_main_menu():
 
 @log_async
 async def start_flash_menu():
-    selected = [0]
-    scroll = [0]
+    selected = [0]    # выбранный элемент по списку
+    cursor = [0]      # положение курсора на экране (0..visible_lines-1)
+    scroll = [0]      # откуда начинается отображение
     next_menu = ["flash"]
     last_redraw = [time.time()]
     visible_lines = 4
@@ -175,7 +176,7 @@ async def start_flash_menu():
     def draw_flash():
         draw_menu(
             items=FLASH_ITEMS,
-            selected_index=selected[0],
+            selected_index=scroll[0] + cursor[0],
             scroll=scroll[0],
             visible_lines=visible_lines,
             highlight_color="red",
@@ -185,9 +186,13 @@ async def start_flash_menu():
     def up():
         selected[0] = (selected[0] - 1) % len(FLASH_ITEMS)
 
-        # Двигаем скролл только если выделение ушло выше видимого окна
-        if selected[0] < scroll[0]:
-            scroll[0] = selected[0]
+        if cursor[0] > 0:
+            cursor[0] -= 1
+        else:
+            scroll[0] -= 1
+            if scroll[0] < 0:
+                scroll[0] = max(0, len(FLASH_ITEMS) - visible_lines)
+                cursor[0] = min(visible_lines - 1, len(FLASH_ITEMS) - 1)
 
         draw_flash()
         last_redraw[0] = time.time()
@@ -195,9 +200,13 @@ async def start_flash_menu():
     def down():
         selected[0] = (selected[0] + 1) % len(FLASH_ITEMS)
 
-        # Двигаем скролл только если выделение ушло ниже видимого окна
-        if selected[0] >= scroll[0] + visible_lines:
-            scroll[0] = selected[0] - visible_lines + 1
+        if cursor[0] < min(visible_lines - 1, len(FLASH_ITEMS) - 1):
+            cursor[0] += 1
+        else:
+            scroll[0] += 1
+            if scroll[0] > len(FLASH_ITEMS) - visible_lines:
+                scroll[0] = 0
+                cursor[0] = 0
 
         draw_flash()
         last_redraw[0] = time.time()
