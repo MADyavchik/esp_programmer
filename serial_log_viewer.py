@@ -13,6 +13,7 @@ async def monitor_serial_data(proc, stop_event):
         line = await proc.stdout.readline()  # Асинхронно читаем строку
         if not line:
             break
+        line = line.decode('utf-8')  # Декодируем байты в строку
         match = LOG_PATTERN.search(line)
         if match:
             key, val = match.groups()
