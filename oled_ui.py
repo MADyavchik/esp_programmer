@@ -197,7 +197,7 @@ def draw_menu(
     if show_back_button:
         # Рисуем жёлтый круг
         center_x, center_y = 24, y_offset + 24  # Центр круга (подгонишь, если надо)
-        radius = 21
+        radius = 15
         draw.ellipse(
             (center_x - radius, center_y - radius, center_x + radius, center_y + radius),
             fill="yellow"
