@@ -174,16 +174,39 @@ def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
     display_on_all(image)
 
 def draw_mac_qr(mac):
+    # Создаём QR-код
     qr = qrcode.QRCode(border=1)
     qr.add_data(mac)
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="white", back_color="black").convert("RGB")
     qr_img = qr_img.resize((80, 80), Image.NEAREST)
+
+    # Создаём изображение для вывода (размер 240x240)
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
-    dummy = Image.new("RGB", (240, 240))
-    dummy_draw = ImageDraw.Draw(dummy)
-    bbox = dummy_draw.textbbox((0, 0), mac, font=font_unselect)
+
+    # Получаем размеры изображения с QR-кодом
+    qr_width, qr_height = qr_img.size
+
+    # Рисуем QR-код в центре изображения
+    x_offset = (240 - qr_width) // 2
+    y_offset = (240 - qr_height) // 2
+    image.paste(qr_img, (x_offset, y_offset))
+
+    # Вычисляем размер и позицию для текста
+    bbox = draw.textbbox((0, 0), mac, font=font_unselect)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+
+    # Позиция текста: немного ниже QR-кода
+    x_position = (240 - text_width) // 2
+    y_position = y_offset + qr_height + 10  # Немного отступаем от QR-кода
+
+    # Рисуем текст (MAC-адрес) на изображении
+    draw.text((x_position, y_position), mac, font=font_unselect, fill="white")
+
+    # Возвращаем изображение с QR-кодом и MAC-адресом
+    display_on_all(image)
 
 
 def draw_menu(
