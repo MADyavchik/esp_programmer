@@ -108,7 +108,7 @@ async def start_settings_menu():
             scroll=selected[0],
             visible_lines=1,
             highlight_color="yellow",
-            show_back_button=True
+            show_back_button=False
         )
 
     async def select():

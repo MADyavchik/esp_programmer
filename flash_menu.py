@@ -21,7 +21,7 @@ def draw_flash():
         scroll=scroll[0],
         visible_lines=VISIBLE_LINES,
         highlight_color="red",
-        show_back_button=True
+        show_back_button=False
     )
 
 @log_async
