@@ -10,11 +10,15 @@ LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 async def monitor_serial_data(proc, stop_event):
     """Асинхронная функция для мониторинга данных"""
     values = {"Battery": "—", "Temp": "—", "TOF": "—", "Weight": "—"}
+
+    # Сразу рисуем таблицу с дефолтными значениями
+    draw_log_table(values)
+
     while not stop_event.is_set():
         line = await proc.stdout.readline()  # Асинхронно читаем строку
         if not line:
             break
-        line = line.decode('utf-8')  # Декодируем байты в строку
+        line = line.decode('utf-8').strip()  # Декодируем байты в строку
         print(f"Received line: {line}")  # Выводим строку в консоль, чтобы проверить
         match = LOG_PATTERN.search(line)
         if match:
@@ -22,6 +26,7 @@ async def monitor_serial_data(proc, stop_event):
             values[key] = val
             print(f"Updated values: {values}")  # Выводим обновленные данные в консоль
             draw_log_table(values)
+
     proc.terminate()
     clear()
 
