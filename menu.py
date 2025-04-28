@@ -2,6 +2,7 @@
 from buttons import setup_buttons
 import time
 import os
+import sys
 from oled_ui import draw_menu  # вместо draw_main_menu
 from oled_ui import show_message, clear
 import asyncio
@@ -11,7 +12,7 @@ def reboot_pi():
     show_message("Reboot...")
     time.sleep(1)
     clear()
-    os.system("sudo reboot")
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
 @log_async
 async def start_main_menu():
