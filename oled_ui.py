@@ -125,28 +125,7 @@ def draw_status_bar(draw):
         draw.line((x+8, y+8, x+2, y+8), fill="yellow")
         draw.line((x+2, y+8, x+8, y+16), fill="yellow")
 
-def draw_main_menu(menu_items, selected_index, scroll=None, visible_lines=None):
-    image = Image.new("RGB", (240, 240), "black")
-    draw = ImageDraw.Draw(image)
-    draw_status_bar(draw)
 
-    line_height = 42
-    radius = line_height // 2
-    top_margin = 40
-
-    for i, item in enumerate(menu_items):
-        y = top_margin + i * line_height
-        if i == selected_index:
-            draw.rounded_rectangle(
-                (5, y - 2, 235, y + line_height - 10),
-                radius=radius,
-                fill="yellow"
-            )
-            draw.text((30, y), item, font=font_bold, fill="black")
-        else:
-            draw.text((30, y), item, font=font_unselect, fill="grey")
-
-    display_on_all(image)
 
 def draw_mac_address(mac):
     image = Image.new("RGB", (240, 240), "black")
@@ -158,20 +137,7 @@ def draw_mac_address(mac):
         draw.text((10, 10), "Error getting MAC", font=font, fill="white")
     display_on_all(image)
 
-def draw_flash_menu(items, selected_index, scroll, visible_lines=2):
-    image = Image.new("RGB", (240, 240), "black")
-    draw = ImageDraw.Draw(image)
-    draw.text((5, 0), "< menu", font=font_unselect, fill="white")
-    line_height = 42
-    for i in range(visible_lines):
-        index = (scroll + i) % len(items)
-        y = 40 + i * line_height
-        if index == selected_index:
-            draw.rectangle((0, y - 2, 240, y + 30), fill="white")
-            draw.text((10, y), items[index], font=font_bold, fill="black")
-        else:
-            draw.text((10, y), items[index], font=font_unselect, fill="white")
-    display_on_all(image)
+
 
 def draw_mac_qr(mac):
     # Создаём QR-код

@@ -21,6 +21,7 @@ async def start_main_menu():
     selected_result = [None]
     last_redraw = [time.time()]
 
+
     def draw():
         draw_menu(
             items=menu_items,
@@ -49,6 +50,7 @@ async def start_main_menu():
 
     def select():
         selected_result[0] = menu_items[selected[0]].lower()
+        clear()#----
         draw()
         last_redraw[0] = time.time()
 
@@ -57,6 +59,7 @@ async def start_main_menu():
 
     setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
 
+    clear()#----
     draw()
 
     while selected_result[0] is None:
