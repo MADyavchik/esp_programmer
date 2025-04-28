@@ -21,8 +21,7 @@ status_data = {"battery": "--%", "wifi": "--", "charging": False}
 def display_on_all(image):
     if st_device:
         try:
-            clear()
-            print("хуй")
+
             image_st = image.resize((240, 240), Image.Resampling.LANCZOS)
 
             st_device.display_image(image_st)
