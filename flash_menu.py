@@ -26,7 +26,7 @@ def draw_flash():
 
 @log_async
 async def start_flash_menu():
-    clear()
+    #clear()
     draw_flash()
 
     next_menu = ["flash"]
@@ -57,5 +57,6 @@ async def start_flash_menu():
 
     while next_menu[0] == "flash":
         await asyncio.sleep(0.1)
+        draw_flash()
 
     return next_menu[0]
