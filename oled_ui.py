@@ -1,3 +1,4 @@
+#oled_ui.py
 from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
@@ -184,3 +185,46 @@ def draw_mac_qr(mac):
     dummy_draw = ImageDraw.Draw(dummy)
     bbox = dummy_draw.textbbox((0, 0), mac, font=font_unselect)
     text_
+
+def draw_menu(
+    items,
+    selected_index,
+    scroll=0,
+    visible_lines=None,
+    highlight_color="yellow",
+    show_back_button=False
+):
+    image = Image.new("RGB", (240, 240), "black")
+    draw = ImageDraw.Draw(image)
+
+    # Сначала всегда статус-бар
+    draw_status_bar(draw)
+
+    y_offset = 40  # статус-бар занимает 40 пикселей
+
+    if show_back_button:
+        draw.text((5, y_offset), "< menu", font=font_unselect, fill="white")
+        y_offset += 40  # ещё отступ после надписи "< menu"
+
+    line_height = 42
+    radius = line_height // 2
+
+    if visible_lines is None:
+        visible_lines = len(items)
+
+    for i in range(visible_lines):
+        index = (scroll + i) % len(items)
+        y = y_offset + i * line_height
+
+        if index == selected_index:
+            # Скругленный прямоугольник выбранного элемента
+            draw.rounded_rectangle(
+                (5, y - 2, 235, y + line_height - 10),
+                radius=radius,
+                fill=highlight_color
+            )
+            draw.text((30, y), items[index], font=font_bold, fill="black")
+        else:
+            draw.text((30, y), items[index], font=font_unselect, fill="grey")
+
+    display_on_all(image)

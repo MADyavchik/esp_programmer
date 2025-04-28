@@ -2,18 +2,16 @@
 from buttons import setup_buttons
 import time
 import os
-from oled_ui import draw_main_menu
+from oled_ui import draw_menu  # вместо draw_main_menu
 from oled_ui import show_message, clear
 import asyncio
 from utils import log_async
-
 
 def reboot_pi():
     show_message("Reboot...")
     time.sleep(1)
     clear()
     os.system("sudo reboot")
-
 
 @log_async
 async def start_main_menu():
@@ -23,7 +21,14 @@ async def start_main_menu():
     last_redraw = [time.time()]
 
     def draw():
-        draw_main_menu(menu_items, selected[0])
+        draw_menu(
+            items=menu_items,
+            selected_index=selected[0],
+            scroll=0,
+            visible_lines=None,
+            highlight_color="yellow",
+            show_back_button=False
+        )
 
     def up():
         selected[0] = (selected[0] - 1) % len(menu_items)

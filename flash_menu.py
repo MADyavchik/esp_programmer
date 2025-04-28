@@ -5,33 +5,41 @@ from esp_flasher import flash_firmware
 import time
 import asyncio
 
-from oled_ui import clear  # Добавь это, если не было
-from oled_ui import draw_flash_menu  # добавить импорт
+from oled_ui import clear
+from oled_ui import draw_menu  # вместо draw_flash_menu
 from utils import log_async
-
 
 items = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 selected = [0]
 scroll = [0]
 VISIBLE_LINES = 2
 
-draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
+def draw_flash():
+    draw_menu(
+        items=items,
+        selected_index=selected[0],
+        scroll=scroll[0],
+        visible_lines=VISIBLE_LINES,
+        highlight_color="yellow",
+        show_back_button=True
+    )
+
 @log_async
 async def start_flash_menu():
     clear()
-    draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
+    draw_flash()
 
     next_menu = ["flash"]
 
     def up():
         selected[0] = (selected[0] - 1) % len(items)
         scroll[0] = selected[0]
-        draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
+        draw_flash()
 
     def down():
         selected[0] = (selected[0] + 1) % len(items)
         scroll[0] = selected[0]
-        draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
+        draw_flash()
 
     def back():
         next_menu[0] = "main"
@@ -43,7 +51,7 @@ async def start_flash_menu():
         result = await flash_firmware(name.lower())
         print(f"◀ Возвращаемся в меню: {result}")
         next_menu[0] = result or "flash"
-        draw_flash_menu(items, selected[0], scroll[0], VISIBLE_LINES)
+        draw_flash()
 
     setup_buttons(up, down, back, select)
 
