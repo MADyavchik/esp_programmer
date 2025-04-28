@@ -196,22 +196,18 @@ def draw_menu(
 
     if show_back_button:
         # Рисуем жёлтый круг
-        center_x, center_y = 24, y_offset + 24  # Центр круга (подгонишь, если надо)
+        center_x, center_y = 24, y_offset + 24
         radius = 15
         draw.ellipse(
             (center_x - radius, center_y - radius, center_x + radius, center_y + radius),
             fill="black"
         )
-
-        # Рисуем стрелочку "назад" (примерно "<")
-        arrow_size = 10
         draw.line(
-            [(center_x + 4, center_y - arrow_size), (center_x - 6, center_y), (center_x + 4, center_y + arrow_size)],
+            [(center_x + 4, center_y - 10), (center_x - 6, center_y), (center_x + 4, center_y + 10)],
             fill="yellow",
             width=4
         )
-
-        y_offset += 45  # чуть больше отступ, чтобы ниже меню не налезло
+        y_offset += 45
 
     line_height = 42
     radius = line_height // 2
@@ -220,11 +216,13 @@ def draw_menu(
         visible_lines = len(items)
 
     for i in range(visible_lines):
-        index = (scroll + i) % len(items)
+        index = scroll + i
+        if index >= len(items):
+            break  # если индекс вышел за пределы списка, остановить рисование
+
         y = y_offset + i * line_height
 
         if index == selected_index:
-            # Скругленный прямоугольник выбранного элемента
             draw.rounded_rectangle(
                 (5, y - 2, 235, y + line_height - 10),
                 radius=radius,
