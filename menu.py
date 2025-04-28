@@ -63,7 +63,7 @@ async def start_main_menu():
 
     while selected_result[0] is None:
         await asyncio.sleep(0.1)
-        if time.time() - last_redraw[0] >= 0.1:
+        if time.time() - last_redraw[0] >= 1:
             draw()
             last_redraw[0] = time.time()
 

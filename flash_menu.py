@@ -61,7 +61,7 @@ async def start_flash_menu():
 
     while next_menu[0] == "flash":
         await asyncio.sleep(0.1)
-        if time.time() - last_redraw[0] >= 0.1:
+        if time.time() - last_redraw[0] >= 1:
             draw_flash()
             last_redraw[0] = time.time()
 
