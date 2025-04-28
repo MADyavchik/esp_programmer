@@ -14,10 +14,12 @@ async def monitor_serial_data(proc, stop_event):
         if not line:
             break
         line = line.decode('utf-8')  # Декодируем байты в строку
+        print(f"Received line: {line}")  # Выводим строку в консоль, чтобы проверить
         match = LOG_PATTERN.search(line)
         if match:
             key, val = match.groups()
             values[key] = val
+            print(f"Updated values: {values}")  # Выводим обновленные данные в консоль
             draw_log_table(values)
     proc.terminate()
     clear()
