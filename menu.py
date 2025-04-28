@@ -107,26 +107,32 @@ async def monitor_printer_connection(interval=10):
 @log_async
 async def start_main_menu():
     selected = [0]
+    scroll = [0]
     selected_result = [None]
     last_redraw = [time.time()]
+    visible_lines = 4  # Например
 
     def draw():
         draw_menu(
             items=MAIN_MENU_ITEMS,
             selected_index=selected[0],
-            scroll=0,
-            visible_lines=None,
+            scroll=scroll[0],
+            visible_lines=visible_lines,
             highlight_color="yellow",
             show_back_button=False
         )
 
     def up():
         selected[0] = (selected[0] - 1) % len(MAIN_MENU_ITEMS)
+        if selected[0] < scroll[0]:
+            scroll[0] = selected[0]
         draw()
         last_redraw[0] = time.time()
 
     def down():
         selected[0] = (selected[0] + 1) % len(MAIN_MENU_ITEMS)
+        if selected[0] >= scroll[0] + visible_lines:
+            scroll[0] = selected[0] - visible_lines + 1
         draw()
         last_redraw[0] = time.time()
 
@@ -164,26 +170,29 @@ async def start_flash_menu():
     scroll = [0]
     next_menu = ["flash"]
     last_redraw = [time.time()]
+    visible_lines = 4
 
     def draw_flash():
         draw_menu(
             items=FLASH_ITEMS,
             selected_index=selected[0],
             scroll=scroll[0],
-            visible_lines=VISIBLE_LINES,
+            visible_lines=visible_lines,
             highlight_color="red",
             show_back_button=False
         )
 
     def up():
         selected[0] = (selected[0] - 1) % len(FLASH_ITEMS)
-        scroll[0] = selected[0]
+        if selected[0] < scroll[0]:
+            scroll[0] = selected[0]
         draw_flash()
         last_redraw[0] = time.time()
 
     def down():
         selected[0] = (selected[0] + 1) % len(FLASH_ITEMS)
-        scroll[0] = selected[0]
+        if selected[0] >= scroll[0] + visible_lines:
+            scroll[0] = selected[0] - visible_lines + 1
         draw_flash()
         last_redraw[0] = time.time()
 
