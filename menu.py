@@ -10,6 +10,7 @@ from utils import log_async
 from esp_flasher import flash_firmware
 
 # --- Переменные ---
+menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
 
@@ -23,7 +24,7 @@ def reboot_pi():
 # --- Главное меню ---
 @log_async
 async def start_main_menu():
-    menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
+    #menu_items = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
     selected = [0]
     selected_result = [None]
     last_redraw = [time.time()]
