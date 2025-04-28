@@ -130,9 +130,11 @@ async def start_settings_menu():
         selected_result[0] = "main"
 
     # Привязываем кнопки
-    setup_buttons(up, down, back, safe_async(select))  # Важно: select — async, обернули через safe_async
+    setup_buttons(up, down, back, lambda: safe_async(select()))  # Важно: select — async, обернули через safe_async
 
     draw()
+
+    last_redraw[0] = time.time()
 
     while selected_result[0] is None:
         await asyncio.sleep(0.1)
