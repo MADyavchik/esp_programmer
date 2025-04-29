@@ -104,7 +104,7 @@ connected_state = {"connected": False, "mac": None}
 CHECK_INTERVAL = 0.1  # секунд
 last_check_time = 0
 
-CURRENT_WINDOW_SIZE = 10
+CURRENT_WINDOW_SIZE = 100
 current_readings = deque(maxlen=CURRENT_WINDOW_SIZE)
 baseline_current = None
 CURRENT_DELTA_THRESHOLD = 80  # мА
