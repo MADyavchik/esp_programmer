@@ -6,6 +6,7 @@ from mac_view import show_mac_address
 from menu import start_settings_menu
 import asyncio
 
+# Маппинг меню
 menu_map = {
     "main": start_main_menu,
     "flash": start_flash_menu,
@@ -19,26 +20,24 @@ async def run_menu_loop():
     stack = ["main"]  # Начинаем с главного меню
 
     while stack:
-        current = stack[-1]
-        handler = menu_map.get(current)
+        current = stack[-1]  # Получаем текущее меню
+        handler = menu_map.get(current)  # Ищем обработчик для текущего меню
 
         if not handler:
             print(f"⚠️ Нет обработчика для '{current}', выходим.")
             stack.pop()
             continue
 
-        result = handler()
-        if asyncio.iscoroutine(result):
-            result = await result
+        result = await handler()  # Вызовем обработчик
 
         if result is None:
             # Возврат назад
-            print(f"Going back from {current} menu")  # Логирование возврата назад
+            print(f"Returning from {current} menu")  # Логируем возврат
             stack.pop()
         elif result == "exit":
             # Явный выход (можно использовать в любом меню)
             break
         else:
             # Переход в подменю
-            print(f"Entering {result} menu")  # Логируем переход в подменю
-            stack.append(result)
+            print(f"Entering {result} menu")  # Логируем переход
+            stack.append(result)  # Добавляем новое меню в стек
