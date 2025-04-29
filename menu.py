@@ -140,7 +140,7 @@ async def start_flash_menu():
         on_select=on_flash_selected
     )
 
-    return "main" if index is "main" else "flash"
+    return "main" if index == "main" else "flash"
 
 
 # --- Меню: Настройки (Принтер) ---
@@ -156,5 +156,5 @@ async def start_settings_menu():
     while True:
         label = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
         index = await run_menu([label], visible_lines=1, on_select=on_toggle_printer)
-        if index is "main":
+        if index == "main":
             return "main"
