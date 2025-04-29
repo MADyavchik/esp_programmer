@@ -17,27 +17,23 @@ menu_map = {
 }
 
 async def run_menu_loop():
-    stack = ["main"]  # Начинаем с главного меню
+    current = "main"  # Начинаем с главного меню
 
-    while stack:
-        current = stack[-1]  # Получаем текущее меню
+    while current:
         handler = menu_map.get(current)  # Ищем обработчик для текущего меню
 
         if not handler:
             print(f"⚠️ Нет обработчика для '{current}', выходим.")
-            stack.pop()
-            continue
+            break
 
-        result = await handler()  # Вызовем обработчик
+        result = await handler()  # Вызовем обработчик для текущего меню
 
         if result is None:
-            # Возврат назад
-            print(f"Returning from {current} menu")  # Логируем возврат
-            stack.pop()
+            print(f"Returning to main menu")  # Логируем возврат
+            current = "main"  # Переводим обратно в главное меню
         elif result == "exit":
-            # Явный выход (можно использовать в любом меню)
+            print("Exiting program.")
             break
         else:
-            # Переход в подменю
             print(f"Entering {result} menu")  # Логируем переход
-            stack.append(result)  # Добавляем новое меню в стек
+            current = result  # Переход в подменю
