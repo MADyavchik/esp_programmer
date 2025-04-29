@@ -104,10 +104,24 @@ connected_state = {"connected": False, "mac": None}
 CHECK_INTERVAL = 10  # секунд
 last_check_time = 0
 
-def is_esp_powered_by_current(threshold=20):
+baseline_current = 300
+CURRENT_DELTA_THRESHOLD = 50  # мА, на сколько должен увеличиться ток
+
+def is_esp_powered_by_current():
+    global baseline_current
     try:
-        current = ina.current  # мА
-        return current > threshold
+        current = ina.current  # в мА
+
+        if baseline_current is None:
+            baseline_current = current
+            print(f"[INA219] Базовый ток установлен: {baseline_current:.1f} мА")
+            return False
+
+        delta = current - baseline_current
+        print(f"[INA219] Текущий ток: {current:.1f} мА, Δ: {delta:.1f} мА")
+
+        return delta > CURRENT_DELTA_THRESHOLD
+
     except Exception as e:
         print(f"[INA219] Ошибка чтения тока: {e}")
         return False
