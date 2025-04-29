@@ -69,7 +69,7 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
 
     def back():
         print("Back button pressed")  # Логирование нажатия кнопки "Назад"
-        result[0] = None
+        result[0] = "back_test"
 
     # Добавим обработчик зажатия кнопки "Вверх"
     def up_hold():
