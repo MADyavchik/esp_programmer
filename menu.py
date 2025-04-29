@@ -112,11 +112,16 @@ async def start_main_menu():
         MAIN_MENU_ITEMS,
         visible_lines=VISIBLE_LINES,
         highlight_color="yellow",
-        #up_hold_action=lambda: result.update("mac"),  # пример
+        #up_hold_action=lambda: None,  # если хочешь добавить поведение — сделай это внутри run_menu
         back_hold_action=back_hold
     )
 
-    return index  # тут уже index — это строка, а не индекс
+    # 🔍 Логика разруливания возвращаемого значения
+    if isinstance(index, str):
+        return index  # "main", "mac" и т.п.
+    if isinstance(index, int):
+        return MAIN_MENU_ITEMS[index].lower()
+    return None
 
 
 # --- Меню: Прошивка ---
