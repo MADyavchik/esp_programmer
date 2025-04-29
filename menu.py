@@ -144,7 +144,7 @@ async def start_flash_menu():
         on_select=on_flash_selected
     )
 
-    return None if index is None else "flash"
+    return "main" if index is "main" else "flash"
 
 
 # --- Меню: Настройки (Принтер) ---
