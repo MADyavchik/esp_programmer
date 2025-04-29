@@ -122,7 +122,7 @@ async def start_main_menu():
         back_hold_action=back_hold
     )
 
-    if selected_result[0]:
+    if selected_result[0] is "mac":
         return selected_result[0]
     if index is "main":
         return "main"
