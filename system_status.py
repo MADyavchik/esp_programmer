@@ -99,42 +99,54 @@ def get_wifi_status():
 
 
 # 🌙 Фоновая функция для обновления данных
-def status_updater():
-    last_check = time.time()
+# Добавь в начало (если ещё не добавлено)
+connected_state = {"connected": False, "mac": None}
+CHECK_INTERVAL = 10  # секунд
+last_check_time = 0
 
+def is_esp_powered_by_current(threshold=20):
+    try:
+        current = ina.current  # мА
+        return current > threshold
+    except Exception as e:
+        print(f"[INA219] Ошибка чтения тока: {e}")
+        return False
+
+def check_esp_connection():
+    global last_check_time
+    now = time.time()
+    if now - last_check_time < CHECK_INTERVAL:
+        return  # не пора ещё
+    last_check_time = now
+
+    if connected_state["connected"]:
+        # Проверим по току, не отвалилась ли
+        if not is_esp_powered_by_current():
+            print("❌ ESP отключена (по току)")
+            connected_state["connected"] = False
+            connected_state["mac"] = None
+    else:
+        # Есть ток — пробуем достать MAC
+        if is_esp_powered_by_current():
+            mac = get_mac_address()
+            if mac:
+                print(f"✅ Обнаружена ESP: {mac}")
+                connected_state["connected"] = True
+                connected_state["mac"] = mac
+
+# Обновлённая фоновая функция
+def status_updater():
     while True:
         battery = get_battery_status()
         wifi = get_wifi_status()
         charging = is_charging()
 
-        now = time.time()
-        if now - last_check > CHECK_INTERVAL:
-            check_esp_connection()
-            last_check = now
+        check_esp_connection()
 
-        esp_status = f"ESP" if connected_state["connected"] else "   "
+        if connected_state["connected"]:
+            esp_status = f"ESP"
+        else:
+            esp_status = "   "
+
         update_status_data(battery, wifi, esp_status, charging)
         time.sleep(1)
-
-connected_state = {"connected": False, "mac": None}
-CHECK_INTERVAL = 10  # раз в 10 сек
-
-def check_esp_connection():
-    if connected_state["connected"]:
-        # Проверим, не отвалилась ли плата
-        if not is_port_connected(PORT):
-            print("❌ ESP отключена")
-            connected_state["connected"] = False
-            connected_state["mac"] = None
-    else:
-        # Попробуем получить MAC
-        mac = get_mac_address()
-        if mac:
-            print(f"✅ Обнаружена ESP: {mac}")
-            connected_state["connected"] = True
-            connected_state["mac"] = mac
-
-
-
-def is_port_connected(port):
-    return os.path.exists(port) and os.access(port, os.R_OK | os.W_OK)
