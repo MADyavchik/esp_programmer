@@ -104,8 +104,8 @@ connected_state = {"connected": False, "mac": None}
 CHECK_INTERVAL = 10  # секунд
 last_check_time = 0
 
-baseline_current = 300
-CURRENT_DELTA_THRESHOLD = 50  # мА, на сколько должен увеличиться ток
+baseline_current = 550
+CURRENT_DELTA_THRESHOLD = 100  # мА, на сколько должен увеличиться ток
 
 def is_esp_powered_by_current():
     global baseline_current
