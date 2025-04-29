@@ -69,7 +69,7 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 24)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 28)
     except:
         font = ImageFont.load_default()
 
