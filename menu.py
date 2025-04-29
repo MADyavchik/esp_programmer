@@ -124,8 +124,8 @@ async def start_main_menu():
 
     if selected_result[0]:
         return selected_result[0]
-    if index is None:
-        return None
+    if index is "main":
+        return "main"
     return MAIN_MENU_ITEMS[index].lower()
 
 
@@ -160,5 +160,5 @@ async def start_settings_menu():
     while True:
         label = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
         index = await run_menu([label], visible_lines=1, on_select=on_toggle_printer)
-        if index is None:
-            return None
+        if index is "main":
+            return "main"
