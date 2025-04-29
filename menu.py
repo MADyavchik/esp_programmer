@@ -72,14 +72,14 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         result[0] = "main"
 
     # Добавим обработчик зажатия кнопки "Вверх"
-    def up_hold():
-        print("Up button held!")  # Логируем зажатие кнопки "Вверх"
-        if up_hold_action:
-            up_hold_action()
+    #def up_hold():
+        #print("Up button held!")  # Логируем зажатие кнопки "Вверх"
+        #if up_hold_action:
+            #up_hold_action()
 
     # Задаем кнопки
     setup_buttons(up, down, back, lambda: safe_async(select),
-                  up_hold_action=up_hold if up_hold_action else None,
+                  up_hold_action=up_hold_action,
                   back_hold_action=back_hold_action)
 
     draw()
