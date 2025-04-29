@@ -85,11 +85,12 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
 
     while result[0] is None:
         await asyncio.sleep(0.1)
-        print(f"[DEBUG] result = {result[0]}")  # <- добавь это
+
         if time.time() - last_redraw[0] > 1:
             draw()
             last_redraw[0] = time.time()
 
+    print(f"[DEBUG] result = {result[0]}")  # <- добавь это
     return result[0]
 
 # --- Вспомогательные функции ---
