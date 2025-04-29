@@ -33,10 +33,12 @@ async def run_menu_loop():
 
         if result is None:
             # Возврат назад
+            print(f"Going back from {current} menu")  # Логирование возврата назад
             stack.pop()
         elif result == "exit":
             # Явный выход (можно использовать в любом меню)
             break
         else:
             # Переход в подменю
+            print(f"Entering {result} menu")  # Логируем переход в подменю
             stack.append(result)

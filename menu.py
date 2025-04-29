@@ -15,18 +15,16 @@ MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
 
-
 # --- Универсальное меню ---
 
-async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None, up_hold_action=None,
-    back_hold_action=None):
+async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None,
+                   up_hold_action=None, back_hold_action=None):
 
     selected = [0]
     cursor = [0]
     scroll = [0]
     result = [None]
     last_redraw = [time.time()]
-
 
     def draw():
         draw_menu(
@@ -71,9 +69,17 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
     def back():
         result[0] = None
 
+    # Добавим логирование на зажатие кнопки "Вверх"
+    def up_hold():
+        print("Up button held!")  # Логируем зажатие кнопки "Вверх"
+        if up_hold_action:
+            up_hold_action()
+
+    # Задаем кнопки
     setup_buttons(up, down, back, lambda: safe_async(select),
-                  up_hold_action=up_hold_action,
+                  up_hold_action=up_hold if up_hold_action else None,
                   back_hold_action=back_hold_action)
+
     draw()
 
     while result[0] is None:
@@ -83,7 +89,6 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
             last_redraw[0] = time.time()
 
     return result[0]
-
 
 # --- Вспомогательные функции ---
 
@@ -105,7 +110,6 @@ async def start_main_menu():
 
     def back_hold():
         reboot_pi()
-
 
     index = await run_menu(
         MAIN_MENU_ITEMS,
