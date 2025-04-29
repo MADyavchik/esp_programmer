@@ -16,7 +16,7 @@ font_unselect = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.
 font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)
 font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
 
-status_data = {"battery": "--%", "wifi": "--", "charging": False}
+status_data = {"battery": "--%", "wifi": "-----", "esp_status": "   ", "charging": False}
 
 def display_on_all(image):
     if st_device:
@@ -122,7 +122,7 @@ def update_status_data(battery, wifi, esp_status, charging=False):
 
 def draw_status_bar(draw):
     draw.text((0, 0), status_data["battery"], font=font_unselect, fill="white")
-    draw.text((120, 0), status_data["esp_status"], font=font_unselect, fill="white")
+    draw.text((90, 0), status_data["esp_status"], font=font_unselect, fill="white")
     draw.text((160, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
         x, y = 70, 0
