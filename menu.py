@@ -18,12 +18,15 @@ VISIBLE_LINES = 4
 
 # --- Универсальное меню ---
 
-async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None):
+async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None, up_hold_action=None,
+    back_hold_action=None):
+
     selected = [0]
     cursor = [0]
     scroll = [0]
     result = [None]
     last_redraw = [time.time()]
+
 
     def draw():
         draw_menu(
@@ -68,7 +71,9 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
     def back():
         result[0] = None
 
-    setup_buttons(up, down, back, lambda: safe_async(select))
+    setup_buttons(up, down, back, lambda: safe_async(select),
+                  up_hold_action=up_hold_action,
+                  back_hold_action=back_hold_action)
     draw()
 
     while result[0] is None:
@@ -101,12 +106,13 @@ async def start_main_menu():
     def back_hold():
         reboot_pi()
 
-    setup_buttons(None, None, None, None, up_hold_action=up_hold, back_hold_action=back_hold)
 
     index = await run_menu(
         MAIN_MENU_ITEMS,
         visible_lines=VISIBLE_LINES,
-        highlight_color="yellow"
+        highlight_color="yellow",
+        up_hold_action=up_hold,
+        back_hold_action=back_hold
     )
 
     if selected_result[0]:
