@@ -72,14 +72,13 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         result[0] = "main"
 
     # Добавим обработчик зажатия кнопки "Вверх"
-    #def up_hold():
-        #print("Up button held!")  # Логируем зажатие кнопки "Вверх"
-        #if up_hold_action:
-            #up_hold_action()
+    def up_hold():
+        print("Up button held!")  # Логируем зажатие кнопки "Вверх"
+        result[0] = "mac"
 
     # Задаем кнопки
     setup_buttons(up, down, back, lambda: safe_async(select),
-                  up_hold_action=up_hold_action,
+                  up_hold_action=up_hold,
                   back_hold_action=back_hold_action)
 
     draw()
@@ -108,8 +107,8 @@ def reboot_pi():
 async def start_main_menu():
     selected_result = [None]
 
-    def up_hold():
-        selected_result[0] = "mac"
+    #def up_hold():
+        #selected_result[0] = "mac"
 
     def back_hold():
         reboot_pi()
@@ -118,7 +117,7 @@ async def start_main_menu():
         MAIN_MENU_ITEMS,
         visible_lines=VISIBLE_LINES,
         highlight_color="yellow",
-        up_hold_action=up_hold,
+        #up_hold_action=up_hold,
         back_hold_action=back_hold
     )
 
