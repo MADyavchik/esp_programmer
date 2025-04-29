@@ -112,7 +112,7 @@ def status_updater():
             last_check = now
 
         esp_status = f"ESP" if connected_state["connected"] else "   "
-        update_status_data(battery, wifi, charging, esp_status)
+        update_status_data(battery, wifi, esp_status, charging)
         time.sleep(1)
 
 connected_state = {"connected": False, "mac": None}
