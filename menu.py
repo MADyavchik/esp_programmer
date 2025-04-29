@@ -18,7 +18,7 @@ VISIBLE_LINES = 4
 
 # --- Универсальное меню ---
 
-async def run_menu(items, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None):
+async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None):
     selected = [0]
     cursor = [0]
     scroll = [0]
@@ -46,7 +46,7 @@ async def run_menu(items, visible_lines=4, highlight_color="yellow", show_back_b
         if cursor[0] > 0:
             cursor[0] -= 1
         else:
-            scroll[0] = (scroll[0] - 1) % len(items)
+            scroll[0] = max(0, scroll[0] - 1)
             if scroll[0] < 0:
                 scroll[0] = max(0, len(items) - visible_lines)
                 cursor[0] = min(visible_lines - 1, len(items) - 1)
@@ -93,8 +93,10 @@ def reboot_pi():
 
 @log_async
 async def start_main_menu():
+    selected_result = [None]
+
     def up_hold():
-        return "mac"
+        selected_result[0] = "mac"
 
     def back_hold():
         reboot_pi()
@@ -107,7 +109,11 @@ async def start_main_menu():
         highlight_color="yellow"
     )
 
-    return MAIN_MENU_ITEMS[index].lower() if index is not None else None
+    if selected_result[0]:
+        return selected_result[0]
+    if index is None:
+        return None
+    return MAIN_MENU_ITEMS[index].lower()
 
 
 # --- Меню: Прошивка ---
