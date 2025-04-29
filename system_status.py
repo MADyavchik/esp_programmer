@@ -101,12 +101,12 @@ def get_wifi_status():
 # 🌙 Фоновая функция для обновления данных
 # Добавь в начало (если ещё не добавлено)
 connected_state = {"connected": False, "mac": None}
-CHECK_INTERVAL = 1  # секунд
+CHECK_INTERVAL = 0.1  # секунд
 last_check_time = 0
 
 CURRENT_WINDOW_SIZE = 10
 current_readings = deque(maxlen=CURRENT_WINDOW_SIZE)
-baseline_current = 550
+baseline_current = None
 CURRENT_DELTA_THRESHOLD = 80  # мА
 
 def is_esp_powered_by_current():
