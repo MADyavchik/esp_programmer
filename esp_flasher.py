@@ -87,7 +87,7 @@ async def flash_firmware(firmware_name):
                 logging.info(f"📡 Обнаружен MAC-адрес: {mac_address}")  # Выводим в лог
 
                # 🔍 Проверка статуса подключения принтера
-                from settings import printer_connection  # импортируем только когда нужен
+                from menu import printer_connection  # импортируем только когда нужен
                 if printer_connection["connected"]:
                     logging.info("🖨️ Принтер уже подключен.")
                     if printer_connection.get("device"):
