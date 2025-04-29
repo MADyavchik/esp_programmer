@@ -152,7 +152,7 @@ async def flash_firmware(firmware_name):
         exit_bootloader()
 
         # 📤 Печать MAC-адреса, если принтер подключен
-        from settings import printer_connection
+        from menu import printer_connection
         if printer_connection["connected"] and printer_connection.get("printer"):
             from printer_functions import print_mac_address
             logging.info("🖨️ Отправляем MAC на печать...")

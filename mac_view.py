@@ -6,7 +6,7 @@ from esp_flasher import get_mac_address
 from buttons import btn_back
 from buttons import setup_buttons
 from printer_functions import print_mac_address
-from settings import printer_connection
+from menu import printer_connection
 
 @log_async
 async def show_mac_address():

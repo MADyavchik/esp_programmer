@@ -111,14 +111,13 @@ async def start_main_menu():
     scroll = [0]      # откуда начинается отображение
     selected_result = [None]
     last_redraw = [time.time()]
-    visible_lines = 4  # например
 
     def draw():
         draw_menu(
             items=MAIN_MENU_ITEMS,
             selected_index=scroll[0] + cursor[0],  # передаем реальный индекс
             scroll=scroll[0],
-            visible_lines=visible_lines,
+            visible_lines=VISIBLE_LINES,
             highlight_color="yellow",
             show_back_button=False
         )
@@ -131,8 +130,8 @@ async def start_main_menu():
         else:
             scroll[0] -= 1
             if scroll[0] < 0:
-                scroll[0] = max(0, len(MAIN_MENU_ITEMS) - visible_lines)
-                cursor[0] = min(visible_lines - 1, len(MAIN_MENU_ITEMS) - 1)
+                scroll[0] = max(0, len(MAIN_MENU_ITEMS) - VISIBLE_LINES)
+                cursor[0] = min(VISIBLE_LINES - 1, len(MAIN_MENU_ITEMS) - 1)
 
         draw()
         last_redraw[0] = time.time()
@@ -140,11 +139,11 @@ async def start_main_menu():
     def down():
         selected[0] = (selected[0] + 1) % len(MAIN_MENU_ITEMS)
 
-        if cursor[0] < min(visible_lines - 1, len(MAIN_MENU_ITEMS) - 1):
+        if cursor[0] < min(VISIBLE_LINES - 1, len(MAIN_MENU_ITEMS) - 1):
             cursor[0] += 1
         else:
             scroll[0] += 1
-            if scroll[0] > len(MAIN_MENU_ITEMS) - visible_lines:
+            if scroll[0] > len(MAIN_MENU_ITEMS) - VISIBLE_LINES:
                 scroll[0] = 0
                 cursor[0] = 0
 
@@ -186,14 +185,14 @@ async def start_flash_menu():
     scroll = [0]      # откуда начинается отображение
     next_menu = ["flash"]
     last_redraw = [time.time()]
-    visible_lines = 4
+
 
     def draw_flash():
         draw_menu(
             items=FLASH_ITEMS,
             selected_index=scroll[0] + cursor[0],
             scroll=scroll[0],
-            visible_lines=visible_lines,
+            visible_lines=VISIBLE_LINES,
             highlight_color="red",
             show_back_button=False
         )
@@ -206,8 +205,8 @@ async def start_flash_menu():
         else:
             scroll[0] -= 1
             if scroll[0] < 0:
-                scroll[0] = max(0, len(FLASH_ITEMS) - visible_lines)
-                cursor[0] = min(visible_lines - 1, len(FLASH_ITEMS) - 1)
+                scroll[0] = max(0, len(FLASH_ITEMS) - VISIBLE_LINES)
+                cursor[0] = min(VISIBLE_LINES - 1, len(FLASH_ITEMS) - 1)
 
         draw_flash()
         last_redraw[0] = time.time()
@@ -215,11 +214,11 @@ async def start_flash_menu():
     def down():
         selected[0] = (selected[0] + 1) % len(FLASH_ITEMS)
 
-        if cursor[0] < min(visible_lines - 1, len(FLASH_ITEMS) - 1):
+        if cursor[0] < min(VISIBLE_LINES - 1, len(FLASH_ITEMS) - 1):
             cursor[0] += 1
         else:
             scroll[0] += 1
-            if scroll[0] > len(FLASH_ITEMS) - visible_lines:
+            if scroll[0] > len(FLASH_ITEMS) - VISIBLE_LINES:
                 scroll[0] = 0
                 cursor[0] = 0
 
