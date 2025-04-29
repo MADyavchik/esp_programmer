@@ -113,15 +113,17 @@ def draw_log_table(data):
     draw.text((0, 120), f"H: {data['TOF']}", font=font, fill="white")
     display_on_all(image)
 
-def update_status_data(battery, wifi, charging=False):
+def update_status_data(battery, wifi, esp_status, charging=False):
     global status_data
     status_data["battery"] = battery
     status_data["wifi"] = wifi
     status_data["charging"] = charging
+    status_data["esp_status"] = esp_status
 
 def draw_status_bar(draw):
     draw.text((0, 0), status_data["battery"], font=font_unselect, fill="white")
-    draw.text((120, 0), status_data["wifi"], font=font_unselect, fill="white")
+    draw.text((120, 0), status_data["esp_status"], font=font_unselect, fill="white")
+    draw.text((160, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
         x, y = 70, 0
         draw.line((x+2, y+0, x+8, y+8), fill="yellow")

@@ -2,6 +2,8 @@
 import subprocess
 import time
 from oled_ui import update_status_data
+import serial
+import logging
 
 # Добавляем поддержку INA219
 from adafruit_ina219 import INA219
@@ -23,6 +25,9 @@ MAX_VOLTAGE = 4.2     # Максимальное напряжение (100%)
 CHANGE_THRESHOLD = 1  # Порог отображения изменений (в процентах)
 
 charging_icon = [""]  # Будем обновлять это значение в status_updater
+
+
+PORT = "/dev/ttyS0"
 
 
 def is_charging():
@@ -56,6 +61,8 @@ def get_battery_status():
     except Exception as e:
         print(f"[INA219] Ошибка получения данных: {e}")
         return "--%"
+
+
 def get_wifi_signal():
     try:
         result = subprocess.run(['iwconfig', 'wlan0'], capture_output=True, text=True)
@@ -67,6 +74,7 @@ def get_wifi_signal():
         print(f"Wi-Fi error: {e}")
     return None
 
+
 def signal_to_bars(signal_level):
     if signal_level is None:
         return 0
@@ -77,13 +85,16 @@ def signal_to_bars(signal_level):
     else:
         return int((signal_level + 100) / 10)
 
+
 def get_wifi_status():
     signal_level = get_wifi_signal()
     if signal_level is not None:
         signal_bars = signal_to_bars(signal_level)
-        return f"{'|' * signal_bars + '-' * (5-signal_bars)} ({signal_level})"
+        #return f"{'|' * signal_bars + '-' * (5-signal_bars)} ({signal_level})"
+        return f"{'|' * signal_bars + '-' * (5-signal_bars)}"
     else:
         return "Signal: -----"
+
 
 # 🌙 Фоновая функция для обновления данных
 def status_updater():
@@ -91,6 +102,16 @@ def status_updater():
         battery = get_battery_status()
         wifi = get_wifi_status()
         charging = is_charging()
-        update_status_data(battery, wifi, charging)
+        # Проверка подключения к ESP
+        esp_status = "ESP" if is_port_connected(PORT) else "   "
+
+        update_status_data(battery, wifi, charging, esp_status)
         time.sleep(1)
 
+#Проверка подключения к порту
+def is_port_connected(port):
+    try:
+        with serial.Serial(port, timeout=1) as ser:
+            return True
+    except (serial.SerialException, FileNotFoundError):
+        return False
