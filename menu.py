@@ -15,6 +15,7 @@ MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
 
+
 # --- Универсальное меню ---
 
 async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None,
@@ -67,9 +68,10 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         last_redraw[0] = time.time()
 
     def back():
+        print("Back button pressed")  # Логирование нажатия кнопки "Назад"
         result[0] = None
 
-    # Добавим логирование на зажатие кнопки "Вверх"
+    # Добавим обработчик зажатия кнопки "Вверх"
     def up_hold():
         print("Up button held!")  # Логируем зажатие кнопки "Вверх"
         if up_hold_action:
