@@ -5,6 +5,7 @@ from oled_ui import update_status_data
 import serial
 import logging
 from esp_flasher import get_mac_address
+import os
 
 # Добавляем поддержку INA219
 from adafruit_ina219 import INA219
@@ -132,3 +133,8 @@ def check_esp_connection():
             print(f"✅ Обнаружена ESP: {mac}")
             connected_state["connected"] = True
             connected_state["mac"] = mac
+
+
+
+def is_port_connected(port):
+    return os.path.exists(port) and os.access(port, os.R_OK | os.W_OK)
