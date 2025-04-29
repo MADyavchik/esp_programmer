@@ -105,11 +105,6 @@ def reboot_pi():
 
 @log_async
 async def start_main_menu():
-    selected_result = [None]
-
-    #def up_hold():
-        #selected_result[0] = "mac"
-
     def back_hold():
         reboot_pi()
 
@@ -117,15 +112,11 @@ async def start_main_menu():
         MAIN_MENU_ITEMS,
         visible_lines=VISIBLE_LINES,
         highlight_color="yellow",
-        #up_hold_action=up_hold,
+        #up_hold_action=lambda: result.update("mac"),  # пример
         back_hold_action=back_hold
     )
 
-    if selected_result[0] is "mac":
-        return selected_result[0]
-    if index is "main":
-        return "main"
-    return MAIN_MENU_ITEMS[index].lower()
+    return index  # тут уже index — это строка, а не индекс
 
 
 # --- Меню: Прошивка ---
