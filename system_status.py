@@ -105,7 +105,7 @@ def status_updater():
         # Проверка подключения к ESP
         esp_status = "ESP" if is_port_connected(PORT) else "   "
 
-        update_status_data(battery, wifi, charging, esp_status)
+        update_status_data(battery, wifi, esp_status, charging)
         time.sleep(1)
 
 #Проверка подключения к порту
