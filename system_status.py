@@ -104,21 +104,31 @@ connected_state = {"connected": False, "mac": None}
 CHECK_INTERVAL = 1  # секунд
 last_check_time = 0
 
+CURRENT_WINDOW_SIZE = 10
+current_readings = deque(maxlen=CURRENT_WINDOW_SIZE)
 baseline_current = 550
-CURRENT_DELTA_THRESHOLD = 90  # мА, на сколько должен увеличиться ток
+CURRENT_DELTA_THRESHOLD = 80  # мА
 
 def is_esp_powered_by_current():
     global baseline_current
-    try:
-        current = ina.current  # в мА
 
-        if baseline_current is None:
-            baseline_current = current
-            print(f"[INA219] Базовый ток установлен: {baseline_current:.1f} мА")
+    try:
+        current = ina.current  # мА
+        current_readings.append(current)
+
+        if len(current_readings) < CURRENT_WINDOW_SIZE:
+            # Недостаточно данных для анализа
             return False
 
-        delta = current - baseline_current
-        print(f"[INA219] Текущий ток: {current:.1f} мА, Δ: {delta:.1f} мА")
+        avg_current = sum(current_readings) / len(current_readings)
+
+        if baseline_current is None:
+            baseline_current = avg_current
+            print(f"[INA219] Установлен базовый ток: {baseline_current:.1f} мА")
+            return False
+
+        delta = avg_current - baseline_current
+        print(f"[INA219] Ток ср: {avg_current:.1f} мА, Δ: {delta:.1f} мА")
 
         return delta > CURRENT_DELTA_THRESHOLD
 
