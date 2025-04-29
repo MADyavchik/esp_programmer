@@ -101,13 +101,13 @@ def get_wifi_status():
 # 🌙 Фоновая функция для обновления данных
 # Добавь в начало (если ещё не добавлено)
 connected_state = {"connected": False, "mac": None}
-CHECK_INTERVAL = 0.1  # секунд
+CHECK_INTERVAL = 1  # секунд
 last_check_time = 0
 
-CURRENT_WINDOW_SIZE = 20
+CURRENT_WINDOW_SIZE = 10
 current_readings = deque(maxlen=CURRENT_WINDOW_SIZE)
 baseline_current = None
-CURRENT_DELTA_THRESHOLD = 80  # мА
+CURRENT_DELTA_THRESHOLD = 50  # мА
 
 def is_esp_powered_by_current():
     global baseline_current
@@ -117,18 +117,17 @@ def is_esp_powered_by_current():
         current_readings.append(current)
 
         if len(current_readings) < CURRENT_WINDOW_SIZE:
-            # Недостаточно данных для анализа
-            return False
+            return False  # Недостаточно данных
 
-        avg_current = sum(current_readings) / len(current_readings)
+        median_current = statistics.median(current_readings)
 
         if baseline_current is None:
-            baseline_current = avg_current
-            print(f"[INA219] Установлен базовый ток: {baseline_current:.1f} мА")
+            baseline_current = median_current
+            print(f"[INA219] Установлен базовый ток (медиана): {baseline_current:.1f} мА")
             return False
 
-        delta = avg_current - baseline_current
-        print(f"[INA219] Ток ср: {avg_current:.1f} мА, Δ: {delta:.1f} мА")
+        delta = median_current - baseline_current
+        print(f"[INA219] Медианный ток: {median_current:.1f} мА, Δ: {delta:.1f} мА")
 
         return delta > CURRENT_DELTA_THRESHOLD
 
