@@ -1,5 +1,3 @@
-# menu.py
-
 import os
 import sys
 import time
@@ -13,10 +11,73 @@ from printer_functions import printer_connection, connect_to_printer, disconnect
 
 # --- Глобальные переменные ---
 
-# Главное меню
 MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
+
+
+# --- Универсальное меню ---
+
+async def run_menu(items, visible_lines=4, highlight_color="yellow", show_back_button=False, on_select=None):
+    selected = [0]
+    cursor = [0]
+    scroll = [0]
+    result = [None]
+    last_redraw = [time.time()]
+
+    def draw():
+        draw_menu(
+            items=items,
+            selected_index=scroll[0] + cursor[0],
+            scroll=scroll[0],
+            visible_lines=visible_lines,
+            highlight_color=highlight_color,
+            show_back_button=show_back_button
+        )
+
+    async def select():
+        index = scroll[0] + cursor[0]
+        if on_select:
+            await on_select(items[index])
+        result[0] = index
+
+    def up():
+        selected[0] = (selected[0] - 1) % len(items)
+        if cursor[0] > 0:
+            cursor[0] -= 1
+        else:
+            scroll[0] = (scroll[0] - 1) % len(items)
+            if scroll[0] < 0:
+                scroll[0] = max(0, len(items) - visible_lines)
+                cursor[0] = min(visible_lines - 1, len(items) - 1)
+        draw()
+        last_redraw[0] = time.time()
+
+    def down():
+        selected[0] = (selected[0] + 1) % len(items)
+        if cursor[0] < min(visible_lines - 1, len(items) - 1):
+            cursor[0] += 1
+        else:
+            scroll[0] += 1
+            if scroll[0] > len(items) - visible_lines:
+                scroll[0] = 0
+                cursor[0] = 0
+        draw()
+        last_redraw[0] = time.time()
+
+    def back():
+        result[0] = None
+
+    setup_buttons(up, down, back, lambda: safe_async(select))
+    draw()
+
+    while result[0] is None:
+        await asyncio.sleep(0.1)
+        if time.time() - last_redraw[0] > 1:
+            draw()
+            last_redraw[0] = time.time()
+
+    return result[0]
 
 
 # --- Вспомогательные функции ---
@@ -27,205 +88,58 @@ def reboot_pi():
     clear()
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
+
 # --- Меню: Главное ---
 
 @log_async
 async def start_main_menu():
-    selected = [0]    # выбранный пункт в полном списке
-    cursor = [0]      # положение курсора на экране (0..visible_lines-1)
-    scroll = [0]      # откуда начинается отображение
-    selected_result = [None]
-    last_redraw = [time.time()]
-
-    def draw():
-        draw_menu(
-            items=MAIN_MENU_ITEMS,
-            selected_index=scroll[0] + cursor[0],  # передаем реальный индекс
-            scroll=scroll[0],
-            visible_lines=VISIBLE_LINES,
-            highlight_color="yellow",
-            show_back_button=False
-        )
-
-    def up():
-        selected[0] = (selected[0] - 1) % len(MAIN_MENU_ITEMS)
-
-        if cursor[0] > 0:
-            cursor[0] -= 1
-        else:
-            scroll[0] -= 1
-            if scroll[0] < 0:
-                scroll[0] = max(0, len(MAIN_MENU_ITEMS) - VISIBLE_LINES)
-                cursor[0] = min(VISIBLE_LINES - 1, len(MAIN_MENU_ITEMS) - 1)
-
-        draw()
-        last_redraw[0] = time.time()
-
-    def down():
-        selected[0] = (selected[0] + 1) % len(MAIN_MENU_ITEMS)
-
-        if cursor[0] < min(VISIBLE_LINES - 1, len(MAIN_MENU_ITEMS) - 1):
-            cursor[0] += 1
-        else:
-            scroll[0] += 1
-            if scroll[0] > len(MAIN_MENU_ITEMS) - VISIBLE_LINES:
-                scroll[0] = 0
-                cursor[0] = 0
-
-        draw()
-        last_redraw[0] = time.time()
-
-    def back():
-        selected_result[0] = None
+    def up_hold():
+        return "mac"
 
     def back_hold():
         reboot_pi()
 
-    def select():
-        selected_result[0] = MAIN_MENU_ITEMS[selected[0]].lower()
-        draw()
-        last_redraw[0] = time.time()
+    setup_buttons(None, None, None, None, up_hold_action=up_hold, back_hold_action=back_hold)
 
-    def up_hold():
-        selected_result[0] = "mac"
+    index = await run_menu(
+        MAIN_MENU_ITEMS,
+        visible_lines=VISIBLE_LINES,
+        highlight_color="yellow"
+    )
 
-    setup_buttons(up, down, back, select, up_hold_action=up_hold, back_hold_action=back_hold)
+    return MAIN_MENU_ITEMS[index].lower() if index is not None else None
 
-    draw()
-
-    while selected_result[0] is None:
-        await asyncio.sleep(0.1)
-        if time.time() - last_redraw[0] >= 1:
-            draw()
-            last_redraw[0] = time.time()
-
-    return selected_result[0]
 
 # --- Меню: Прошивка ---
 
 @log_async
 async def start_flash_menu():
-    selected = [0]    # выбранный элемент по списку
-    cursor = [0]      # положение курсора на экране (0..visible_lines-1)
-    scroll = [0]      # откуда начинается отображение
-    next_menu = ["flash"]
-    last_redraw = [time.time()]
-
-
-    def draw_flash():
-        draw_menu(
-            items=FLASH_ITEMS,
-            selected_index=scroll[0] + cursor[0],
-            scroll=scroll[0],
-            visible_lines=VISIBLE_LINES,
-            highlight_color="red",
-            show_back_button=False
-        )
-
-    def up():
-        selected[0] = (selected[0] - 1) % len(FLASH_ITEMS)
-
-        if cursor[0] > 0:
-            cursor[0] -= 1
-        else:
-            scroll[0] -= 1
-            if scroll[0] < 0:
-                scroll[0] = max(0, len(FLASH_ITEMS) - VISIBLE_LINES)
-                cursor[0] = min(VISIBLE_LINES - 1, len(FLASH_ITEMS) - 1)
-
-        draw_flash()
-        last_redraw[0] = time.time()
-
-    def down():
-        selected[0] = (selected[0] + 1) % len(FLASH_ITEMS)
-
-        if cursor[0] < min(VISIBLE_LINES - 1, len(FLASH_ITEMS) - 1):
-            cursor[0] += 1
-        else:
-            scroll[0] += 1
-            if scroll[0] > len(FLASH_ITEMS) - VISIBLE_LINES:
-                scroll[0] = 0
-                cursor[0] = 0
-
-        draw_flash()
-        last_redraw[0] = time.time()
-
-    def back():
-        next_menu[0] = "main"
-
-    async def select():
-        name = FLASH_ITEMS[selected[0]]
-        print(f"▶ Выбрана прошивка: {name}")
+    async def on_flash_selected(name):
         clear()
-        result = await flash_firmware(name.lower())
-        print(f"◀ Возвращаемся в меню: {result}")
-        next_menu[0] = result or "flash"
-        draw_flash()
-        last_redraw[0] = time.time()
+        await flash_firmware(name.lower())
 
-    setup_buttons(up, down, back, select)
+    index = await run_menu(
+        FLASH_ITEMS,
+        visible_lines=VISIBLE_LINES,
+        highlight_color="red",
+        on_select=on_flash_selected
+    )
 
-    draw_flash()
+    return "main" if index is None else "flash"
 
-    while next_menu[0] == "flash":
-        await asyncio.sleep(0.1)
-        if time.time() - last_redraw[0] >= 1:
-            draw_flash()
-            last_redraw[0] = time.time()
-
-    return next_menu[0]
 
 # --- Меню: Настройки (Принтер) ---
 
 @log_async
 async def start_settings_menu():
-    await asyncio.sleep(0.1)
-    menu_items = ["Print: ?"]
-    selected = [0]
-    selected_result = [None]
-    last_redraw = [0]
-
-    def refresh_labels():
-        menu_items[0] = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
-
-    def draw():
-        refresh_labels()
-        draw_menu(
-            items=menu_items,
-            selected_index=selected[0],
-            scroll=selected[0],
-            visible_lines=1,
-            highlight_color="yellow",
-            show_back_button=False
-        )
-
-    async def select():
+    async def on_toggle_printer(_):
         if printer_connection["connected"]:
             await disconnect_from_printer()
         else:
             await connect_to_printer()
-        draw()
 
-    def up():
-        selected[0] = (selected[0] - 1) % len(menu_items)
-        draw()
-
-    def down():
-        selected[0] = (selected[0] + 1) % len(menu_items)
-        draw()
-
-    def back():
-        selected_result[0] = "main"
-
-    setup_buttons(up, down, back, lambda: safe_async(select))
-
-    draw()
-    last_redraw[0] = time.time()
-
-    while selected_result[0] is None:
-        await asyncio.sleep(0.1)
-        if time.time() - last_redraw[0] > 3:
-            draw()
-            last_redraw[0] = time.time()
-
-    return selected_result[0]
+    while True:
+        label = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
+        index = await run_menu([label], visible_lines=1, on_select=on_toggle_printer)
+        if index is None:
+            return "main"
