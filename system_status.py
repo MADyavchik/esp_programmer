@@ -4,6 +4,7 @@ import time
 from oled_ui import update_status_data
 import serial
 import logging
+from esp_flasher import get_mac_address
 
 # Добавляем поддержку INA219
 from adafruit_ina219 import INA219
@@ -93,25 +94,41 @@ def get_wifi_status():
         #return f"{'|' * signal_bars + '-' * (5-signal_bars)} ({signal_level})"
         return f"{'|' * signal_bars + '-' * (5-signal_bars)}"
     else:
-        return "Signal: -----"
+        return "-----"
 
 
 # 🌙 Фоновая функция для обновления данных
 def status_updater():
+    last_check = time.time()
+
     while True:
         battery = get_battery_status()
         wifi = get_wifi_status()
         charging = is_charging()
-        # Проверка подключения к ESP
-        esp_status = "ESP" if is_port_connected(PORT) else "   "
 
-        update_status_data(battery, wifi, esp_status, charging)
+        now = time.time()
+        if now - last_check > CHECK_INTERVAL:
+            check_esp_connection()
+            last_check = now
+
+        esp_status = f"ESP" if connected_state["connected"] else "   "
+        update_status_data(battery, wifi, charging, esp_status)
         time.sleep(1)
 
-#Проверка подключения к порту
-def is_port_connected(port):
-    try:
-        with serial.Serial(port, timeout=1) as ser:
-            return True
-    except (serial.SerialException, FileNotFoundError):
-        return False
+connected_state = {"connected": False, "mac": None}
+CHECK_INTERVAL = 10  # раз в 10 сек
+
+def check_esp_connection():
+    if connected_state["connected"]:
+        # Проверим, не отвалилась ли плата
+        if not is_port_connected(PORT):
+            print("❌ ESP отключена")
+            connected_state["connected"] = False
+            connected_state["mac"] = None
+    else:
+        # Попробуем получить MAC
+        mac = get_mac_address()
+        if mac:
+            print(f"✅ Обнаружена ESP: {mac}")
+            connected_state["connected"] = True
+            connected_state["mac"] = mac
