@@ -69,12 +69,13 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     draw = ImageDraw.Draw(image)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 28)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 28)
     except:
         font = ImageFont.load_default()
 
     max_line_length = 9
-    lines = [mac_address[i:i + max_line_length] for i in range(0, len(mac_address), max_line_length)]
+    cleaned = ''.join([c for i, c in enumerate(mac_address) if (i + 1) % max_line_length != 0])
+    lines = [cleaned[i:i + (max_line_length - 1)] for i in range(0, len(cleaned), max_line_length - 1)]
 
     text_height = sum([draw.textbbox((0, 0), line, font=font)[3] for line in lines])
     x = (width - max([draw.textbbox((0, 0), line, font=font)[2] for line in lines])) // 2
