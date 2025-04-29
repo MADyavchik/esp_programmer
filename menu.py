@@ -9,8 +9,7 @@ from buttons import setup_buttons, safe_async
 from oled_ui import draw_menu, clear, show_message
 from utils import log_async
 from esp_flasher import flash_firmware
-from printer_functions import get_device_by_mac, connect_printer, disconnect_printer
-from print_config import DEFAULT_PRINTER_CONFIG
+from printer_functions import printer_connection, connect_to_printer, disconnect_from_printer
 
 # --- Глобальные переменные ---
 
@@ -19,14 +18,6 @@ MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
 
-# Принтер
-printer_connection = {
-    "mac": "01:EC:01:36:C3:86",
-    "device": None,
-    "printer": None,
-    "connected": False,
-}
-monitoring_task = None
 
 # --- Вспомогательные функции ---
 
@@ -35,72 +26,6 @@ def reboot_pi():
     time.sleep(1)
     clear()
     os.execv(sys.executable, [sys.executable] + sys.argv)
-
-async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
-    global monitoring_task
-
-    device = await get_device_by_mac(printer_connection["mac"])
-    if not device:
-        show_message("Printer not found")
-        await asyncio.sleep(1)
-        return
-
-    printer = await connect_printer(device)
-
-    printer_connection.update({
-        "device": device,
-        "printer": printer,
-        "connected": True,
-        "config": config,
-    })
-    show_message("Printer connected")
-    await asyncio.sleep(1)
-
-async def disconnect_from_printer():
-    global monitoring_task
-
-    if printer_connection["printer"]:
-        await disconnect_printer(printer_connection["printer"])
-
-    printer_connection.update({
-        "device": None,
-        "printer": None,
-        "connected": False,
-    })
-    show_message("Printer disconnected")
-    await asyncio.sleep(1)
-
-    if monitoring_task and not monitoring_task.done():
-        monitoring_task.cancel()
-        try:
-            await monitoring_task
-        except asyncio.CancelledError:
-            pass
-
-async def monitor_printer_connection(interval=10):
-    while True:
-        printer = printer_connection.get("printer")
-        if not printer:
-            break
-
-        try:
-            if hasattr(printer, "get_print_status"):
-                status = await printer.get_print_status()
-                if not status or status.get("error", False):
-                    raise Exception("Printer not responding")
-            else:
-                raise Exception("get_print_status not supported")
-        except Exception as e:
-            print(f"⚠️ Принтер отключён: {e}")
-            printer_connection.update({
-                "connected": False,
-                "printer": None,
-                "device": None,
-            })
-            show_message("Printer disconnected")
-            break
-
-        await asyncio.sleep(interval)
 
 # --- Меню: Главное ---
 

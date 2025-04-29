@@ -1,3 +1,4 @@
+#printer_functions.py
 import sys
 import os
 import struct
@@ -9,6 +10,7 @@ import asyncio
 from NiimPrintX.nimmy.printer import PrinterClient, RequestCodeEnum
 from bleak import BleakScanner
 from PIL import Image, ImageDraw, ImageFont
+from oled_ui import show_message
 
 
 # Поиск устройства по MAC
@@ -130,3 +132,80 @@ async def main():
 # Запуск
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+async def monitor_printer_connection(interval=10):
+    while True:
+        printer = printer_connection.get("printer")
+        if not printer:
+            break
+
+        try:
+            if hasattr(printer, "get_print_status"):
+                status = await printer.get_print_status()
+                if not status or status.get("error", False):
+                    raise Exception("Printer not responding")
+            else:
+                raise Exception("get_print_status not supported")
+        except Exception as e:
+            print(f"⚠️ Принтер отключён: {e}")
+            printer_connection.update({
+                "connected": False,
+                "printer": None,
+                "device": None,
+            })
+            show_message("Printer disconnected")
+            break
+
+        await asyncio.sleep(interval)
+
+
+async def disconnect_from_printer():
+    global monitoring_task
+
+    if printer_connection["printer"]:
+        await disconnect_printer(printer_connection["printer"])
+
+    printer_connection.update({
+        "device": None,
+        "printer": None,
+        "connected": False,
+    })
+    show_message("Printer disconnected")
+    await asyncio.sleep(1)
+
+    if monitoring_task and not monitoring_task.done():
+        monitoring_task.cancel()
+        try:
+            await monitoring_task
+        except asyncio.CancelledError:
+            pass
+
+async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
+    global monitoring_task
+
+    device = await get_device_by_mac(printer_connection["mac"])
+    if not device:
+        show_message("Printer not found")
+        await asyncio.sleep(1)
+        return
+
+    printer = await connect_printer(device)
+
+    printer_connection.update({
+        "device": device,
+        "printer": printer,
+        "connected": True,
+        "config": config,
+    })
+    show_message("Printer connected")
+    await asyncio.sleep(1)
+
+
+printer_connection = {
+    "mac": "01:EC:01:36:C3:86",
+    "device": None,
+    "printer": None,
+    "connected": False,
+}
+monitoring_task = None
