@@ -16,9 +16,27 @@ menu_map = {
 }
 
 async def run_menu_loop():
-    current = "main"
-    while current:
-        next_menu = menu_map[current]()
-        if asyncio.iscoroutine(next_menu):
-            next_menu = await next_menu
-        current = next_menu
+    stack = ["main"]  # Начинаем с главного меню
+
+    while stack:
+        current = stack[-1]
+        handler = menu_map.get(current)
+
+        if not handler:
+            print(f"⚠️ Нет обработчика для '{current}', выходим.")
+            stack.pop()
+            continue
+
+        result = handler()
+        if asyncio.iscoroutine(result):
+            result = await result
+
+        if result is None:
+            # Возврат назад
+            stack.pop()
+        elif result == "exit":
+            # Явный выход (можно использовать в любом меню)
+            break
+        else:
+            # Переход в подменю
+            stack.append(result)
