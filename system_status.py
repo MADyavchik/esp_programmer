@@ -151,11 +151,10 @@ def check_esp_connection():
     else:
         # Есть ток — пробуем достать MAC
         if is_esp_powered_by_current():
-            mac = get_mac_address()
-            if mac:
-                print(f"✅ Обнаружена ESP: {mac}")
-                connected_state["connected"] = True
-                connected_state["mac"] = mac
+
+            print(f"✅ Обнаружена ESP: {mac}")
+            connected_state["connected"] = True
+            connected_state["mac"] = None
 
 # Обновлённая фоновая функция
 def status_updater():
