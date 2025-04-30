@@ -6,7 +6,7 @@ import loop_reference
 
 btn_up = Button(26, hold_time=1, bounce_time=0.1)
 btn_down = Button(13, bounce_time=0.1)
-btn_back = Button(6, hold_time=3, bounce_time=0.1)
+btn_back = Button(27, hold_time=3, bounce_time=0.1)
 btn_select = Button(19, bounce_time=0.1)
 
 def safe_async(coro_func):
