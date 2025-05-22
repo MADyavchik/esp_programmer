@@ -39,7 +39,7 @@ async def flash_firmware(firmware_name):
         elif firmware_name == "repeater":
             nvs = os.path.join(firmware_path, "repeater_nvs_0x9000.bin")
         else:
-            nvs = os.path.join(firmware_path, "sw_nvs_0x9000.bin")
+            nvs = os.path.join(firmware_path, "sw_nvs_a_0x9000.bin")
         if not os.path.exists(nvs):
             logging.error(f"❌ NVS-файл не найден: {nvs}")
             return
