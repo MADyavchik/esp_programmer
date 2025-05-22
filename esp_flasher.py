@@ -42,6 +42,7 @@ async def flash_firmware(firmware_name):
             nvs = os.path.join(firmware_path, "sw_nvs_a_0x9000.bin")
         if not os.path.exists(nvs):
             logging.error(f"❌ NVS-файл не найден: {nvs}")
+            show_message(f"NVS-файл не найден: {nvs}")
             return
 
     for file in [bootloader, firmware, partitions, ota]:
