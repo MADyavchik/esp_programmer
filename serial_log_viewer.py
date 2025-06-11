@@ -17,17 +17,18 @@ EXTRA_PATTERNS = {
     "DOM.Online": re.compile(r"SSID\s+DOM\.Online\s+RSSI:\s+(-?\d+)", re.IGNORECASE),
 }
 
-# Данные для таблицы
-values = {
-    "Battery": "—",
-    "Temp": "—",          # 1WIRE Temp
-    "TOF": "—",
-    "Weight": "—",
-    "CPU Temp": "—",
-    "DOM.Online": "—"
-}
+
 
 async def monitor_serial_data(proc, stop_event):
+    # Данные для таблицы
+    values = {
+        "Battery": "—",
+        "Temp": "—",          # 1WIRE Temp
+        "TOF": "—",
+        "Weight": "—",
+        "CPU Temp": "—",
+        "DOM.Online": "—"
+    }
     draw_log_table(values)
 
     while not stop_event.is_set():
@@ -41,7 +42,7 @@ async def monitor_serial_data(proc, stop_event):
         match = LOG_PATTERN.search(line)
         if match:
             key, val = match.groups()
-            key = key.capitalize()
+            #key = key.capitalize()
             values[key] = val
             print(f"Updated values: {values}")
             draw_log_table(values)
