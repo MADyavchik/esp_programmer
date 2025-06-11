@@ -110,12 +110,23 @@ def draw_log_table(data):
 
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
-    draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
-    draw.text((0, 40), f"WEIGHT: {data['Weight']}", font=font, fill="white")
-    draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
-    draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
-    draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
-    draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
+    #draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
+    draw.text((0, 0), f"BATT: {data.get('Battery', '—')}", font=font, fill="white")
+
+    #draw.text((0, 40), f"WEIGHT: {data['Weight']}", font=font, fill="white")
+    draw.text((0, 0), f"WEIGHT: {data.get('Weight', '—')}", font=font, fill="white")
+
+    #draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
+    draw.text((0, 0), f"TEMP: {data.get('Temp', '—')}", font=font, fill="white")
+
+    #draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
+    draw.text((0, 0), f"TOF: {data.get('TOF', '—')}", font=font, fill="white")
+
+    #draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
+    draw.text((0, 0), f"CPU t: {data.get('CPU Temp', '—')}", font=font, fill="white")
+
+    #draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
+    draw.text((0, 0), f"RSSI: {data.get('DOM.Online', '—')}", font=font, fill="white")
     display_on_all(image)
 
 def update_status_data(battery, wifi, charging=False):
