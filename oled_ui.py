@@ -105,6 +105,9 @@ def show_message(text):
     display_on_all(image)
 
 def draw_log_table(data):
+
+    print("🎨 draw_log_table called with:", data)  # DEBUG
+
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
     draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
