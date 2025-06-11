@@ -113,7 +113,7 @@ def draw_log_table(data):
     draw.text((0, 120), f"H: {data['TOF']}", font=font, fill="white")
     display_on_all(image)
 
-def update_status_data(battery, wifi, esp_status, charging=False):
+def update_status_data(battery, wifi, charging=False):
     global status_data
     status_data["battery"] = battery
     status_data["wifi"] = wifi
