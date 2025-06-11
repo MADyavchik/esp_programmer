@@ -6,7 +6,7 @@ from buttons import btn_back
 from buttons import setup_buttons
 
 # Старый парсер — не трогаем
-LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)", re.IGNORECASE)
+LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
 # Дополнительные паттерны — из новых логов
 EXTRA_PATTERNS = {
