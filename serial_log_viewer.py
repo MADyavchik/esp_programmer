@@ -74,10 +74,6 @@ async def show_serial_data():
         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
 
-     # 👇 Воткнули сюда
-    stderr_line = await proc.stderr.readline()
-    if stderr_line:
-        print(f"⚠️ PLATFORMIO ERROR: {stderr_line.decode().strip()}")
 
     # Асинхронно мониторим данные
     asyncio.create_task(monitor_serial_data(proc, stop_event))
