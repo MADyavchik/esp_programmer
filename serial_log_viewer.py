@@ -5,50 +5,51 @@ from oled_ui import draw_log_table, clear
 from buttons import btn_back
 from buttons import setup_buttons
 
-# Старый парсер — не трогаем
+# Строго без IGNORECASE для точного совпадения ключей
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
-# Дополнительные паттерны — из новых логов
+# Дополнительные паттерны
 EXTRA_PATTERNS = {
-    "Battery": re.compile(r"BATTERY\s+\[OK\]\s+(\d+)", re.IGNORECASE),
-    "Temp": re.compile(r"1WIRE Temperature\s+\[OK\]\s+Temp:\s+(\d+)", re.IGNORECASE),
-    "Weight": re.compile(r"WEIGHT\s+\[OK\]\s+Read\s+(-?\d+)", re.IGNORECASE),
-    "CPU Temp": re.compile(r"CPU TEMP\s+\[OK\]\s+(\d+)", re.IGNORECASE),
-    "DOM.Online": re.compile(r"SSID\s+DOM\.Online\s+RSSI:\s+(-?\d+)", re.IGNORECASE),
+    "Battery": re.compile(r"BATTERY\s+\[OK\]\s+(\d+)"),
+    "Temp": re.compile(r"1WIRE Temperature\s+\[OK\]\s+Temp:\s+(\d+)"),
+    "Weight": re.compile(r"WEIGHT\s+\[OK\]\s+Read\s+(-?\d+)"),
+    "CPU Temp": re.compile(r"CPU TEMP\s+\[OK\]\s+(\d+)"),
+    "DOM.Online": re.compile(r"SSID\s+DOM\.Online\s+RSSI:\s+(-?\d+)")
 }
 
-
+# Значения по умолчанию
+values = {
+    "Battery": "—",
+    "Temp": "—",
+    "TOF": "—",
+    "Weight": "—",
+    "CPU Temp": "—",
+    "DOM.Online": "—"
+}
 
 async def monitor_serial_data(proc, stop_event):
-    # Данные для таблицы
-    values = {
-        "Battery": "—",
-        "Temp": "—",          # 1WIRE Temp
-        "TOF": "—",
-        "Weight": "—",
-        "CPU Temp": "—",
-        "DOM.Online": "—"
-    }
+    """Асинхронная функция для мониторинга UART"""
     draw_log_table(values)
 
     while not stop_event.is_set():
         line = await proc.stdout.readline()
         if not line:
             break
-        line = line.decode('utf-8').strip()
+
+        line = line.decode("utf-8").strip()
         print(f"Received line: {line}")
 
         # 1. Стандартный парсинг
         match = LOG_PATTERN.search(line)
         if match:
             key, val = match.groups()
-            #key = key.capitalize()
-            values[key] = val
-            print(f"Updated values: {values}")
-            draw_log_table(values)
-            continue
+            if key in values:
+                values[key] = val
+                print(f"Updated values: {values}")
+                draw_log_table(values)
+                continue
 
-        # 2. Расширенный парсинг
+        # 2. Дополнительный парсинг
         for key, pattern in EXTRA_PATTERNS.items():
             match = pattern.search(line)
             if match:
@@ -63,30 +64,35 @@ async def monitor_serial_data(proc, stop_event):
 async def show_serial_data():
     """Функция для отображения серийных данных"""
     clear()
-
-    # Оставляем только кнопку "назад", остальные отключаем
     setup_buttons(None, None, None, None)
-
-
     stop_event = asyncio.Event()
 
     proc = await asyncio.create_subprocess_exec(
         "platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyS0",
-        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
     )
 
+    # Отладка ошибок
+    asyncio.create_task(log_stderr(proc))
 
-    # Асинхронно мониторим данные
+    # Мониторинг данных
     asyncio.create_task(monitor_serial_data(proc, stop_event))
 
     while not btn_back.is_pressed:
-        await asyncio.sleep(0.1)  # Ожидаем нажатия кнопки
+        await asyncio.sleep(0.1)
 
-    stop_event.set()  # Останавливаем мониторинг
-    await proc.wait()  # Ждем завершения процесса
-
+    stop_event.set()
+    await proc.wait()
     clear()
-
     return "main"
+
+# Функция логгирования ошибок
+async def log_stderr(proc):
+    while True:
+        line = await proc.stderr.readline()
+        if not line:
+            break
+        print(f"⚠️ STDERR: {line.decode().strip()}")
 
 
