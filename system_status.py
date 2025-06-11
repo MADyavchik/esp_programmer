@@ -163,7 +163,7 @@ def status_updater():
         wifi = get_wifi_status()
         charging = is_charging()
 
-        check_esp_connection()
+        #check_esp_connection()
 
         if connected_state["connected"]:
             esp_status = f"ESP"

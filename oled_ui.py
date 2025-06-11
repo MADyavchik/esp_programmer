@@ -118,11 +118,11 @@ def update_status_data(battery, wifi, esp_status, charging=False):
     status_data["battery"] = battery
     status_data["wifi"] = wifi
     status_data["charging"] = charging
-    status_data["esp_status"] = esp_status
+    #status_data["esp_status"] = esp_status
 
 def draw_status_bar(draw):
     draw.text((0, 0), status_data["battery"], font=font_unselect, fill="white")
-    draw.text((90, 0), status_data["esp_status"], font=font_unselect, fill="white")
+    #draw.text((90, 0), status_data["esp_status"], font=font_unselect, fill="white")
     draw.text((160, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
         x, y = 70, 0
