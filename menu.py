@@ -12,7 +12,7 @@ from printer_functions import printer_connection, connect_to_printer, disconnect
 # --- Глобальные переменные ---
 
 MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
-FLASH_ITEMS = ["Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
+FLASH_ITEMS = ["TEST", "Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 VISIBLE_LINES = 4
 
 

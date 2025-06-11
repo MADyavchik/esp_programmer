@@ -14,7 +14,7 @@ FLASH_DIR = "esp"
 PORT = "/dev/ttyS0"
 
 # Названия прошивок без NVS
-NO_NVS = ["sens_sw", "sens_old"]
+NO_NVS = ["test", "sens_sw", "sens_old"]
 
 async def flash_firmware(firmware_name):
     firmware_name = firmware_name.lower()
