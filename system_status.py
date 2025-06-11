@@ -163,12 +163,9 @@ def status_updater():
         wifi = get_wifi_status()
         charging = is_charging()
 
-        #check_esp_connection()
 
-        if connected_state["connected"]:
-            esp_status = f"ESP"
-        else:
-            esp_status = "   "
 
-        update_status_data(battery, wifi, esp_status, charging)
+
+
+        update_status_data(battery, wifi, charging)
         time.sleep(1)
