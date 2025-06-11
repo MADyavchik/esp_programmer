@@ -5,27 +5,52 @@ from oled_ui import draw_log_table, clear
 from buttons import btn_back
 from buttons import setup_buttons
 
+# Основной короткий паттерн
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
-async def monitor_serial_data(proc, stop_event):
-    """Асинхронная функция для мониторинга данных"""
-    values = {"Battery": "—", "Temp": "—", "TOF": "—", "Weight": "—"}
+# Дополнительные логовые паттерны
+EXTRA_PATTERNS = {
+    "CPU Temp": re.compile(r"CPU TEMP\s+\[OK\]\s+(\d+)", re.IGNORECASE),
+    "DOM.Online": re.compile(r"SSID\s+DOM\.Online\s+RSSI:\s+(-?\d+)", re.IGNORECASE),
+}
 
-    # Сразу рисуем таблицу с дефолтными значениями
+# Единая таблица значений
+values = {
+    "Battery": "—",
+    "Temp": "—",          # Это 1WIRE Temperature
+    "TOF": "—",
+    "Weight": "—",
+    "CPU Temp": "—",
+    "DOM.Online": "—"
+}
+
+async def monitor_serial_data(proc, stop_event):
     draw_log_table(values)
 
     while not stop_event.is_set():
-        line = await proc.stdout.readline()  # Асинхронно читаем строку
+        line = await proc.stdout.readline()
         if not line:
             break
-        line = line.decode('utf-8').strip()  # Декодируем байты в строку
-        print(f"Received line: {line}")  # Выводим строку в консоль, чтобы проверить
+        line = line.decode('utf-8').strip()
+        print(f"Received line: {line}")
+
+        # Стандартный парсинг
         match = LOG_PATTERN.search(line)
         if match:
             key, val = match.groups()
             values[key] = val
-            print(f"Updated values: {values}")  # Выводим обновленные данные в консоль
+            print(f"Updated values: {values}")
             draw_log_table(values)
+            continue
+
+        # Дополнительный парсинг (CPU Temp, DOM.Online)
+        for key, pattern in EXTRA_PATTERNS.items():
+            match = pattern.search(line)
+            if match:
+                values[key] = match.group(1)
+                print(f"Updated extra value: {key} = {values[key]}")
+                draw_log_table(values)
+                break  # только одно совпадение на строку
 
     proc.terminate()
     clear()
