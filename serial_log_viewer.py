@@ -1,5 +1,6 @@
 import asyncio
 import subprocess
+from utils import log_async
 import re
 from oled_ui import draw_log_table, clear
 from buttons import btn_back
@@ -75,7 +76,7 @@ async def monitor_serial_data(proc, stop_event):
 
     proc.terminate()
     clear()
-
+@log_async
 async def show_serial_data():
     """Функция для отображения серийных данных"""
     clear()
@@ -100,7 +101,7 @@ async def show_serial_data():
     stop_event.set()
     await proc.wait()
     clear()
-    return "main"
+    return "flash"
 
 # Функция логгирования ошибок
 async def log_stderr(proc):
