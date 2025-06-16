@@ -176,10 +176,10 @@ async def flash_firmware(firmware_name):
         show_message("Ошибка")
         time.sleep(2)
         clear()
-
+    from serial_log_viewer import show_serial_data
     if firmware_name == "test":
         print("TEST!!!!!!!!!!!!!!!!!")
-        return "log"
+        await show_serial_data()
     else:
         return "flash"
 
