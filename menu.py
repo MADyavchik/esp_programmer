@@ -129,9 +129,12 @@ async def start_main_menu():
 
 @log_async
 async def start_flash_menu():
+    selected_result = None  # сюда сохраним результат прошивки (например, "log" или "flash")
+
     async def on_flash_selected(name):
+        nonlocal selected_result
         clear()
-        await flash_firmware(name.lower())
+        selected_result = await flash_firmware(name.lower())
 
     index = await run_menu(
         FLASH_ITEMS,
@@ -140,7 +143,14 @@ async def start_flash_menu():
         on_select=on_flash_selected
     )
 
-    return "main" if index == "main" else "flash"
+    if index == "main":
+        return "main"
+
+    # Если прошивка вернула "log", то возвращаем его
+    if selected_result is not None:
+        return selected_result
+
+    return "flash"
 
 
 # --- Меню: Настройки (Принтер) ---
