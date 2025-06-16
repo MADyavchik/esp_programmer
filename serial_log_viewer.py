@@ -36,56 +36,67 @@ async def monitor_serial_data(proc, stop_event):
     draw_log_table(values)
     last_line_time = time.time()
 
-
     while not stop_event.is_set():
         try:
-
             line = await asyncio.wait_for(proc.stdout.readline(), timeout=1.0)
+
+            if not line:
+                print("🔌 Порт закрылся")
+                show_message("Disconnect..")
+                stop_event.set()
+                break
+
+            line = line.decode("utf-8", errors="ignore").strip()
+
+            # 🛑 Пропускаем служебные строки
+            if line.startswith('---'):
+                print(f"⚙️ Служебная строка: {line}")
+                continue
+
+            print(f"Received line: {line}")
+            last_line_time = time.time()
+
+            # Стандартный парсинг
+            match = LOG_PATTERN.search(line)
+            if match:
+                key, val = match.groups()
+                if key in values:
+                    values[key]["value"] = val
+                    values[key]["status"] = "white"
+                    draw_log_table(values)
+                continue
+
+            # Доп. парсинг
+            for key, pattern in EXTRA_PATTERNS.items():
+                match = pattern.search(line)
+                if match:
+                    if len(match.groups()) == 2:
+                        status, value = match.groups()
+                        values[key]["value"] = f"{value}"
+                        values[key]["status"] = (
+                            "lime" if status == "OK"
+                            else "red" if status == "FAIL"
+                            else "white"
+                        )
+                    else:
+                        value = match.group(1)
+                        values[key]["value"] = value
+                        values[key]["status"] = "white"
+                    draw_log_table(values)
+                    break
+
+        except asyncio.TimeoutError:
             if time.time() - last_line_time > 5:
                 print("❌ Нет данных с платы слишком долго — считаем, что отключена")
                 show_message("Нет связи")
                 stop_event.set()
                 break
-
-        except asyncio.TimeoutError:
             continue
+
         except Exception as e:
             print(f"Readline error: {e}")
-            break
-
-        if not line:
-            print("🔌 Порт закрылся")
-            show_message("Disconnect..")
             stop_event.set()
             break
-
-        line = line.decode("utf-8", errors="ignore").strip()
-        print(f"Received line: {line}")
-
-        # 1. Стандартный парсинг
-        match = LOG_PATTERN.search(line)
-        if match:
-            key, val = match.groups()
-            if key in values:
-                values[key]["value"] = val
-                values[key]["status"] = "white"
-                draw_log_table(values)
-            continue
-
-        # 2. Дополнительный парсинг
-        for key, pattern in EXTRA_PATTERNS.items():
-            match = pattern.search(line)
-            if match:
-                if len(match.groups()) == 2:
-                    status, value = match.groups()
-                    values[key]["value"] = f"{value}"
-                    values[key]["status"] = "lime" if status == "OK" else ("red" if status == "FAIL" else "white")
-                else:
-                    value = match.group(1)
-                    values[key]["value"] = value
-                    values[key]["status"] = "white"
-                draw_log_table(values)
-                break
 
 
 @log_async
