@@ -55,11 +55,11 @@ async def monitor_serial_data(proc, stop_event):
             if match:
                 if len(match.groups()) == 2:
                     status, value = match.groups()
-                    values[key] = f"{status} {value}"
+                    values[key] = f"{value} {status} "
                 else:
                     values[key] = match.group(1)
                 print(f"Updated extra value: {key} = {values[key]}")
-                draw_log_table(values)
+                draw_log_table(values, status)
                 break
 
     proc.terminate()
