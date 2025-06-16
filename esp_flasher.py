@@ -168,6 +168,7 @@ async def flash_firmware(firmware_name):
         #log
         from serial_log_viewer import show_serial_data
         if firmware_name == "TEST":
+            print("TEST_shit")
             await show_serial_data()
 
     except subprocess.CalledProcessError as e:
