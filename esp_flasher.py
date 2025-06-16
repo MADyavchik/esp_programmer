@@ -166,10 +166,10 @@ async def flash_firmware(firmware_name):
             logging.warning("⚠️ Принтер не подключен — печать пропущена.")
 
         #log
-        from serial_log_viewer import show_serial_data
+        #from serial_log_viewer import show_serial_data
         if firmware_name == "test":
             print("TEST")
-            await show_serial_data()
+            #await show_serial_data()
 
     except subprocess.CalledProcessError as e:
         logging.error(f"❌ Прошивка не удалась: {e}")
@@ -181,7 +181,11 @@ async def flash_firmware(firmware_name):
         show_message("Ошибка")
         time.sleep(2)
         clear()
-    return "flash"
+
+    if firmware_name == "test":
+        return "log"
+    else:
+        return "flash"
 
 def get_mac_address():
     try:
