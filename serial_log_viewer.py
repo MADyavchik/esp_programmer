@@ -33,6 +33,11 @@ values = {
 
 async def monitor_serial_data(proc, stop_event):
     """Асинхронная функция для мониторинга UART"""
+    # Очистка значений
+    for val in values.values():
+        val["value"] = "—"
+        val["status"] = None
+
     draw_log_table(values)
     last_line_time = time.time()
 
@@ -89,7 +94,7 @@ async def monitor_serial_data(proc, stop_event):
             if time.time() - last_line_time > 3:
                 print("❌ Нет данных с платы слишком долго — считаем, что отключена")
                 show_message("Нет связи")
-                await asyncio.sleep(2)
+                await asyncio.sleep(1)
                 stop_event.set()
                 break
             continue
