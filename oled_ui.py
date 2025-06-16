@@ -111,10 +111,10 @@ def draw_log_table(data):
     image = Image.new("RGB", (240, 240), "grey")
     draw = ImageDraw.Draw(image)
 
-    draw.rectangle((0, 0, 239, 39), outline=data['Battery']['status'], fill=data['Battery']['status'])
+    draw.rectangle((0, 0, 239, 39), outline="black", fill=data['Battery']['status'])
     draw.text((0, 0), f"BATT: {data['Battery']['value']}", font=font, fill="black")
 
-    draw.rectangle((0, 40, 239, 79), outline=data['Weight']['status'], fill=data['Weight']['status'])
+    draw.rectangle((0, 40, 239, 79), outline="black", fill=data['Weight']['status'])
     draw.text((0, 40), f"W: {data['Weight']['value']}", font=font, fill="black")
 
     #draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
@@ -126,7 +126,7 @@ def draw_log_table(data):
     #draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
 
 
-    draw.rectangle((0, 160, 239, 199), outline=data['CPU Temp']['status'], fill=data['CPU Temp']['status'])
+    draw.rectangle((0, 160, 239, 199), outline="black", fill=data['CPU Temp']['status'])
     draw.text((0, 160), f"CPU t: {data['CPU Temp']['value']}", font=font, fill="black")
     #draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
 
