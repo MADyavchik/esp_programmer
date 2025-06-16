@@ -111,44 +111,46 @@ def draw_log_table(data, status = None):
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
 
-    if status == "OK":
+    mark = status
+
+    if mark == "OK":
         draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="green")
-    elif status == "FAIL":
+    elif mark == "FAIL":
         draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="red")
     else:
         draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
 
-    if status == "OK":
+    if mark == "OK":
         draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="green")
-    elif status == "FAIL":
+    elif mark == "FAIL":
         draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="red")
     else:
         draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
 
-    if status == "OK":
+    if mark == "OK":
         draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="green")
-    elif status == "FAIL":
+    elif mark == "FAIL":
         draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="red")
     else:
         draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
 
-    if status == "OK":
+    if mark == "OK":
         draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="green")
-    elif status == "FAIL":
+    elif mark == "FAIL":
         draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="red")
     else:
         draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
 
-    if status == "OK":
+    if mark == "OK":
         draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="green")
-    elif status == "FAIL":
+    elif mark == "FAIL":
         draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="red")
     else:
         draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
 
-    if status == "OK":
+    if mark == "OK":
         draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="green")
-    elif status == "FAIL":
+    elif mark == "FAIL":
         draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="red")
     else:
         draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
