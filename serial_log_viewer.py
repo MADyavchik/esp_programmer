@@ -44,7 +44,8 @@ async def monitor_serial_data(proc, stop_event):
         if match:
             key, val = match.groups()
             if key in values:
-                values[key] = val
+                values[key]["value"] = val
+                values[key]["status"] = "white"
                 print(f"Updated values: {values}")
                 draw_log_table(values)
                 continue
