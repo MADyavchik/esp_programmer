@@ -86,9 +86,10 @@ async def monitor_serial_data(proc, stop_event):
                     break
 
         except asyncio.TimeoutError:
-            if time.time() - last_line_time > 5:
+            if time.time() - last_line_time > 3:
                 print("❌ Нет данных с платы слишком долго — считаем, что отключена")
                 show_message("Нет связи")
+                await asyncio.sleep(2)
                 stop_event.set()
                 break
             continue
