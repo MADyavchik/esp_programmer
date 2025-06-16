@@ -53,8 +53,11 @@ async def monitor_serial_data(proc, stop_event):
         for key, pattern in EXTRA_PATTERNS.items():
             match = pattern.search(line)
             if match:
-                status, value = match.groups()
-                values[key] = f"{value} ({status})"
+                if len(match.groups()) == 2:
+                    status, value = match.groups()
+                    values[key] = f"{status} {value}"
+                else:
+                    values[key] = match.group(1)
                 print(f"Updated extra value: {key} = {values[key]}")
                 draw_log_table(values)
                 break
