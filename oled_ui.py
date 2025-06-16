@@ -119,39 +119,39 @@ def draw_log_table(data, status = None):
         draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
 
     if status == "OK":
-        draw.text((0, 0), f"W: {data['Weight']}", font=font, fill="green")
+        draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="green")
     elif status == "FAIL":
-        draw.text((0, 0), f"W: {data['Weight']}", font=font, fill="red")
+        draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="red")
     else:
-        draw.text((0, 0), f"W: {data['Weight']}", font=font, fill="white")
+        draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
 
     if status == "OK":
-        draw.text((0, 0), f"TEMP: {data['Temp']}", font=font, fill="green")
+        draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="green")
     elif status == "FAIL":
-        draw.text((0, 0), f"TEMP: {data['Temp']}", font=font, fill="red")
+        draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="red")
     else:
-        draw.text((0, 0), f"TEMP: {data['Temp']}", font=font, fill="white")
+        draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
 
     if status == "OK":
-        draw.text((0, 0), f"TOF: {data['TOF']}", font=font, fill="green")
+        draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="green")
     elif status == "FAIL":
-        draw.text((0, 0), f"TOF: {data['TOF']}", font=font, fill="red")
+        draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="red")
     else:
-        draw.text((0, 0), f"TOF: {data['TOF']}", font=font, fill="white")
+        draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
 
     if status == "OK":
-        draw.text((0, 0), f"CPU t: {data['CPU Temp']}", font=font, fill="green")
+        draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="green")
     elif status == "FAIL":
-        draw.text((0, 0), f"CPU t: {data['CPU Temp']}", font=font, fill="red")
+        draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="red")
     else:
-        draw.text((0, 0), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
+        draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
 
     if status == "OK":
-        draw.text((0, 0), f"RSSI: {data['DOM.Online']}", font=font, fill="green")
+        draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="green")
     elif status == "FAIL":
-        draw.text((0, 0), f"RSSI: {data['DOM.Online']}", font=font, fill="red")
+        draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="red")
     else:
-        draw.text((0, 0), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
+        draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
 
     display_on_all(image)
 
