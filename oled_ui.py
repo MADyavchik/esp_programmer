@@ -112,6 +112,7 @@ def draw_log_table(data):
     draw = ImageDraw.Draw(image)
 
     draw.text((0, 0), f"BATT: {data['Battery']['value']}", font=font, fill=data['Battery']['status'])
+    draw.rectangle((0, 0, 240, 40), outline=data['Battery']['status'], fill=None)
 
     draw.text((0, 40), f"W: {data['Weight']['value']}", font=font, fill=data['Weight']['status'])
     #draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
