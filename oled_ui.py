@@ -104,56 +104,29 @@ def show_message(text):
 
     display_on_all(image)
 
-def draw_log_table(data, status = None):
+def draw_log_table(data):
 
     print("🎨 draw_log_table called with:", data)  # DEBUG
 
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
 
-    mark = status
+    draw.text((0, 0), f"BATT: {data['Battery']['value']}", font=font, fill=data['Battery']['status'])
 
-    if mark == "OK":
-        draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="green")
-    elif mark == "FAIL":
-        draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="red")
-    else:
-        draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
+    draw.text((0, 40), f"W: {data['Weight']['value']}", font=font, fill=data['Weight']['status'])
+    #draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
 
-    if mark == "OK":
-        draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="green")
-    elif mark == "FAIL":
-        draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="red")
-    else:
-        draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
+    draw.text((0, 80), f"TEMP: {data['Temp']['value']}", font=font, fill=data['Temp']['status'])
+    #draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
 
-    if mark == "OK":
-        draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="green")
-    elif mark == "FAIL":
-        draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="red")
-    else:
-        draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
+    draw.text((0, 120), f"TOF: {data['TOF']['value']}", font=font, fill=data['TOF']['status'])
+    #draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
 
-    if mark == "OK":
-        draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="green")
-    elif mark == "FAIL":
-        draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="red")
-    else:
-        draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
+    draw.text((0, 160), f"CPU t: {data['CPU Temp']['value']}", font=font, fill=data['CPU Temp']['status'])
+    #draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
 
-    if mark == "OK":
-        draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="green")
-    elif mark == "FAIL":
-        draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="red")
-    else:
-        draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
-
-    if mark == "OK":
-        draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="green")
-    elif mark == "FAIL":
-        draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="red")
-    else:
-        draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
+    draw.text((0, 200), f"RSSI: {data['DOM.Online']['value']}", font=font, fill=data['DOM.Online']['status'])
+    #draw.text((0, 200), f"RSSI: {data['DOM.Online']}", font=font, fill="white")
 
     display_on_all(image)
 

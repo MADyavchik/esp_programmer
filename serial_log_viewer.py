@@ -19,12 +19,12 @@ EXTRA_PATTERNS = {
 
 # Значения по умолчанию
 values = {
-    "Battery": "—",
-    "Temp": "—",
-    "TOF": "—",
-    "Weight": "—",
-    "CPU Temp": "—",
-    "DOM.Online": "—"
+    "Battery": {"value": "—", "status": None},
+    "Temp": {"value": "—", "status": None},
+    "TOF": {"value": "—", "status": None},
+    "Weight": {"value": "—", "status": None},
+    "CPU Temp": {"value": "—", "status": None},
+    "DOM.Online": {"value": "—", "status": None}
 }
 
 async def monitor_serial_data(proc, stop_event):
@@ -55,11 +55,21 @@ async def monitor_serial_data(proc, stop_event):
             if match:
                 if len(match.groups()) == 2:
                     status, value = match.groups()
-                    values[key] = f"{value} {status} "
+                    values[key]["value"] = f"{value}"
+                    if status == "OK":
+                        values[key]["status"] = f"green"
+                    elif status == "FAIL":
+                        values[key]["status"] = f"red"
+                    else:
+                        values[key]["status"] = f"white"
+
                 else:
-                    values[key] = match.group(1)
+                    value = match.group(1)
+                    values[key]["value"] = value
+                    values[key]["status"] = "white"
+
                 print(f"Updated extra value: {key} = {values[key]}")
-                draw_log_table(values, status)
+                draw_log_table(values)
                 break
 
     proc.terminate()
