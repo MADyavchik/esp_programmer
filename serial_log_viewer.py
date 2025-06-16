@@ -10,10 +10,10 @@ LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
 # Дополнительные паттерны
 EXTRA_PATTERNS = {
-    "Battery": re.compile(r"BATTERY\s+\[OK\]\s+(\d+)"),
-    "Temp": re.compile(r"1WIRE Temperature\s+\[OK\]\s+Temp:\s+(\d+)"),
-    "Weight": re.compile(r"WEIGHT\s+\[OK\]\s+Read\s+(-?\d+)"),
-    "CPU Temp": re.compile(r"CPU TEMP\s+\[OK\]\s+(\d+)"),
+    "Battery": re.compile(r"BATTERY\s+\[(OK|FAIL)\]\s+(\d+)"),
+    "Temp": re.compile(r"1WIRE Temperature\s+\[(OK|FAIL)\]\s+Temp:\s+(\d+)"),
+    "Weight": re.compile(r"WEIGHT\s+\[(OK|FAIL)\]\s+Read\s+(-?\d+)"),
+    "CPU Temp": re.compile(r"CPU TEMP\s+\[(OK|FAIL)\]\s+(\d+)"),
     "DOM.Online": re.compile(r"SSID\s+DOM\.Online\s+RSSI:\s+(-?\d+)")
 }
 
@@ -53,7 +53,8 @@ async def monitor_serial_data(proc, stop_event):
         for key, pattern in EXTRA_PATTERNS.items():
             match = pattern.search(line)
             if match:
-                values[key] = match.group(1)
+                status, value = match.groups()
+                values[key] = f"{value} ({status})"
                 print(f"Updated extra value: {key} = {values[key]}")
                 draw_log_table(values)
                 break
