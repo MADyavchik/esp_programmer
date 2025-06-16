@@ -80,7 +80,7 @@ async def monitor_serial_data(proc, stop_event):
 async def show_serial_data():
     """Функция для отображения серийных данных"""
     clear()
-    setup_buttons(None, None, None, None)
+
     stop_event = asyncio.Event()
 
     proc = await asyncio.create_subprocess_exec(
@@ -89,17 +89,37 @@ async def show_serial_data():
         stderr=asyncio.subprocess.PIPE
     )
 
-    # Отладка ошибок
+    # Логируем stderr
     asyncio.create_task(log_stderr(proc))
 
-    # Мониторинг данных
-    asyncio.create_task(monitor_serial_data(proc, stop_event))
+    # Задаем кнопку Назад
+    def handle_back():
+        stop_event.set()
 
-    while not btn_back.is_pressed:
-        await asyncio.sleep(0.1)
+    setup_buttons(None, None, handle_back, None)
 
-    stop_event.set()
-    await proc.wait()
+    # Запускаем монитор
+    monitor_task = asyncio.create_task(monitor_serial_data(proc, stop_event))
+
+    # Ждем завершения
+    await stop_event.wait()
+
+    # Ждем завершения таска
+    if not monitor_task.done():
+        monitor_task.cancel()
+        try:
+            await monitor_task
+        except asyncio.CancelledError:
+            pass
+
+    # Завершаем subprocess
+    try:
+        proc.terminate()
+        await asyncio.wait_for(proc.wait(), timeout=3)
+
+    except Exception:
+        proc.kill()
+
     clear()
     return "flash"
 
