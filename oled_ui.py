@@ -108,11 +108,11 @@ def draw_log_table(data):
 
     print("🎨 draw_log_table called with:", data)  # DEBUG
 
-    image = Image.new("RGB", (240, 240), "black")
+    image = Image.new("RGB", (240, 240), "grey")
     draw = ImageDraw.Draw(image)
 
-    draw.text((0, 0), f"BATT: {data['Battery']['value']}", font=font, fill=data['Battery']['status'])
-    draw.rectangle((0, 0, 239, 39), outline=data['Battery']['status'], fill=None)
+    draw.text((0, 0), f"BATT: {data['Battery']['value']}", font=font, fill="black")
+    draw.rectangle((0, 0, 239, 39), outline=data['Battery']['status'], fill=data['Battery']['status'])
 
     draw.text((0, 40), f"W: {data['Weight']['value']}", font=font, fill=data['Weight']['status'])
     draw.rectangle((0, 40, 239, 79), outline=data['Weight']['status'], fill=None)
