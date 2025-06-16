@@ -112,10 +112,10 @@ def draw_log_table(data):
     draw = ImageDraw.Draw(image)
 
     draw.text((0, 0), f"BATT: {data['Battery']['value']}", font=font, fill=data['Battery']['status'])
-    draw.rectangle((0, 0, 238, 40), outline=data['Battery']['status'], fill=None)
+    draw.rectangle((0, 0, 239, 39), outline=data['Battery']['status'], fill=None)
 
     draw.text((0, 40), f"W: {data['Weight']['value']}", font=font, fill=data['Weight']['status'])
-    draw.rectangle((0, 40, 238, 80), outline=data['Weight']['status'], fill=None)
+    draw.rectangle((0, 40, 239, 79), outline=data['Weight']['status'], fill=None)
     #draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
 
     draw.text((0, 80), f"TEMP: {data['Temp']['value']}", font=font, fill=data['Temp']['status'])
@@ -125,7 +125,7 @@ def draw_log_table(data):
     #draw.text((0, 120), f"TOF: {data['TOF']}", font=font, fill="white")
 
     draw.text((0, 160), f"CPU t: {data['CPU Temp']['value']}", font=font, fill=data['CPU Temp']['status'])
-    draw.rectangle((0, 160, 238, 200), outline=data['CPU Temp']['status'], fill=None)
+    draw.rectangle((0, 160, 239, 199), outline=data['CPU Temp']['status'], fill=None)
     #draw.text((0, 160), f"CPU t: {data['CPU Temp']}", font=font, fill="white")
 
     draw.text((0, 200), f"RSSI: {data['DOM.Online']['value']}", font=font, fill=data['DOM.Online']['status'])
