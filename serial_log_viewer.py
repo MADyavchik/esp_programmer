@@ -5,6 +5,7 @@ import re
 from oled_ui import draw_log_table, clear
 from buttons import btn_back
 from buttons import setup_buttons
+from oled_ui import show_message
 
 # Строго без IGNORECASE для точного совпадения ключей
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
@@ -33,11 +34,19 @@ async def monitor_serial_data(proc, stop_event):
     draw_log_table(values)
 
     while not stop_event.is_set():
-        line = await proc.stdout.readline()
-        if not line:
+        try:
+            line = await asyncio.wait_for(proc.stdout.readline(), timeout=1.0)
+        except asyncio.TimeoutError:
+            continue
+        except Exception as e:
+            print(f"Readline error: {e}")
             break
 
-        line = line.decode("utf-8").strip()
+        if not line:
+            print("🔌 Порт закрылся")
+            break
+
+        line = line.decode("utf-8", errors="ignore").strip()
         print(f"Received line: {line}")
 
         # 1. Стандартный парсинг
@@ -47,9 +56,8 @@ async def monitor_serial_data(proc, stop_event):
             if key in values:
                 values[key]["value"] = val
                 values[key]["status"] = "white"
-                print(f"Updated values: {values}")
                 draw_log_table(values)
-                continue
+            continue
 
         # 2. Дополнительный парсинг
         for key, pattern in EXTRA_PATTERNS.items():
@@ -58,53 +66,50 @@ async def monitor_serial_data(proc, stop_event):
                 if len(match.groups()) == 2:
                     status, value = match.groups()
                     values[key]["value"] = f"{value}"
-                    if status == "OK":
-                        values[key]["status"] = f"lime"
-                    elif status == "FAIL":
-                        values[key]["status"] = f"red"
-                    else:
-                        values[key]["status"] = f"white"
-
+                    values[key]["status"] = "lime" if status == "OK" else ("red" if status == "FAIL" else "white")
                 else:
                     value = match.group(1)
                     values[key]["value"] = value
                     values[key]["status"] = "white"
-
-                print(f"Updated extra value: {key} = {values[key]}")
                 draw_log_table(values)
                 break
 
-    proc.terminate()
-    clear()
+
 @log_async
 async def show_serial_data():
     """Функция для отображения серийных данных"""
     clear()
-
     stop_event = asyncio.Event()
 
-    proc = await asyncio.create_subprocess_exec(
-        "platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyS0",
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
-    )
+    # Попытка запуска
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyS0",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+    except Exception as e:
+        show_message(f"Ошибка запуска:\n{e}")
+        await asyncio.sleep(2)
+        clear()
+        return "flash"
 
-    # Логируем stderr
+    # Старт логгирования stderr
     asyncio.create_task(log_stderr(proc))
 
-    # Задаем кнопку Назад
+    # Кнопка назад
     def handle_back():
         stop_event.set()
 
     setup_buttons(None, None, handle_back, None)
 
-    # Запускаем монитор
+    # Старт мониторинга
     monitor_task = asyncio.create_task(monitor_serial_data(proc, stop_event))
 
-    # Ждем завершения
+    # Ждём выхода
     await stop_event.wait()
 
-    # Ждем завершения таска
+    # Завершаем таск
     if not monitor_task.done():
         monitor_task.cancel()
         try:
@@ -112,11 +117,10 @@ async def show_serial_data():
         except asyncio.CancelledError:
             pass
 
-    # Завершаем subprocess
+    # Завершаем процесс
     try:
         proc.terminate()
         await asyncio.wait_for(proc.wait(), timeout=3)
-
     except Exception:
         proc.kill()
 
@@ -126,9 +130,16 @@ async def show_serial_data():
 # Функция логгирования ошибок
 async def log_stderr(proc):
     while True:
-        line = await proc.stderr.readline()
-        if not line:
+        try:
+            line = await asyncio.wait_for(proc.stderr.readline(), timeout=1.0)
+            if not line:
+                break  # процесс завершился или stderr закрылся
+            print(f"⚠️ STDERR: {line.decode().strip()}")
+        except asyncio.TimeoutError:
+            continue  # просто ждём следующую порцию stderr
+        except Exception as e:
+            print(f"❌ log_stderr error: {e}")
             break
-        print(f"⚠️ STDERR: {line.decode().strip()}")
+
 
 
