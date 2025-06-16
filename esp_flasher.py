@@ -165,11 +165,6 @@ async def flash_firmware(firmware_name):
         else:
             logging.warning("⚠️ Принтер не подключен — печать пропущена.")
 
-        #log
-        #from serial_log_viewer import show_serial_data
-        if firmware_name == "test":
-            print("TEST")
-            #await show_serial_data()
 
     except subprocess.CalledProcessError as e:
         logging.error(f"❌ Прошивка не удалась: {e}")
@@ -183,6 +178,7 @@ async def flash_firmware(firmware_name):
         clear()
 
     if firmware_name == "test":
+        print("TEST!!!!!!!!!!!!!!!!!")
         return "log"
     else:
         return "flash"
