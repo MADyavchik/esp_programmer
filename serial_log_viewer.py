@@ -44,6 +44,8 @@ async def monitor_serial_data(proc, stop_event):
 
         if not line:
             print("🔌 Порт закрылся")
+            show_message("Disconnect..")
+            stop_event.set()
             break
 
         line = line.decode("utf-8", errors="ignore").strip()
@@ -77,11 +79,9 @@ async def monitor_serial_data(proc, stop_event):
 
 @log_async
 async def show_serial_data():
-    """Функция для отображения серийных данных"""
     clear()
     stop_event = asyncio.Event()
 
-    # Попытка запуска
     try:
         proc = await asyncio.create_subprocess_exec(
             "platformio", "device", "monitor", "--baud", "115200", "--port", "/dev/ttyS0",
@@ -89,40 +89,41 @@ async def show_serial_data():
             stderr=asyncio.subprocess.PIPE
         )
     except Exception as e:
-        show_message(f"Ошибка запуска:\n{e}")
+        print(f"❌ Не удалось запустить monitor: {e}")
+        show_message("Ошибка запуска monitor")
         await asyncio.sleep(2)
-        clear()
         return "flash"
 
-    # Старт логгирования stderr
+    # stderr лог
     asyncio.create_task(log_stderr(proc))
 
-    # Кнопка назад
+    # Назначаем кнопку "Назад"
     def handle_back():
+        print("⬅️ Кнопка назад нажата")
         stop_event.set()
 
     setup_buttons(None, None, handle_back, None)
 
-    # Старт мониторинга
     monitor_task = asyncio.create_task(monitor_serial_data(proc, stop_event))
 
-    # Ждём выхода
+    # Ждем выхода из логгера
     await stop_event.wait()
 
-    # Завершаем таск
+    # Пробуем завершить процесс
+    if proc.returncode is None:
+        proc.terminate()
+        try:
+            await asyncio.wait_for(proc.wait(), timeout=3)
+        except asyncio.TimeoutError:
+            proc.kill()
+
+    # Дождаться завершения задачи
     if not monitor_task.done():
         monitor_task.cancel()
         try:
             await monitor_task
         except asyncio.CancelledError:
             pass
-
-    # Завершаем процесс
-    try:
-        proc.terminate()
-        await asyncio.wait_for(proc.wait(), timeout=3)
-    except Exception:
-        proc.kill()
 
     clear()
     return "flash"
