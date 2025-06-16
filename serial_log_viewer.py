@@ -7,6 +7,8 @@ from buttons import btn_back
 from buttons import setup_buttons
 from oled_ui import show_message
 
+import time
+
 # Строго без IGNORECASE для точного совпадения ключей
 LOG_PATTERN = re.compile(r"(Battery|Temp|TOF|Weight):\s*(-?\d+)")
 
@@ -32,10 +34,19 @@ values = {
 async def monitor_serial_data(proc, stop_event):
     """Асинхронная функция для мониторинга UART"""
     draw_log_table(values)
+    last_line_time = time.time()
+
 
     while not stop_event.is_set():
         try:
+
             line = await asyncio.wait_for(proc.stdout.readline(), timeout=1.0)
+            if time.time() - last_line_time > 5:
+                print("❌ Нет данных с платы слишком долго — считаем, что отключена")
+                show_message("Нет связи")
+                stop_event.set()
+                break
+
         except asyncio.TimeoutError:
             continue
         except Exception as e:
@@ -95,7 +106,7 @@ async def show_serial_data():
         return "flash"
 
     # stderr лог
-    asyncio.create_task(log_stderr(proc))
+    asyncio.create_task(log_stderr(proc, stop_event))
 
     # Назначаем кнопку "Назад"
     def handle_back():
@@ -129,15 +140,21 @@ async def show_serial_data():
     return "flash"
 
 # Функция логгирования ошибок
-async def log_stderr(proc):
+async def log_stderr(proc, stop_event):
     while True:
         try:
             line = await asyncio.wait_for(proc.stderr.readline(), timeout=1.0)
             if not line:
-                break  # процесс завершился или stderr закрылся
-            print(f"⚠️ STDERR: {line.decode().strip()}")
+                break
+            text = line.decode(errors="ignore").strip()
+            print(f"⚠️ STDERR: {text}")
+            if "disconnected" in text.lower() or "unavailable" in text.lower():
+                print("🛑 Устройство отключено!")
+                show_message("Disconnected")
+                stop_event.set()
+                break
         except asyncio.TimeoutError:
-            continue  # просто ждём следующую порцию stderr
+            continue
         except Exception as e:
             print(f"❌ log_stderr error: {e}")
             break
