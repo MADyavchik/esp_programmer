@@ -58,7 +58,7 @@ async def monitor_serial_data(proc, stop_event):
                     status, value = match.groups()
                     values[key]["value"] = f"{value}"
                     if status == "OK":
-                        values[key]["status"] = f"green"
+                        values[key]["status"] = f"lime"
                     elif status == "FAIL":
                         values[key]["status"] = f"red"
                     else:
