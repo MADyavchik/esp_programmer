@@ -113,7 +113,7 @@ def draw_log_table(data):
     draw.text((0, 0), f"BATT: {data['Battery']}", font=font, fill="white")
     #draw.text((0, 0), f"BATT: {data.get('Battery', '—')}", font=font, fill="white")
 
-    draw.text((0, 40), f"WEIGHT: {data['Weight']}", font=font, fill="white")
+    draw.text((0, 40), f"W: {data['Weight']}", font=font, fill="white")
     #draw.text((0, 40), f"WEIGHT: {data.get('Weight', '—')}", font=font, fill="white")
 
     draw.text((0, 80), f"TEMP: {data['Temp']}", font=font, fill="white")
