@@ -159,7 +159,17 @@ async def start_flash_menu():
 
 @log_async
 async def start_settings_menu():
-    async def on_select(index):
+    while True:
+        menu_items = [
+            f"Print: {'On' if printer_connection['connected'] else 'Off'}",
+            f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}"
+        ]
+
+        index = await run_menu(menu_items, visible_lines=2)
+
+        if index == "main":
+            return "main"
+
         if index == 0:
             # Переключение принтера
             if printer_connection["connected"]:
@@ -169,15 +179,6 @@ async def start_settings_menu():
         elif index == 1:
             # Изменение количества
             await change_print_quantity()
-
-    while True:
-        menu_items = [
-            f"Print: {'On' if printer_connection['connected'] else 'Off'}",
-            f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}"
-        ]
-        index = await run_menu(menu_items, visible_lines=2, on_select=on_select)
-        if index == "main":
-            return "main"
 
 async def change_print_quantity():
     options = [str(i) for i in range(1, 11)]
