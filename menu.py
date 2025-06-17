@@ -8,11 +8,13 @@ from oled_ui import draw_menu, clear, show_message
 from utils import log_async
 from esp_flasher import flash_firmware
 from printer_functions import printer_connection, connect_to_printer, disconnect_from_printer
+from print_config import DEFAULT_PRINTER_CONFIG
 
 # --- Глобальные переменные ---
 
 MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
 FLASH_ITEMS = ["TEST", "Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
+SETTINGS_ITEMS = ["Print:", "Quant:"]
 VISIBLE_LINES = 4
 
 
@@ -157,14 +159,29 @@ async def start_flash_menu():
 
 @log_async
 async def start_settings_menu():
-    async def on_toggle_printer(_):
-        if printer_connection["connected"]:
-            await disconnect_from_printer()
-        else:
-            await connect_to_printer()
+    async def on_select(index):
+        if index == 0:
+            # Переключение принтера
+            if printer_connection["connected"]:
+                await disconnect_from_printer()
+            else:
+                await connect_to_printer()
+        elif index == 1:
+            # Изменение количества
+            await change_print_quantity()
 
     while True:
-        label = f"Print: {'On' if printer_connection['connected'] else 'Off'}"
-        index = await run_menu([label], visible_lines=1, on_select=on_toggle_printer)
+        menu_items = [
+            f"Print: {'On' if printer_connection['connected'] else 'Off'}",
+            f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}"
+        ]
+        index = await run_menu(menu_items, visible_lines=2, on_select=on_select)
         if index == "main":
             return "main"
+
+async def change_print_quantity():
+    options = [str(i) for i in range(1, 11)]
+    idx = await run_menu(options, visible_lines=5)
+
+    if isinstance(idx, int):
+        DEFAULT_PRINTER_CONFIG.quantity = int(options[idx])
