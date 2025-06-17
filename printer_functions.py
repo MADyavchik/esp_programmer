@@ -3,6 +3,7 @@ import sys
 import os
 import struct
 from types import MethodType
+from oled_ui import animate_activity
 
 sys.path.append(os.path.abspath('/home/pauro/NiimPrintX'))
 
@@ -64,8 +65,8 @@ from print_config import DEFAULT_PRINTER_CONFIG
 async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CONFIG):
     width = config.width
     height = config.height
-    quantity = config.quantity  # Количество копий
-    density = config.density    # Плотность
+    quantity = config.quantity
+    density = config.density
 
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
@@ -90,26 +91,35 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
 
     image = image.rotate(270, expand=True)
 
-    await printer.print_image(image, quantity=quantity, density=density)
+    # 👇 Добавляем анимацию во время печати
+    stop_event = asyncio.Event()
+    animation_task = asyncio.create_task(animate_activity(stop_event, message="Печать..."))
 
-    # Явно запрашиваем статус
-    if hasattr(printer, "get_print_status"):
-        status = await printer.get_print_status()
-    else:
-        print("⚠️ Принтер не поддерживает получение статуса.")
-        return
+    try:
+        await printer.print_image(image, quantity=quantity, density=density)
 
-    if not isinstance(status, dict) or status.get("error", False):
-        print(f"❌ Ошибка: статус печати не получен или содержит ошибку. Статус: {status}")
-        return
+        if hasattr(printer, "get_print_status"):
+            status = await printer.get_print_status()
+        else:
+            print("⚠️ Принтер не поддерживает получение статуса.")
+            return
 
-    printed = status.get("page", 0)
-    expected = status.get("quantity", 1)
+        if not isinstance(status, dict) or status.get("error", False):
+            print(f"❌ Ошибка: статус печати не получен или содержит ошибку. Статус: {status}")
+            return
 
-    if printed >= expected:
-        print("✅ Изображение успешно отправлено на печать.")
-    else:
-        print(f"⚠️ Печать завершена не полностью. Статус: {status}")
+        printed = status.get("page", 0)
+        expected = status.get("quantity", 1)
+
+        if printed >= expected:
+            print("✅ Изображение успешно отправлено на печать.")
+        else:
+            print(f"⚠️ Печать завершена не полностью. Статус: {status}")
+    finally:
+        # ✅ Остановить анимацию в любом случае
+        stop_event.set()
+        await animation_task
+
 
 # Пример функции для отключения принтера
 async def disconnect_printer(printer):

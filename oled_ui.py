@@ -1,6 +1,7 @@
 #oled_ui.py
 from PIL import Image, ImageDraw, ImageFont
 import qrcode
+import asyncio
 
 # ST7789
 try:
@@ -257,3 +258,46 @@ def draw_menu(
             draw.text((30, y), items[index], font=font_unselect, fill="grey")
 
     display_on_all(image)
+
+async def animate_activity(stop_event, message="Printing..."):
+    bar_count = 5
+    width = 240
+    height = 240
+    bar_width = 10
+    spacing = 15
+    center_y = height // 2
+    max_bar_height = 60
+    min_bar_height = 20
+    step = 5
+
+    # координаты X для пяти столбиков, равномерно распределенных по центру
+    start_x = (width - ((bar_count - 1) * spacing + bar_count * bar_width)) // 2
+    bar_xs = [start_x + i * (bar_width + spacing) for i in range(bar_count)]
+    heights = [min_bar_height] * bar_count
+    directions = [1] * bar_count
+
+    tick = 0
+    while not stop_event.is_set():
+        image = Image.new("RGB", (width, height), "black")
+        draw = ImageDraw.Draw(image)
+
+        # текст сверху
+        draw.text((10, 10), message, font=font, fill="white")
+
+        for i in range(bar_count):
+            # волнообразное движение по очереди
+            if tick % bar_count == i:
+                heights[i] += step * directions[i]
+                if heights[i] >= max_bar_height or heights[i] <= min_bar_height:
+                    directions[i] *= -1  # реверс направления
+
+            bar_height = heights[i]
+            x = bar_xs[i]
+            y_top = center_y - bar_height // 2
+            y_bottom = center_y + bar_height // 2
+
+            draw.rectangle((x, y_top, x + bar_width, y_bottom), fill="yellow")
+
+        display_on_all(image)
+        tick += 1
+        await asyncio.sleep(0.1)
