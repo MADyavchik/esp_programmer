@@ -55,14 +55,17 @@ async def run_print_connect():
         await disconnect_from_printer()
     else:
         #show_message("Подключение...")
-        # ▶️ Запуск анимации печати
+        # ▶️ Запуск анимации
         stop_event = asyncio.Event()
         animation_task = asyncio.create_task(animate_activity(stop_event, message="Подключение..."))
 
-        await connect_to_printer()
+        result = await connect_to_printer()
 
         # ⏹️ Остановка анимации
         stop_event.set()
         await animation_task
+
+        show_message(result)
+        await asyncio.sleep(1)
 
     return "settings"

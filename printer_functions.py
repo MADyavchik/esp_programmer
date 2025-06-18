@@ -199,9 +199,9 @@ async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
 
     device = await get_device_by_mac(printer_connection["mac"])
     if not device:
-        show_message("Printer not found")
-        await asyncio.sleep(1)
-        return
+        #show_message("Printer not found")
+        #await asyncio.sleep(1)
+        return "Принтер не найден"
 
     printer = await connect_printer(device)
 
@@ -211,8 +211,9 @@ async def connect_to_printer(config=DEFAULT_PRINTER_CONFIG):
         "connected": True,
         "config": config,
     })
-    show_message("Printer connected")
-    await asyncio.sleep(1)
+    #show_message("Printer connected")
+    #await asyncio.sleep(1)
+    return "Принтер подключен"
 
 
 printer_connection = {
