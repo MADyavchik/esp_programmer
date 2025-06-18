@@ -92,8 +92,8 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     image = image.rotate(270, expand=True)
 
     # 👇 Добавляем анимацию во время печати
-    stop_event = asyncio.Event()
-    animation_task = asyncio.create_task(animate_activity(stop_event, message="Печать..."))
+    #stop_event = asyncio.Event()
+    #animation_task = asyncio.create_task(animate_activity(stop_event, message="Печать..."))
 
     try:
         await printer.print_image(image, quantity=quantity, density=density)
@@ -115,10 +115,13 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
             print("✅ Изображение успешно отправлено на печать.")
         else:
             print(f"⚠️ Печать завершена не полностью. Статус: {status}")
-    finally:
+
+    except Exception as e:
+        print(f"Ошибка: {e}")
+    #finally:
         # ✅ Остановить анимацию в любом случае
-        stop_event.set()
-        await animation_task
+        #stop_event.set()
+        #await animation_task
 
 
 # Пример функции для отключения принтера
