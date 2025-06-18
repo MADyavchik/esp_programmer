@@ -1,7 +1,7 @@
 # screens/print_screen.py
 import asyncio
 from oled_ui import show_message, clear
-from printer_functions import print_mac_address, printer_connection
+from printer_functions import print_mac_address, printer_connection, disconnect_from_printer, connect_to_printer
 from utils import log_async
 import state
 from oled_ui import animate_activity
@@ -46,3 +46,14 @@ async def run_print_screen():
 
     await asyncio.sleep(2)
     return "log"
+@log_async
+async def run_print_connect():
+    clear()
+    # Переключение принтера
+    if printer_connection["connected"]:
+        await disconnect_from_printer()
+    else:
+        show_message("Подключение...")
+        await connect_to_printer()
+
+    return "settings"

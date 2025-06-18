@@ -172,10 +172,12 @@ async def start_settings_menu():
 
         if index == 0:
             # Переключение принтера
-            if printer_connection["connected"]:
-                await disconnect_from_printer()
-            else:
-                await connect_to_printer()
+            #if printer_connection["connected"]:
+                #await disconnect_from_printer()
+            #else:
+                #await connect_to_printer()
+            return "print_connect"
+
         elif index == 1:
             # Изменение количества
             await change_print_quantity()
