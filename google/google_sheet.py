@@ -3,7 +3,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
-key_path = os.path.expanduser('~/google-credentials.json')
+key_path = os.path.expanduser('~/parsfor-efc9e0058e29.json')
 
 def init_google_sheet():
     scope = [
