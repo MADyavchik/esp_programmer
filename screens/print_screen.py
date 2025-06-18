@@ -3,13 +3,16 @@ import asyncio
 from oled_ui import show_message, clear
 from printer_functions import print_mac_address, printer_connection
 from utils import log_async
+import state
 
 
 @log_async
-async def run_print_screen(mac_address):
+async def run_print_screen():
     clear()
     show_message("Печать MAC...")
     await asyncio.sleep(0.5)  # небольшая пауза перед началом
+
+    mac_address = state.mac_address
 
     if printer_connection["connected"] and printer_connection.get("printer"):
         try:

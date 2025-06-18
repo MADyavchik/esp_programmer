@@ -160,7 +160,7 @@ async def flash_firmware(firmware_name):
         # 📤 Печать MAC-адреса, если принтер подключен
         if state.mac_address:
             logging.info("🖨️ Отправляем MAC на печать...")
-            await run_print_screen(state.mac_address)
+            return "print"
         else:
             logging.warning("❗ MAC-адрес не получен, печать невозможна.")
 
