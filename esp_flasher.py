@@ -8,6 +8,7 @@ import re
 import time
 import threading
 from screens.print_screen import run_print_screen
+from google.google_sheet import append_mac_address
 
 import state
 
@@ -201,6 +202,10 @@ def get_mac_address():
         mac_line = next((line for line in result.stdout.splitlines() if "MAC:" in line), None)
         if mac_line:
             mac = mac_line.split("MAC:")[1].strip()
+
+            #отправка мак адреса в таблицу
+            append_mac_address(mac)
+
             logging.info(f"✅ MAC-адрес: {mac}")
             exit_bootloader()
             return mac
