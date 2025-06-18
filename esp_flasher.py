@@ -9,6 +9,8 @@ import time
 import threading
 from screens.print_screen import run_print_screen
 
+import state
+
 logging.basicConfig(level=logging.INFO)
 
 FLASH_DIR = "esp"
@@ -53,7 +55,7 @@ async def flash_firmware(firmware_name):
             logging.error(f"❌ Файл не найден: {file}")
             return
 
-    mac_address = None  # Добавляем переменную для MAC-адреса
+    #mac_address = None  # Добавляем переменную для MAC-адреса
 
     try:
         logging.info("🔌 Перевод ESP32 в режим bootloader...")
@@ -86,9 +88,9 @@ async def flash_firmware(firmware_name):
 
             # Проверяем, не содержит ли строка MAC-адрес
             mac_match = re.search(r"MAC:\s*([0-9a-fA-F:]{17})", line)
-            if mac_match and not mac_address:
-                mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
-                logging.info(f"📡 Обнаружен MAC-адрес: {mac_address}")  # Выводим в лог
+            if mac_match and not state.mac_address:
+                state.mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
+                logging.info(f"📡 Обнаружен MAC-адрес: {state.mac_address}")  # Выводим в лог
 
                # 🔍 Проверка статуса подключения принтера
                 from printer_functions import printer_connection  # импортируем только когда нужен
@@ -156,9 +158,9 @@ async def flash_firmware(firmware_name):
         exit_bootloader()
 
         # 📤 Печать MAC-адреса, если принтер подключен
-        if mac_address:
+        if state.mac_address:
             logging.info("🖨️ Отправляем MAC на печать...")
-            await run_print_screen(mac_address)
+            await run_print_screen(state.mac_address)
         else:
             logging.warning("❗ MAC-адрес не получен, печать невозможна.")
 
