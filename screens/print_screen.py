@@ -22,13 +22,14 @@ async def run_print_screen():
                 config=printer_connection["config"]
             )
             clear()
-            show_message("✅ MAC напечатан")
+            show_message("MAC напечатан")
         except Exception as e:
             clear()
-            show_message("❌ Ошибка печати")
+            show_message("Ошибка печати")
             print(f"Ошибка печати: {e}")
     else:
         clear()
-        show_message("⚠️ Принтер не подключен")
+        show_message("Принтер не подключен")
 
     await asyncio.sleep(2)  # Показать результат пару секунд
+    return "flash"
