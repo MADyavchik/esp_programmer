@@ -10,8 +10,8 @@ from oled_ui import animate_activity
 @log_async
 async def run_print_screen():
     clear()
-    show_message("Печать MAC...")
-    await asyncio.sleep(0.5)
+    #show_message("Печать MAC...")
+    #await asyncio.sleep(0.5)
 
     mac_address = state.mac_address
 
