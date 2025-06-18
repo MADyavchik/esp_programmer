@@ -2,7 +2,10 @@
 import asyncio
 from oled_ui import show_message, clear
 from printer_functions import print_mac_address, printer_connection
+from utils import log_async
 
+
+@log_async
 async def run_print_screen(mac_address):
     clear()
     show_message("Печать MAC...")
