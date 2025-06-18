@@ -4,6 +4,7 @@ from serial_log_viewer import show_serial_data
 from git_update import start_git_update
 from mac_view import show_mac_address
 from menu import start_settings_menu
+from printer_functions import print_mac_address
 import asyncio
 
 # Маппинг меню
@@ -14,6 +15,7 @@ menu_map = {
     "update": start_git_update,
     "mac": show_mac_address,
     "settings": start_settings_menu,  # async
+    "print": print_mac_address,
 }
 
 async def run_menu_loop():

@@ -7,6 +7,7 @@ from oled_ui import draw_progress_bar, show_message, clear
 import re
 import time
 import threading
+from screens.print_screen import run_print_screen
 
 logging.basicConfig(level=logging.INFO)
 
@@ -155,15 +156,12 @@ async def flash_firmware(firmware_name):
         exit_bootloader()
 
         # 📤 Печать MAC-адреса, если принтер подключен
-        from printer_functions import printer_connection
-        if printer_connection["connected"] and printer_connection.get("printer"):
-            from printer_functions import print_mac_address
+        if mac_address:
             logging.info("🖨️ Отправляем MAC на печать...")
-            show_message("Printing MAC...")
-            time.sleep(2)
-            await print_mac_address(printer_connection["printer"], mac_address, config=printer_connection["config"])
+            await run_print_screen(mac_address)
         else:
-            logging.warning("⚠️ Принтер не подключен — печать пропущена.")
+            logging.warning("❗ MAC-адрес не получен, печать невозможна.")
+
 
 
     except subprocess.CalledProcessError as e:

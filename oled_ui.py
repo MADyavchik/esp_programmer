@@ -301,3 +301,5 @@ async def animate_activity(stop_event, message="Printing..."):
         display_on_all(image)
         tick += 1
         await asyncio.sleep(0.1)
+
+
