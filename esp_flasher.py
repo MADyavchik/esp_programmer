@@ -91,7 +91,12 @@ async def flash_firmware(firmware_name):
             mac_match = re.search(r"MAC:\s*([0-9a-fA-F:]{17})", line)
             if mac_match and not state.mac_address:
                 state.mac_address = mac_match.group(1).lower()  # Сохраняем MAC-адрес
+
                 logging.info(f"📡 Обнаружен MAC-адрес: {state.mac_address}")  # Выводим в лог
+
+                #отправка мак адреса в таблицу
+                append_mac_address(state.mac_address)
+
 
                # 🔍 Проверка статуса подключения принтера
                 from printer_functions import printer_connection  # импортируем только когда нужен
