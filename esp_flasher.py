@@ -73,6 +73,8 @@ async def flash_firmware(firmware_name):
         logging.info("🧽 Очистка флеша...")
         show_message("Erasing flash...")
 
+        state.mac_address = None # сбрасываем мак
+
         # Запускаем процесс очистки флеша, чтобы парсить MAC-адрес
         process = subprocess.Popen([
             "esptool.py", "--chip", "esp32", "-b", "460800", "-p", PORT, "erase_flash"
