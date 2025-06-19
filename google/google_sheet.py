@@ -24,7 +24,7 @@ from datetime import datetime
 
 from datetime import datetime
 
-def append_mac_address(mac_address: str):
+def append_mac_address(mac_address: str, firmware: str = None):
     try:
         sheet = init_google_sheet()
         all_records = sheet.get_all_records()
@@ -42,11 +42,11 @@ def append_mac_address(mac_address: str):
         now_data = datetime.now().strftime('%d/%m/%Y')
         now_time = datetime.now().strftime('%H:%M:%S')
 
-        row_values = [now_data, now_time, mac_address]
+        row_values = [now_data, now_time, mac_address, firmware]
 
         if existing_row_index:
             # Обновляем существующую строку (все три колонки)
-            sheet.update(f"A{existing_row_index}:C{existing_row_index}", [row_values])
+            sheet.update(f"A{existing_row_index}:D{existing_row_index}", [row_values])
             print(f"🔁 Обновлён MAC: {mac_address}")
         else:
             # Добавляем новую строку

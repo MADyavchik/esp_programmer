@@ -22,6 +22,9 @@ NO_NVS = ["test", "sens_sw", "sens_old"]
 
 async def flash_firmware(firmware_name):
     firmware_name = firmware_name.lower()
+
+    state.firmware_lable = firmware_name.lower()
+
     logging.info(f"🚀 Начинаем прошивку: {firmware_name}")
 
     firmware_path = os.path.join(FLASH_DIR, firmware_name)
@@ -97,7 +100,7 @@ async def flash_firmware(firmware_name):
                 logging.info(f"📡 Обнаружен MAC-адрес: {state.mac_address}")  # Выводим в лог
 
                 #отправка мак адреса в таблицу
-                append_mac_address(state.mac_address)
+                append_mac_address(state.mac_address, state.firmware_lable)
                 print("✅ MAC должен был быть добавлен/обновлен в таблице")
 
 
