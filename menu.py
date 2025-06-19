@@ -165,7 +165,7 @@ async def start_settings_menu():
             f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}"
         ]
 
-        index = await run_menu(menu_items, visible_lines=2)
+        index = await run_menu(menu_items, visible_lines=2, highlight_color="lime")
 
         if index == "main":
             return "main"
