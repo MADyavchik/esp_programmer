@@ -20,14 +20,29 @@ def init_google_sheet():
 
     return sheet
 
+from datetime import datetime
+
 def append_mac_address(mac_address: str):
     try:
         sheet = init_google_sheet()
+        all_records = sheet.get_all_records()  # Список словарей
 
-        # Пример строки: [MAC, Дата и время]
+        # Найти индекс строки с этим MAC (если есть)
+        existing_row_index = None
+        for i, row in enumerate(all_records):
+            if row.get("MAC") == mac_address:
+                existing_row_index = i + 2  # +2 потому что get_all_records пропускает заголовки и индексация с 1
+
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        sheet.append_row([mac_address, now])
 
-        print(f"✅ Добавлен MAC: {mac_address}")
+        if existing_row_index:
+            # Обновляем существующую строку
+            sheet.update(f"B{existing_row_index}", now)
+            print(f"🔁 Обновлён MAC: {mac_address}")
+        else:
+            # Добавляем новую строку
+            sheet.append_row([now, mac_address])
+            print(f"✅ Добавлен MAC: {mac_address}")
+
     except Exception as e:
         print(f"❌ Ошибка при добавлении MAC: {e}")
