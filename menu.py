@@ -184,7 +184,7 @@ async def start_settings_menu():
 
 async def change_print_quantity():
     options = [str(i) for i in range(1, 11)]
-    idx = await run_menu(options, visible_lines=5)
+    idx = await run_menu(options, visible_lines=5, highlight_color="lime")
 
     if isinstance(idx, int):
         DEFAULT_PRINTER_CONFIG.quantity = int(options[idx])
