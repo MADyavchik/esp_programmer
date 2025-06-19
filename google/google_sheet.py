@@ -33,15 +33,16 @@ def append_mac_address(mac_address: str):
             if row.get("MAC") == mac_address:
                 existing_row_index = i + 2  # +2 потому что get_all_records пропускает заголовки и индексация с 1
 
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        now_data = datetime.now().strftime('%d/%m/%Y')
+        now_time = datetime.now().strftime('%H:%M:%S')
 
         if existing_row_index:
             # Обновляем существующую строку
-            sheet.update(f"B{existing_row_index}", now)
+            sheet.update(now_data, now_time, f"B{existing_row_index}")
             print(f"🔁 Обновлён MAC: {mac_address}")
         else:
             # Добавляем новую строку
-            sheet.append_row([now, mac_address])
+            sheet.append_row([now_data, now_time, mac_address])
             print(f"✅ Добавлен MAC: {mac_address}")
 
     except Exception as e:
