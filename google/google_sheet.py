@@ -29,9 +29,9 @@ def append_mac_address(mac_address: str):
         sheet = init_google_sheet()
         all_records = sheet.get_all_records()
 
-        print("📋 Все записи:")
-        for row in all_records:
-            print(row)
+        #print("📋 Все записи:")
+        #for row in all_records:
+            #print(row)
 
         # Найти индекс строки с этим MAC (если есть)
         existing_row_index = None
