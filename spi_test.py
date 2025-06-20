@@ -1,6 +1,7 @@
 # spi_test.py
 
 from st7789_pi import ST7789
+import RPi.GPIO as GPIO
 import time
 
 BL_PIN = 25
