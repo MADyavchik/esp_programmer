@@ -32,10 +32,12 @@ async def inactivity_watcher(timeout=30):
             if backlight_on:
                 print("💤 Пользователь бездействует, выключаем подсветку!")
                 st_device.set_backlight(False)
+                st_device.sleep()
                 backlight_on = False
         else:
             if not backlight_on:
                 print("👆 Активность обнаружена, включаем подсветку")
+                st_device.wake()
                 st_device.set_backlight(True)
                 backlight_on = True
 

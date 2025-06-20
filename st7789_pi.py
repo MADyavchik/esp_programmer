@@ -107,3 +107,14 @@ class ST7789:
         rgb565 = (r << 11) | (g << 5) | b
         result = np.dstack(((rgb565 >> 8) & 0xFF, rgb565 & 0xFF)).flatten().tolist()
         return result
+
+    def sleep(self):
+        self.write_cmd(0x28)  # Display OFF
+        time.sleep(0.05)
+        self.write_cmd(0x10)  # Sleep IN
+        time.sleep(0.1)
+
+    def wake(self):
+        self.write_cmd(0x11)  # Sleep OUT
+        time.sleep(0.12)
+        self.write_cmd(0x29)  # Display ON
