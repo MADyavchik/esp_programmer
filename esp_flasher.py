@@ -99,9 +99,7 @@ async def flash_firmware(firmware_name):
 
                 logging.info(f"📡 Обнаружен MAC-адрес: {state.mac_address}")  # Выводим в лог
 
-                #отправка мак адреса в таблицу
-                append_mac_address(state.mac_address, state.firmware_lable)
-                print("✅ MAC должен был быть добавлен/обновлен в таблице")
+
 
 
                # 🔍 Проверка статуса подключения принтера
@@ -169,8 +167,13 @@ async def flash_firmware(firmware_name):
         #clear()
         exit_bootloader()
 
+        #отправка мак адреса в таблицу
+
+
         # 📤 Печать MAC-адреса, если принтер подключен
         if state.mac_address:
+            append_mac_address(state.mac_address, state.firmware_lable)
+            print("✅ MAC должен был быть добавлен/обновлен в таблице")
             logging.info("🖨️ Отправляем MAC на печать...")
             return "print"
         else:
