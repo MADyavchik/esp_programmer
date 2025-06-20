@@ -24,19 +24,20 @@ font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-B
 status_data = {"battery": "--%", "wifi": "-----", "esp_status": "   ", "charging": False}
 
 async def inactivity_watcher(timeout=30):
+    backlight_on = True
     while True:
         await asyncio.sleep(1)
         elapsed = time.time() - state.last_activity_time[0]
         if elapsed > timeout:
-            print("💤 Пользователь бездействует, выключаем подсветку!")
-            # Здесь вызываем метод выключения подсветки, например:
-            print("Подсветка выкл")
-            st_device.set_backlight(False)
-            # Можно выйти из цикла или ждать действий
+            if backlight_on:
+                print("💤 Пользователь бездействует, выключаем подсветку!")
+                st_device.set_backlight(False)
+                backlight_on = False
         else:
-            # Если нужно — включить подсветку обратно при активности
-            st_device.set_backlight(True)
-            print("Подсветка вкл")
+            if not backlight_on:
+                print("👆 Активность обнаружена, включаем подсветку")
+                st_device.set_backlight(True)
+                backlight_on = True
 
 def display_on_all(image):
     if st_device:
