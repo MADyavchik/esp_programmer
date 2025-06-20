@@ -103,15 +103,15 @@ async def flash_firmware(firmware_name):
 
 
                # 🔍 Проверка статуса подключения принтера
-                from printer_functions import printer_connection  # импортируем только когда нужен
-                if printer_connection["connected"]:
-                    logging.info("🖨️ Принтер уже подключен.")
-                    if printer_connection.get("device"):
-                        logging.info(f"🔧 Device: {printer_connection['device']}")
-                    else:
-                        logging.info("⚠️ Устройство не найдено в printer_connection.")
-                else:
-                    logging.info("🖨️ Принтер не подключен.")
+                #from printer_functions import printer_connection  # импортируем только когда нужен
+                #if printer_connection["connected"]:
+                    #logging.info("🖨️ Принтер уже подключен.")
+                    #if printer_connection.get("device"):
+                       # logging.info(f"🔧 Device: {printer_connection['device']}")
+                    #else:
+                        #logging.info("⚠️ Устройство не найдено в printer_connection.")
+                #else:
+                    #logging.info("🖨️ Принтер не подключен.")
         process.wait()
 
         logging.info("🔁 Повторный вход в bootloader...")
@@ -167,15 +167,20 @@ async def flash_firmware(firmware_name):
         #clear()
         exit_bootloader()
 
-        #отправка мак адреса в таблицу
+
+
 
 
         # 📤 Печать MAC-адреса, если принтер подключен
+        from printer_functions import printer_connection  # импортируем только когда нужен
         if state.mac_address:
             append_mac_address(state.mac_address, state.firmware_label)
             print("✅ MAC должен был быть добавлен/обновлен в таблице")
-            logging.info("🖨️ Отправляем MAC на печать...")
-            return "print"
+            if printer_connection["connected"]:
+                logging.info("🖨️ Отправляем MAC на печать...")
+                return "print"
+            else:
+                logging.info("🖨️ Принтер не подключен!")
         else:
             logging.warning("❗ MAC-адрес не получен, печать невозможна.")
 
