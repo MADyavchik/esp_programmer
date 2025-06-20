@@ -7,7 +7,7 @@ import threading
 import loop_reference
 
 from menu_navigation import run_menu_loop
-from oled_ui import clear
+from oled_ui import clear, inactivity_watcher
 from system_status import status_updater
 from utils import log_error
 
@@ -21,6 +21,8 @@ def start_status_thread():
 async def main():
 
     loop_reference.main_loop = asyncio.get_running_loop()
+
+    watcher_task = asyncio.create_task(inactivity_watcher(timeout=30))
 
     start_status_thread()
     while True:

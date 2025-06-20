@@ -2,6 +2,10 @@
 from PIL import Image, ImageDraw, ImageFont
 import qrcode
 import asyncio
+import state
+import time
+
+
 
 # ST7789
 try:
@@ -18,6 +22,21 @@ font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold
 font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
 
 status_data = {"battery": "--%", "wifi": "-----", "esp_status": "   ", "charging": False}
+
+async def inactivity_watcher(timeout=30):
+    while True:
+        await asyncio.sleep(1)
+        elapsed = time.time() - state.last_activity_time[0]
+        if elapsed > timeout:
+            print("💤 Пользователь бездействует, выключаем подсветку!")
+            # Здесь вызываем метод выключения подсветки, например:
+            print("Подсветка выкл")
+            #ST7789.set_backlight(False)
+            # Можно выйти из цикла или ждать действий
+        else:
+            # Если нужно — включить подсветку обратно при активности
+            #ST7789.set_backlight(True)
+            print("Подсветка вкл")
 
 def display_on_all(image):
     if st_device:
