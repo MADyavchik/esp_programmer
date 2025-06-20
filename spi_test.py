@@ -3,15 +3,18 @@
 from st7789_pi import ST7789
 import time
 
-disp = ST7789()
+BL_PIN = 25
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BL_PIN, GPIO.OUT)
 
-print("🔆 Включаем подсветку на 3 секунды")
-disp.set_backlight(True)
-time.sleep(3)
+pwm = GPIO.PWM(BL_PIN, 1000)  # 1 kHz
+pwm.start(100)  # 100% яркость
 
-print("🌑 Выключаем подсветку на 3 секунды")
-disp.set_backlight(False)
-time.sleep(3)
+print("🔅 Уменьшаем яркость до 0")
+for dc in range(100, -1, -5):  # от 100 до 0 с шагом 5
+    pwm.ChangeDutyCycle(dc)
+    time.sleep(0.1)
 
-print("🔁 Повтор")
-disp.set_backlight(True)
+print("✅ Готово")
+pwm.stop()
+GPIO.cleanup()
