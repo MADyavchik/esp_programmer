@@ -3,6 +3,7 @@ import sys
 import time
 import asyncio
 
+import state
 from buttons import setup_buttons, safe_async
 from oled_ui import draw_menu, clear, show_message
 from utils import log_async
@@ -17,6 +18,12 @@ FLASH_ITEMS = ["TEST", "Universal", "Master", "Repeater", "Sens_SW", "Sens_OLD"]
 SETTINGS_ITEMS = ["Print:", "Quant:"]
 VISIBLE_LINES = 4
 
+
+state.last_activity_time = [time.time()]
+
+def update_activity():
+    state.last_activity_time[0] = time.time()
+    print(f"click {state.last_activity_time[0]}")
 
 # --- Универсальное меню ---
 
@@ -40,12 +47,14 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         )
 
     async def select():
+        update_activity()
         index = scroll[0] + cursor[0]
         if on_select:
             await on_select(items[index])
         result[0] = index
 
     def up():
+        update_activity()
         selected[0] = (selected[0] - 1) % len(items)
         if cursor[0] > 0:
             cursor[0] -= 1
@@ -58,6 +67,7 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         last_redraw[0] = time.time()
 
     def down():
+        update_activity()
         selected[0] = (selected[0] + 1) % len(items)
         if cursor[0] < min(visible_lines - 1, len(items) - 1):
             cursor[0] += 1
@@ -70,11 +80,13 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         last_redraw[0] = time.time()
 
     def back():
+        update_activity()
         print("Back button pressed")  # Логирование нажатия кнопки "Назад"
         result[0] = "main"
 
     # Добавим обработчик зажатия кнопки "Вверх"
     def up_hold():
+        update_activity()
         print("Up button held!")  # Логируем зажатие кнопки "Вверх"
         result[0] = "mac"
 

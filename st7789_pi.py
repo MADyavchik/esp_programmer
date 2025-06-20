@@ -50,6 +50,15 @@ class ST7789:
             self.spi.writebytes(data[i:i + max_chunk])
 
     def set_backlight(self, on=True):
+        """Полное включение/выключение подсветки"""
+        self.pwm.ChangeDutyCycle(100 if on else 0)
+
+    def set_backlight_level(self, level_percent):
+        """Регулировка яркости от 0 до 100%"""
+        level = max(0, min(100, level_percent))
+        self.pwm.ChangeDutyCycle(level)
+
+    def set_backlight(self, on=True):
         GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
 
     def init_display(self):
