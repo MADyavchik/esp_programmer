@@ -35,13 +35,7 @@ async def inactivity_watcher(timeout=30):
                 st_device.sleep()
                 backlight_on = False
 
-                # Выключаем Wi-Fi
-                try:
-                    subprocess.run(['ifconfig', 'wlan0', 'down'])
-                    wifi_enabled = False
-                    print("📶 Wi-Fi отключен")
-                except Exception as e:
-                    print(f"Ошибка выключения Wi-Fi: {e}")
+
 
         else:
             if not backlight_on:
@@ -50,14 +44,7 @@ async def inactivity_watcher(timeout=30):
                 st_device.set_backlight(True)
                 backlight_on = True
 
-                # Включаем Wi-Fi обратно
-                if not wifi_enabled:
-                    try:
-                        subprocess.run(['ifconfig', 'wlan0', 'up'])
-                        wifi_enabled = True
-                        print("📶 Wi-Fi включен")
-                    except Exception as e:
-                        print(f"Ошибка включения Wi-Fi: {e}")
+
 
 def display_on_all(image):
     if st_device:
