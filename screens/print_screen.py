@@ -7,6 +7,7 @@ import state
 from oled_ui import animate_activity
 
 
+
 @log_async
 async def run_print_screen():
     clear()
@@ -45,7 +46,12 @@ async def run_print_screen():
         show_message("Принтер не подключен")
 
     await asyncio.sleep(2)
-    return "log"
+
+    if state.firmware_label == "test":
+        return "log"
+    else:
+        return "flash"
+
 @log_async
 async def run_print_connect():
     clear()

@@ -23,7 +23,7 @@ NO_NVS = ["test", "sens_sw", "sens_old"]
 async def flash_firmware(firmware_name):
     firmware_name = firmware_name.lower()
 
-    state.firmware_lable = firmware_name.lower()
+    state.firmware_label = firmware_name.lower()
 
     logging.info(f"🚀 Начинаем прошивку: {firmware_name}")
 
@@ -172,7 +172,7 @@ async def flash_firmware(firmware_name):
 
         # 📤 Печать MAC-адреса, если принтер подключен
         if state.mac_address:
-            append_mac_address(state.mac_address, state.firmware_lable)
+            append_mac_address(state.mac_address, state.firmware_label)
             print("✅ MAC должен был быть добавлен/обновлен в таблице")
             logging.info("🖨️ Отправляем MAC на печать...")
             return "print"
