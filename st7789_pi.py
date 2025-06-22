@@ -7,7 +7,7 @@ import array
 import numpy as np
 
 class ST7789:
-    def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=25, width=240, height=240, pwm_freq=1000):
+    def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=25, width=240, height=240, pwm_freq=10000):
         self.width = width
         self.height = height
         self.spi = spidev.SpiDev()
