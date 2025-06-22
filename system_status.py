@@ -22,7 +22,7 @@ import statistics
 voltage_history = deque(maxlen=60)
 last_percent = [None]  # Используем список, чтобы изменять внутри функции
 
-MIN_VOLTAGE = 3.0     # Минимальное напряжение (0%)
+MIN_VOLTAGE = 3.3     # Минимальное напряжение (0%)
 MAX_VOLTAGE = 4.2     # Максимальное напряжение (100%)
 CHANGE_THRESHOLD = 1  # Порог отображения изменений (в процентах)
 
@@ -30,6 +30,28 @@ charging_icon = [""]  # Будем обновлять это значение в
 
 
 PORT = "/dev/ttyS0"
+
+def voltage_to_percent(v):
+    # Значения под нагрузкой (приблизительные)
+    lut = [
+        (4.20, 100),
+        (4.10, 95),
+        (4.00, 90),
+        (3.92, 80),
+        (3.85, 70),
+        (3.79, 60),
+        (3.75, 50),
+        (3.70, 40),
+        (3.65, 30),
+        (3.60, 20),
+        (3.50, 10),
+        (3.40, 5),
+        (3.30, 0)
+    ]
+    for voltage, percent in lut:
+        if v >= voltage:
+            return percent
+    return 0
 
 
 def is_charging():
@@ -44,20 +66,21 @@ def is_charging():
 
 def get_battery_status():
     try:
-        voltage = ina.bus_voltage + ina.shunt_voltage
+        voltage = ina.bus_voltage
         voltage_history.append(voltage)
 
         if len(voltage_history) < voltage_history.maxlen:
             return "--%"
 
         median_voltage = statistics.median(voltage_history)
-
-        percent = (median_voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE) * 100
-        percent = max(0, min(100, percent))
-        rounded_percent = int(percent)
+        rounded_percent = voltage_to_percent(median_voltage)
 
         if last_percent[0] is None or abs(rounded_percent - last_percent[0]) >= CHANGE_THRESHOLD:
             last_percent[0] = rounded_percent
+
+        # Предупреждение о падении напряжения
+        if median_voltage < 3.3:
+            print(f"⚠️ Низкое напряжение: {median_voltage:.2f} В — возможное отключение скоро")
 
         return f"{last_percent[0]}%"
     except Exception as e:
