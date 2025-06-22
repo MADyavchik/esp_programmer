@@ -77,6 +77,8 @@ class ST7789:
         time.sleep(0.12)
         self.write_cmd(0x29)  # Display ON
 
+        self.fill_color(0x0000)
+
     def set_window(self, x0, y0, x1, y1):
         self.write_cmd(0x2A)
         self.write_data([x0 >> 8, x0 & 0xFF, x1 >> 8, x1 & 0xFF])
