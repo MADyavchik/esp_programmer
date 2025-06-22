@@ -19,7 +19,7 @@ ina = INA219(i2c_bus)
 from collections import deque
 import statistics
 
-voltage_history = deque(maxlen=10)
+voltage_history = deque(maxlen=60)
 last_percent = [None]  # Используем список, чтобы изменять внутри функции
 
 MIN_VOLTAGE = 3.3     # Минимальное напряжение (0%)

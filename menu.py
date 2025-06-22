@@ -100,7 +100,7 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
     while result[0] is None:
         await asyncio.sleep(0.1)
 
-        if time.time() - last_redraw[0] > 1:
+        if time.time() - last_redraw[0] > 0.2:
             draw()
             last_redraw[0] = time.time()
 
