@@ -22,7 +22,7 @@ async def main():
 
     loop_reference.main_loop = asyncio.get_running_loop()
 
-    watcher_task = asyncio.create_task(inactivity_watcher(timeout=30))
+    watcher_task = asyncio.create_task(inactivity_watcher())
 
     start_status_thread()
     while True:
