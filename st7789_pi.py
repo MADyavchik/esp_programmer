@@ -7,7 +7,7 @@ import array
 import numpy as np
 
 class ST7789:
-    def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=25, width=240, height=240):
+    def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=25, width=240, height=240, pwm_freq=1000):
         self.width = width
         self.height = height
         self.spi = spidev.SpiDev()
@@ -24,6 +24,9 @@ class ST7789:
         GPIO.setup(self.dc, GPIO.OUT)
         GPIO.setup(self.reset, GPIO.OUT)
         GPIO.setup(self.bl, GPIO.OUT)
+
+        self.pwm = GPIO.PWM(bl, pwm_freq)
+        self.pwm.start(100)  # Стартуем с полной яркостью
 
         self.reset_display()
         self.init_display()
@@ -59,8 +62,8 @@ class ST7789:
         level = max(0, min(100, level_percent))
         self.pwm.ChangeDutyCycle(level)
 
-    def set_backlight(self, on=True):
-        GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
+    #def set_backlight(self, on=True):
+        #GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
 
     def init_display(self):
         self.write_cmd(0x36)
