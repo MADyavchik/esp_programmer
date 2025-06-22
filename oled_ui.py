@@ -62,7 +62,8 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
                     break
             else:
                 print("⏹️ Завершение работы устройства...")
-                st_device.set_backlight(False)
+                st_device.set_backlight_level(0)
+                await asyncio.sleep(1)
                 os.system("sudo poweroff")
 
 
