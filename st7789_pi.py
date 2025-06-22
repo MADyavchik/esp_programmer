@@ -55,6 +55,7 @@ class ST7789:
 
     def set_backlight_level(self, level_percent):
         """Регулировка яркости от 0 до 100%"""
+        print(f"🔆 Меняем яркость на {level_percent}%")
         level = max(0, min(100, level_percent))
         self.pwm.ChangeDutyCycle(level)
 
