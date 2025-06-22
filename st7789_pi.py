@@ -12,7 +12,7 @@ class ST7789:
         self.height = height
         self.spi = spidev.SpiDev()
         self.spi.open(spi_bus, spi_device)
-        self.spi.max_speed_hz = 62500000  # 62.5 MHz
+        self.spi.max_speed_hz = 30000000  # 30 MHz
         self.spi.mode = 3
 
         self.dc = dc
@@ -38,7 +38,7 @@ class ST7789:
         GPIO.output(self.reset, GPIO.LOW)
         time.sleep(0.1)
         GPIO.output(self.reset, GPIO.HIGH)
-        time.sleep(0.1)
+        time.sleep(0.2)
 
     def write_cmd(self, cmd):
         GPIO.output(self.dc, GPIO.LOW)
@@ -74,8 +74,9 @@ class ST7789:
 
         self.write_cmd(0x21)  # Inversion ON
         self.write_cmd(0x11)  # Sleep Out
-        time.sleep(0.12)
+        time.sleep(0.15)
         self.write_cmd(0x29)  # Display ON
+        time.sleep(0.1)
 
         self.fill_color(0x0000)
 
