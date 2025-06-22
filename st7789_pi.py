@@ -78,7 +78,7 @@ class ST7789:
         self.write_cmd(0x29)  # Display ON
         time.sleep(0.1)
 
-        #self.fill_color(0x0000)
+        self.fill_color(0x0000)
 
     def set_window(self, x0, y0, x1, y1):
         self.write_cmd(0x2A)
