@@ -217,4 +217,4 @@ def status_updater():
 
 
         update_status_data(battery, wifi, charging)
-        time.sleep(1)
+        time.sleep(0.2)
