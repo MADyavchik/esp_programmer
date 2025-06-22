@@ -62,6 +62,7 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
                     break
             else:
                 print("⏹️ Завершение работы устройства...")
+                st_device.set_backlight(False)
                 os.system("sudo poweroff")
 
 
