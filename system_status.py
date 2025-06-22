@@ -67,7 +67,7 @@ def is_charging():
 def get_battery_status():
     try:
         voltage = ina.bus_voltage
-        print(voltage)
+        print(f"ina.bus_voltage = {voltage}")
         voltage_history.append(voltage)
 
         if len(voltage_history) < voltage_history.maxlen:
