@@ -60,7 +60,7 @@ class ST7789:
         """Регулировка яркости от 0 до 100%"""
         print(f"🔆 Меняем яркость на {level_percent}%")
         level = max(0, min(100, level_percent))
-        self.pwm.ChangeDutyCycle(1)
+        self.pwm.ChangeDutyCycle(level)
 
     #def set_backlight(self, on=True):
         #GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
