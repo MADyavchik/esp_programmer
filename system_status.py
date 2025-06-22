@@ -53,6 +53,13 @@ def voltage_to_percent(v):
             return percent
     return 0
 
+def get_adjusted_voltage():
+    voltage = ina.bus_voltage
+    current = ina.current
+    if current < -20:  # Зарядка — ток идёт внутрь
+        voltage -= 0.02  # Подстройка: 20–50 мВ в зависимости от твоей батареи
+    return voltage
+
 
 def is_charging():
     try:
@@ -66,7 +73,7 @@ def is_charging():
 
 def get_battery_status():
     try:
-        voltage = ina.bus_voltage
+        voltage = get_adjusted_voltage()
         print(f"ina.bus_voltage = {voltage}")
         voltage_history.append(voltage)
 
