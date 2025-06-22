@@ -4,6 +4,7 @@ import qrcode
 import asyncio
 import state
 import time
+import os
 import subprocess
 
 
@@ -23,26 +24,45 @@ font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-B
 
 status_data = {"battery": "--%", "wifi": "-----", "esp_status": "   ", "charging": False}
 
-async def inactivity_watcher(timeout=30):
+async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=600):
     backlight_on = True
+    shutdown_initiated = False
+
     while True:
         await asyncio.sleep(1)
         elapsed = time.time() - state.last_activity_time[0]
-        if elapsed > timeout:
-            if backlight_on:
-                print("💤 Пользователь бездействует, выключаем подсветку!")
-                st_device.set_backlight(False)
-                st_device.sleep()
-                backlight_on = False
 
+        # Выключаем подсветку при бездействии
+        if elapsed > sleep_timeout and backlight_on:
+            print("💤 Пользователь бездействует, выключаем подсветку!")
+            st_device.set_backlight_level(20)
+            #st_device.set_backlight(False)
+            #st_device.sleep()
+            backlight_on = False
 
+        # Включаем подсветку при активности
+        elif elapsed <= sleep_timeout and not backlight_on:
+            print("👆 Активность обнаружена, включаем подсветку")
+            #st_device.wake()
+            #st_device.set_backlight(True)
+            st_device.set_backlight_level(100)
+            backlight_on = True
 
-        else:
-            if not backlight_on:
-                print("👆 Активность обнаружена, включаем подсветку")
-                st_device.wake()
-                st_device.set_backlight(True)
-                backlight_on = True
+        # Завершаем работу устройства при долгом бездействии
+        if elapsed > shutdown_timeout and not shutdown_initiated:
+            print("⚠️ Долгое бездействие, выключаем устройство через 10 секунд...")
+            shutdown_initiated = True
+
+            # Даём 10 секунд на отмену, если юзер активен
+            for _ in range(10):
+                await asyncio.sleep(1)
+                if time.time() - state.last_activity_time[0] < shutdown_timeout:
+                    print("❌ Действие отменено — активность обнаружена!")
+                    shutdown_initiated = False
+                    break
+            else:
+                print("⏹️ Завершение работы устройства...")
+                os.system("sudo poweroff")
 
 
 
