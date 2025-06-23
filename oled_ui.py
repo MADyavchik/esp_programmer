@@ -35,7 +35,7 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
         # Выключаем подсветку при бездействии
         if elapsed > sleep_timeout and backlight_on:
             print("💤 Пользователь бездействует, выключаем подсветку!")
-            st_device.set_backlight_level(30)
+            st_device.set_backlight_level(10)
             #st_device.set_backlight(False)
             #st_device.sleep()
             backlight_on = False
