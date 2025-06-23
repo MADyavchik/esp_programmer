@@ -76,6 +76,7 @@ class ST7789:
         duty_ns = int(1000000 * level / 100)  # из 1_000_000 нс
         print(f"PWM path: {self.pwm_path}")
         with open(f"{self.pwm_path}/duty_cycle", "w") as f:
+            f.write("1")  # обязательно включить
             f.write(str(duty_ns))
 
     #def set_backlight(self, on=True):
