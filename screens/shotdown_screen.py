@@ -10,9 +10,18 @@ from st7789_pi import ST7789
 st_device = ST7789(width=240, height=240, dc=23, reset=24, bl=12)
 
 async def run_shotdown_halt():
-    for i in range(10, 0, -1):
-        elapsed = time.time() - state.last_activity_time[0]
-        if elapsed < state.shutdown_timeout:
+    print("⚠️ Без активности. Запуск таймера выключения...")
+
+    countdown = 10
+
+    # Фиксируем момент начала обратного отсчёта
+    shutdown_start = time.time()
+
+    for i in range(countdown, 0, -1):
+        elapsed_since_start = time.time() - shutdown_start
+        activity_elapsed = time.time() - state.last_activity_time[0]
+
+        if activity_elapsed < elapsed_since_start:
             print("❌ Действие отменено — активность обнаружена!")
             return
 
@@ -21,7 +30,6 @@ async def run_shotdown_halt():
 
     print("⏹️ Завершение работы устройства...")
     st_device.set_backlight(False)
-
     await asyncio.sleep(0.5)  # даём гаснуть экрану
 
     os.system("sudo halt")
