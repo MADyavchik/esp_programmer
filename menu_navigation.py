@@ -6,6 +6,7 @@ from mac_view import show_mac_address
 from menu import start_settings_menu
 from screens.print_screen import run_print_screen, run_print_connect
 from screens.shotdown_screen import run_shotdown_halt
+from oled_ui import inactivity_watcher
 import asyncio
 
 # Маппинг меню
@@ -22,23 +23,38 @@ menu_map = {
 }
 
 async def run_menu_loop():
-    current = "main"  # Начинаем с главного меню
+    current = "main"
 
     while current:
-        handler = menu_map.get(current)  # Ищем обработчик для текущего меню
+        handler = menu_map.get(current)
 
         if not handler:
             print(f"⚠️ Нет обработчика для '{current}', выходим.")
             break
 
-        result = await handler()  # Вызовем обработчик для текущего меню
+        # Запускаем параллельно меню и inactivity_watcher
+        handler_task = asyncio.create_task(handler())
+        watcher_task = asyncio.create_task(inactivity_watcher())
+
+        done, pending = await asyncio.wait(
+            [handler_task, watcher_task],
+            return_when=asyncio.FIRST_COMPLETED
+        )
+
+        # Получаем результат того, кто завершился первым
+        finished_task = list(done)[0]
+        result = finished_task.result()
+
+        # Отменяем оставшуюся задачу (если она ещё работает)
+        for task in pending:
+            task.cancel()
 
         if result is None:
-            print(f"Returning to main menu")  # Логируем возврат
-            current = "main"  # Переводим обратно в главное меню
+            print(f"Returning to main menu")
+            current = "main"
         elif result == "exit":
             print("Exiting program.")
             break
         else:
-            print(f"Entering {result} menu")  # Логируем переход
-            current = result  # Переход в подменю
+            print(f"Entering {result} menu")
+            current = result
