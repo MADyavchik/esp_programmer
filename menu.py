@@ -105,7 +105,7 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
             draw()
             last_redraw[0] = time.time()
 
-    print(f"[DEBUG] result = {result[0]}")  # <- добавь это
+    #print(f"[DEBUG] result = {result[0]}")  # <- добавь это
     return result[0]
 
 # --- Вспомогательные функции ---

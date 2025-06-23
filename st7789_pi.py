@@ -72,12 +72,22 @@ class ST7789:
     def set_backlight_level(self, level_percent):
         """Регулировка яркости через аппаратный PWM"""
         print(f"🔆 Меняем яркость на {level_percent}%")
+
         level = max(0, min(100, level_percent))
         duty_ns = int(1000000 * level / 100)  # из 1_000_000 нс
-        print(f"PWM path: {self.pwm_path}")
+
+        print("📟 PWM состояние ДО изменения:")
+        self.debug_pwm()
+
+        # Убедимся, что PWM включён
+        with open(f"{self.pwm_path}/enable", "w") as f:
+            f.write("1")
+
         with open(f"{self.pwm_path}/duty_cycle", "w") as f:
-            f.write("1")  # обязательно включить
             f.write(str(duty_ns))
+
+        print("📟 PWM состояние ПОСЛЕ изменения:")
+        self.debug_pwm()
 
     #def set_backlight(self, on=True):
         #GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
@@ -165,3 +175,11 @@ class ST7789:
             f.write("1")
 
         self.pwm_path = pwm  # Сохраняем путь для управления дальше
+
+    def debug_pwm(self):
+        for fname in ["period", "duty_cycle", "enable"]:
+            try:
+                with open(f"{self.pwm_path}/{fname}") as f:
+                    print(f"{fname} = {f.read().strip()}")
+            except Exception as e:
+                print(f"Ошибка чтения {fname}: {e}")

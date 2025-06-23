@@ -82,7 +82,7 @@ def get_adjusted_voltage():
 def is_charging():
     try:
         current = ina.current  # мА
-        print(f"[INA219] Current = {ina.current} мА")
+        #print(f"[INA219] Current = {ina.current} мА")
         return current < -5  # Зарядка: ток входит в батарею (можешь поэкспериментировать с порогом)
     except Exception as e:
         print(f"[INA219] Ошибка при чтении тока: {e}")
@@ -92,7 +92,7 @@ def is_charging():
 def get_battery_status():
     try:
         voltage = get_adjusted_voltage()
-        print(f"ina.bus_voltage = {voltage}")
+        #print(f"ina.bus_voltage = {voltage}")
         voltage_history.append(voltage)
 
         if len(voltage_history) < voltage_history.maxlen:
