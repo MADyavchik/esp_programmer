@@ -78,7 +78,7 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
 
                 # Завершаем систему
                 os.system("sudo halt")
-                return  # или break — если хочешь выйти из цикла
+                break  # или break — если хочешь выйти из цикла
 
 
 def display_on_all(image):
