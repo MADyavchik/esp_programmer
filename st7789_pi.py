@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 import time
 import array
 import numpy as np
+import os
 
 class ST7789:
     def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=12, width=240, height=240, pwm_freq=10000):
@@ -24,6 +25,8 @@ class ST7789:
         GPIO.setup(self.dc, GPIO.OUT)
         GPIO.setup(self.reset, GPIO.OUT)
         GPIO.setup(self.bl, GPIO.OUT)
+
+        self.use_hw_pwm()
 
         self.pwm = GPIO.PWM(bl, pwm_freq)
         self.pwm.start(100)  # Стартуем с полной яркостью
@@ -52,15 +55,27 @@ class ST7789:
         for i in range(0, len(data), max_chunk):
             self.spi.writebytes(data[i:i + max_chunk])
 
+    #def set_backlight(self, on=True):
+        #"""Полное включение/выключение подсветки"""
+        #self.pwm.ChangeDutyCycle(100 if on else 0)
+
     def set_backlight(self, on=True):
-        """Полное включение/выключение подсветки"""
-        self.pwm.ChangeDutyCycle(100 if on else 0)
+        with open(f"{self.pwm_path}/enable", "w") as f:
+            f.write("1" if on else "0")
+
+    #def set_backlight_level(self, level_percent):
+        #"""Регулировка яркости от 0 до 100%"""
+        #print(f"🔆 Меняем яркость на {level_percent}%")
+        #level = max(0, min(100, level_percent))
+        #self.pwm.ChangeDutyCycle(level)
 
     def set_backlight_level(self, level_percent):
-        """Регулировка яркости от 0 до 100%"""
+        """Регулировка яркости через аппаратный PWM"""
         print(f"🔆 Меняем яркость на {level_percent}%")
         level = max(0, min(100, level_percent))
-        self.pwm.ChangeDutyCycle(level)
+        duty_ns = int(1000000 * level / 100)  # из 1_000_000 нс
+        with open(f"{self.pwm_path}/duty_cycle", "w") as f:
+            f.write(str(duty_ns))
 
     #def set_backlight(self, on=True):
         #GPIO.output(self.bl, GPIO.HIGH if on else GPIO.LOW)
@@ -125,3 +140,26 @@ class ST7789:
         self.write_cmd(0x11)  # Sleep OUT
         time.sleep(0.12)
         self.write_cmd(0x29)  # Display ON
+
+    def use_hw_pwm(self):
+        """Настраивает аппаратный ШИМ на GPIO12 (PWM0)"""
+        pwmchip = "/sys/class/pwm/pwmchip0"
+        pwm = f"{pwmchip}/pwm0"
+
+        # Экспортируем pwm0 (если не экспортирован)
+        if not os.path.exists(pwm):
+            with open(f"{pwmchip}/export", "w") as f:
+                f.write("0")
+            time.sleep(0.1)
+
+        # Установка периода и duty cycle (например, 1 кГц и 100% яркость)
+        with open(f"{pwm}/period", "w") as f:
+            f.write("1000000")  # 1 мс = 1 кГц
+
+        with open(f"{pwm}/duty_cycle", "w") as f:
+            f.write("1000000")  # 100%
+
+        with open(f"{pwm}/enable", "w") as f:
+            f.write("1")
+
+        self.pwm_path = pwm  # Сохраняем путь для управления дальше
