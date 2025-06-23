@@ -9,7 +9,7 @@ from oled_ui import show_message
 from st7789_pi import ST7789
 st_device = ST7789(width=240, height=240, dc=23, reset=24, bl=12)
 
-async def run_shutdown_halt():
+async def run_shotdown_halt():
     for i in range(10, 0, -1):
         elapsed = time.time() - state.last_activity_time[0]
         if elapsed < state.shutdown_timeout:
