@@ -13,7 +13,7 @@ import board
 import busio
 
 # Указываем шину /dev/i2c-3
-i2c_bus = busio.I2C(scl=board.D5, sda=board.D6)  # соответствуют GPIO5 и GPIO6
+i2c_bus = busio.I2C(scl=board.D6, sda=board.D5)  # соответствуют GPIO5 и GPIO6
 ina = INA219(i2c_bus)
 
 from collections import deque
