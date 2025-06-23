@@ -12,8 +12,8 @@ from adafruit_ina219 import INA219
 import board
 import busio
 
-# Настройка I2C и инициализация INA219
-i2c_bus = busio.I2C(board.SCL, board.SDA)
+# Указываем шину /dev/i2c-3
+i2c_bus = busio.I2C(scl=board.D17, sda=board.D27)  # соответствуют GPIO17 и GPIO27
 ina = INA219(i2c_bus)
 
 from collections import deque
