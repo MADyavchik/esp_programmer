@@ -6,6 +6,7 @@ import state
 import time
 import os
 import subprocess
+import state
 
 
 # ST7789
@@ -26,9 +27,10 @@ font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-B
 
 status_data = {"battery": "--%", "wifi": "-----", "esp_status": "   ", "charging": False}
 
-async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
+async def inactivity_watcher(sleep_timeout=30):
     backlight_on = True
     shutdown_initiated = False
+    shutdown_timeout = state.shutdown_timeout
 
     while True:
         await asyncio.sleep(1)
@@ -51,34 +53,7 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
             print("⚠️ Долгое бездействие, выключаем устройство через 10 секунд...")
             shutdown_initiated = True
 
-            for _ in range(10):
-                await asyncio.sleep(1)
-                if time.time() - state.last_activity_time[0] < shutdown_timeout:
-                    print("❌ Действие отменено — активность обнаружена!")
-                    shutdown_initiated = False
-                    break
-            else:
-                print("⏹️ Завершение работы устройства...")
-                st_device.set_backlight(False)
-
-                # Ожидаем немного, чтобы вывести сообщение и отключить подсветку
-                await asyncio.sleep(0.5)
-
-                # Завершаем другие задачи, но shutdown выполняем после
-                current = asyncio.current_task()
-                for task in asyncio.all_tasks():
-                    if task is not current:
-                        task.cancel()
-
-                try:
-                    # Подождём немного, чтобы таски успели завершиться корректно
-                    await asyncio.sleep(0.5)
-                except asyncio.CancelledError:
-                    pass
-
-                # Завершаем систему
-                os.system("sudo halt")
-                break  # или break — если хочешь выйти из цикла
+            return "shotdown"
 
 
 def display_on_all(image):

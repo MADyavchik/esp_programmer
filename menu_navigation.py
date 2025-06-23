@@ -5,6 +5,7 @@ from git_update import start_git_update
 from mac_view import show_mac_address
 from menu import start_settings_menu
 from screens.print_screen import run_print_screen, run_print_connect
+from screens.shotdown_screen import run_shotdown_halt
 import asyncio
 
 # Маппинг меню
@@ -17,6 +18,7 @@ menu_map = {
     "settings": start_settings_menu,  # async
     "print": run_print_screen,
     "print_connect": run_print_connect,
+    "shotdown": run_shotdown_halt,
 }
 
 async def run_menu_loop():
