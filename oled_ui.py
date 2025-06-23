@@ -71,7 +71,7 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
                         task.cancel()
 
                 await asyncio.sleep(0.2)  # немного подождать, чтобы отмены сработали
-                os.system("sudo poweroff")
+                os.system("sudo halt")
 
 
 
