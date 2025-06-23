@@ -67,9 +67,9 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
                 st_device.set_backlight(False)
 
                 # Завершаем все другие задачи
-                for task in asyncio.all_tasks():
-                    if task != asyncio.current_task():
-                        task.cancel()
+                #for task in asyncio.all_tasks():
+                    #if task != asyncio.current_task():
+                        #task.cancel()
 
                 await asyncio.sleep(0.2)  # немного подождать, чтобы отмены сработали
                 os.system("sudo halt")
