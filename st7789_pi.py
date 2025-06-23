@@ -24,12 +24,12 @@ class ST7789:
         GPIO.setwarnings(False)
         GPIO.setup(self.dc, GPIO.OUT)
         GPIO.setup(self.reset, GPIO.OUT)
-        GPIO.setup(self.bl, GPIO.OUT)
+        #GPIO.setup(self.bl, GPIO.OUT)
 
         self.use_hw_pwm()
 
-        self.pwm = GPIO.PWM(bl, pwm_freq)
-        self.pwm.start(100)  # Стартуем с полной яркостью
+        #self.pwm = GPIO.PWM(bl, pwm_freq)
+        #self.pwm.start(100)  # Стартуем с полной яркостью
 
         self.reset_display()
         self.init_display()
