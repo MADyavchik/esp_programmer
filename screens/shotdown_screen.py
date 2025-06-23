@@ -30,6 +30,6 @@ async def run_shotdown_halt():
 
     print("⏹️ Завершение работы устройства...")
     st_device.set_backlight(False)
-    state.shutdown_pending = False
+    #state.shutdown_pending = False
     await asyncio.sleep(0.5)
     os.system("sudo halt")
