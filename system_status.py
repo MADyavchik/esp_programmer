@@ -11,9 +11,10 @@ import os
 from adafruit_ina219 import INA219
 import board
 import busio
+import bitbangio
 
-# Указываем шину /dev/i2c-3
-i2c_bus = busio.I2C(scl=board.D6, sda=board.D5)  # соответствуют GPIO5 и GPIO6
+# Программная I2C на пинах, например: SDA на GPIO5, SCL на GPIO6
+i2c_bus = bitbangio.I2C(scl=board.D6, sda=board.D5)
 ina = INA219(i2c_bus)
 
 from collections import deque
