@@ -11,7 +11,7 @@ import subprocess
 # ST7789
 try:
     from st7789_pi import ST7789
-    st_device = ST7789(width=240, height=240, dc=23, reset=24, bl=25)
+    st_device = ST7789(width=240, height=240, dc=23, reset=24, bl=12)
 except Exception as e:
     st_device = None
     print("ST7789 init failed:", e)
