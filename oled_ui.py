@@ -52,7 +52,7 @@ async def inactivity_watcher(sleep_timeout=30):
         if elapsed > shutdown_timeout and not shutdown_initiated:
             print("⚠️ Долгое бездействие, выключаем устройство через 10 секунд...")
 
-            state.shutdown_pending = False
+            state.shutdown_pending = True
             return "shotdown"
 
 
