@@ -38,15 +38,11 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
         if elapsed > sleep_timeout and backlight_on:
             print("💤 Пользователь бездействует, выключаем подсветку!")
             st_device.set_backlight_level(5)
-            #st_device.set_backlight(False)
-            #st_device.sleep()
             backlight_on = False
 
         # Включаем подсветку при активности
         elif elapsed <= sleep_timeout and not backlight_on:
             print("👆 Активность обнаружена, включаем подсветку")
-            #st_device.wake()
-            #st_device.set_backlight(True)
             st_device.set_backlight_level(100)
             backlight_on = True
 
@@ -55,7 +51,6 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
             print("⚠️ Долгое бездействие, выключаем устройство через 10 секунд...")
             shutdown_initiated = True
 
-            # Даём 10 секунд на отмену, если юзер активен
             for _ in range(10):
                 await asyncio.sleep(1)
                 if time.time() - state.last_activity_time[0] < shutdown_timeout:
@@ -63,18 +58,27 @@ async def inactivity_watcher(sleep_timeout=30, shutdown_timeout=60):
                     shutdown_initiated = False
                     break
             else:
-                # В конце inactivity_watcher перед poweroff
                 print("⏹️ Завершение работы устройства...")
                 st_device.set_backlight(False)
 
-                # Завершаем все другие задачи
+                # Ожидаем немного, чтобы вывести сообщение и отключить подсветку
+                await asyncio.sleep(0.5)
+
+                # Завершаем другие задачи, но shutdown выполняем после
+                current = asyncio.current_task()
                 for task in asyncio.all_tasks():
-                    if task != asyncio.current_task():
+                    if task is not current:
                         task.cancel()
 
-                await asyncio.sleep(0.2)  # немного подождать, чтобы отмены сработали
-                os.system("sudo halt")
+                try:
+                    # Подождём немного, чтобы таски успели завершиться корректно
+                    await asyncio.sleep(0.5)
+                except asyncio.CancelledError:
+                    pass
 
+                # Завершаем систему
+                os.system("sudo halt")
+                return  # или break — если хочешь выйти из цикла
 
 
 def display_on_all(image):
