@@ -74,6 +74,7 @@ class ST7789:
         print(f"🔆 Меняем яркость на {level_percent}%")
         level = max(0, min(100, level_percent))
         duty_ns = int(1000000 * level / 100)  # из 1_000_000 нс
+        print(f"PWM path: {self.pwm_path}")
         with open(f"{self.pwm_path}/duty_cycle", "w") as f:
             f.write(str(duty_ns))
 
