@@ -12,6 +12,7 @@ import subprocess
 try:
     from st7789_pi import ST7789
     st_device = ST7789(width=240, height=240, dc=23, reset=24, bl=12)
+    st_device.wake()
 except Exception as e:
     st_device = None
     print("ST7789 init failed:", e)
