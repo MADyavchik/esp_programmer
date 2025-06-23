@@ -9,12 +9,11 @@ import os
 
 # Добавляем поддержку INA219
 from adafruit_ina219 import INA219
+from adafruit_bitbangio import I2C
 import board
-import busio
-import bitbangio
 
 # Программная I2C на пинах, например: SDA на GPIO5, SCL на GPIO6
-i2c_bus = bitbangio.I2C(scl=board.D6, sda=board.D5)
+i2c_bus = I2C(scl=board.D6, sda=board.D5)
 ina = INA219(i2c_bus)
 
 from collections import deque
