@@ -23,9 +23,11 @@ async def run_shotdown_halt():
 
         if activity_elapsed < elapsed_since_start:
             print("❌ Действие отменено — активность обнаружена!")
+            st_device.set_backlight_level(100)
             return
 
         show_message(f"Выключение через: {i} сек")
+        print(f"Выключение через: {i} сек")
         await asyncio.sleep(1)
 
     print("⏹️ Завершение работы устройства...")
