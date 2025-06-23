@@ -8,6 +8,7 @@ from screens.print_screen import run_print_screen, run_print_connect
 from screens.shotdown_screen import run_shotdown_halt
 from oled_ui import inactivity_watcher
 import asyncio
+import state
 
 # Маппинг меню
 menu_map = {
@@ -32,29 +33,35 @@ async def run_menu_loop():
             print(f"⚠️ Нет обработчика для '{current}', выходим.")
             break
 
-        # Запускаем параллельно меню и inactivity_watcher
         handler_task = asyncio.create_task(handler())
-        watcher_task = asyncio.create_task(inactivity_watcher())
+
+        # Только если таймер выключения ещё не активен — запускаем inactivity_watcher
+        if not getattr(state, "shutdown_pending", False):
+            watcher_task = asyncio.create_task(inactivity_watcher())
+            tasks = [handler_task, watcher_task]
+        else:
+            tasks = [handler_task]
 
         done, pending = await asyncio.wait(
-            [handler_task, watcher_task],
+            tasks,
             return_when=asyncio.FIRST_COMPLETED
         )
 
-        # Получаем результат того, кто завершился первым
-        finished_task = list(done)[0]
-        result = finished_task.result()
+        result = list(done)[0].result()
 
-        # Отменяем оставшуюся задачу (если она ещё работает)
         for task in pending:
             task.cancel()
 
+        # Если выход отменён (появилась активность), сбрасываем флаг
         if result is None:
             print(f"Returning to main menu")
+            state.shutdown_pending = False  # сброс на всякий случай
             current = "main"
+
         elif result == "exit":
             print("Exiting program.")
             break
+
         else:
             print(f"Entering {result} menu")
             current = result
