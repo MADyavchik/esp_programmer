@@ -101,7 +101,7 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
         await asyncio.sleep(0.1)
 
         if time.time() - last_redraw[0] > 1:
-            print("[DEBUG] redraw triggered")
+            #print("[DEBUG] redraw triggered")
             draw()
             last_redraw[0] = time.time()
 
