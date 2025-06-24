@@ -12,10 +12,16 @@ class ST7789:
         t0 = time.time()
         print("[ST7789] ⏱ Старт инициализации дисплея")
 
+        self.width = width
+        self.height = height
         self.spi = spidev.SpiDev()
         self.spi.open(spi_bus, spi_device)
         self.spi.max_speed_hz = 30000000
         self.spi.mode = 3
+
+        self.dc = dc
+        self.reset = reset
+        self.bl = bl
 
         t1 = time.time()
         print(f"[ST7789] ✅ SPI готов за {t1 - t0:.3f} сек")
