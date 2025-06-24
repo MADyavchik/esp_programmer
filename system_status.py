@@ -214,6 +214,7 @@ def check_esp_connection():
 
 # Обновлённая фоновая функция
 def status_updater():
+    previous_charging = None  # Начальное значение
     while state.status_updater_running:
         battery = get_battery_status()
         wifi = get_wifi_status()
