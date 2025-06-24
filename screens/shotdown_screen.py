@@ -52,7 +52,7 @@ def cleanup_and_shutdown():
     print("⚙️ Выключаем подсветку и чистим GPIO перед завершением...")
     state.status_updater_running = False
 
-    try:
+    """try:
         GPIO.setmode(GPIO.BCM)  # Обязательно до любого использования GPIO
         BACKLIGHT_PIN = 12
 
@@ -61,6 +61,6 @@ def cleanup_and_shutdown():
         GPIO.setup(BACKLIGHT_PIN, GPIO.IN)
         GPIO.cleanup()  # Теперь безопасно
     except Exception as e:
-        print(f"[GPIO Cleanup Error] {e}")
+        print(f"[GPIO Cleanup Error] {e}")"""
 
     os.system("sudo halt")  # Требует прав root
