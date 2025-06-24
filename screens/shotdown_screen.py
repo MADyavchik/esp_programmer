@@ -58,7 +58,7 @@ def cleanup_and_shutdown():
 
         GPIO.setup(BACKLIGHT_PIN, GPIO.OUT)
         GPIO.output(BACKLIGHT_PIN, GPIO.LOW)
-        #GPIO.cleanup()  # Теперь безопасно
+        GPIO.cleanup()  # Теперь безопасно
     except Exception as e:
         print(f"[GPIO Cleanup Error] {e}")
 
