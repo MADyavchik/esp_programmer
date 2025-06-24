@@ -45,7 +45,7 @@ async def run_shotdown_halt():
     cleanup_and_shutdown()
 
         # 🛑 Мгновенно завершаем Python-процесс
-    os._exit(0)
+    #os._exit(0)
 
 
 def cleanup_and_shutdown():
