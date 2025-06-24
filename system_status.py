@@ -14,6 +14,8 @@ import board
 import RPi.GPIO as GPIO
 import state
 
+from menu import update_activity
+
 
 GPIO.setmode(GPIO.BCM)
 
@@ -217,7 +219,14 @@ def status_updater():
         wifi = get_wifi_status()
         charging = is_charging()
 
+        if charging:
+            update_activity()
+
         state.charging_is = charging
 
         update_status_data(battery, wifi, charging)
         time.sleep(0.2)
+
+def update_activity():
+    state.last_activity_time[0] = time.time()
+    print(f"click {state.last_activity_time[0]}")

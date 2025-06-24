@@ -11,6 +11,8 @@ from esp_flasher import flash_firmware
 from printer_functions import printer_connection, connect_to_printer, disconnect_from_printer
 from print_config import DEFAULT_PRINTER_CONFIG
 
+from system_status import update_activity
+
 # --- Глобальные переменные ---
 
 MAIN_MENU_ITEMS = ["FLASH", "UPDATE", "LOG", "SETTINGS"]
@@ -21,9 +23,7 @@ VISIBLE_LINES = 4
 
 state.last_activity_time = [time.time()]
 
-def update_activity():
-    state.last_activity_time[0] = time.time()
-    print(f"click {state.last_activity_time[0]}")
+
 
 # --- Универсальное меню ---
 
