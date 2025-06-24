@@ -5,6 +5,7 @@ import os
 import time
 import state
 from oled_ui import show_message, clear, st_device
+import RPi.GPIO as GPIO
 
 
 async def run_shotdown_halt():
@@ -32,6 +33,9 @@ async def run_shotdown_halt():
     if st_device:
         clear()
         st_device.set_backlight(False)
+
+    GPIO.cleanup()
+    st_device.spi.close()
     #state.shutdown_pending = False
     await asyncio.sleep(0.5)
     ret = os.system("sudo halt")
