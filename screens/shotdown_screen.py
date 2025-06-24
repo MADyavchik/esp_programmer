@@ -34,4 +34,5 @@ async def run_shotdown_halt():
         st_device.set_backlight(False)
     #state.shutdown_pending = False
     await asyncio.sleep(0.5)
-    os.system("sudo halt")
+    ret = os.system("sudo halt")
+    print(f"[HALT] Команда halt вернула код {ret}")
