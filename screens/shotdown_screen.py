@@ -34,7 +34,9 @@ async def run_shotdown_halt():
 
     if st_device:
         clear()
+
         st_device.set_backlight(False)
+
 
 
     #state.shutdown_pending = False
