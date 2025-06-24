@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 class ST7789:
-    def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=12, width=240, height=240, pwm_freq=10000):
+    def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=12, width=240, height=240, enable_backlight=False):
         self.width = width
         self.height = height
         self.spi = spidev.SpiDev()
@@ -33,7 +33,8 @@ class ST7789:
 
         self.reset_display()
         self.init_display()
-        self.set_backlight(True)
+        if enable_backlight:
+            self.set_backlight(True)
 
     def reset_display(self):
         GPIO.output(self.reset, GPIO.HIGH)

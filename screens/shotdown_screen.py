@@ -19,7 +19,8 @@ async def run_shotdown_halt():
 
         if activity_elapsed < elapsed_since_start:
             print("❌ Действие отменено — активность обнаружена!")
-            st_device.set_backlight_level(100)
+            if st_device:
+                st_device.set_backlight_level(100)
             state.shutdown_pending = False
             return
 
@@ -27,8 +28,10 @@ async def run_shotdown_halt():
         await asyncio.sleep(1)
 
     print("⏹️ Завершение работы устройства...")
-    clear()
-    st_device.set_backlight(False)
+
+    if st_device:
+        clear()
+        st_device.set_backlight(False)
     #state.shutdown_pending = False
     await asyncio.sleep(0.5)
     os.system("sudo halt")
