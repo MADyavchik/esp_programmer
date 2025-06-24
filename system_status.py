@@ -14,7 +14,7 @@ import board
 import RPi.GPIO as GPIO
 import state
 
-from menu import update_activity
+
 
 
 GPIO.setmode(GPIO.BCM)
