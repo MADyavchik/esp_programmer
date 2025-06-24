@@ -36,3 +36,6 @@ async def run_shotdown_halt():
     await asyncio.sleep(0.5)
     ret = os.system("sudo halt")
     print(f"[HALT] Команда halt вернула код {ret}")
+
+        # 🛑 Мгновенно завершаем Python-процесс
+    os._exit(0)
