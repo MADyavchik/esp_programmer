@@ -36,8 +36,7 @@ async def run_shotdown_halt():
         clear()
         st_device.set_backlight(False)
 
-    GPIO.cleanup()
-    st_device.spi.close()
+
     #state.shutdown_pending = False
     await asyncio.sleep(0.5)
 
