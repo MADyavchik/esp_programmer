@@ -7,6 +7,8 @@ import state
 from oled_ui import show_message, clear, st_device
 import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)
+
 
 async def run_shotdown_halt():
     print("⚠️ Без активности. Запуск таймера выключения...")
