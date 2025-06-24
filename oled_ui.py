@@ -37,7 +37,7 @@ async def inactivity_watcher(sleep_timeout=30):
         elapsed = time.time() - state.last_activity_time[0]
 
         # Выключаем подсветку при бездействии
-        if elapsed > sleep_timeout and backlight_on:
+        if elapsed > sleep_timeout and backlight_on and not state.charging_is:
             print("💤 Пользователь бездействует, выключаем подсветку!")
             if st_device:
                 st_device.set_backlight_level(5)
@@ -46,7 +46,7 @@ async def inactivity_watcher(sleep_timeout=30):
             backlight_on = False
 
         # Включаем подсветку при активности
-        elif elapsed <= sleep_timeout and not backlight_on:
+        elif (elapsed <= sleep_timeout and not backlight_on) or state.charging_is:
             print("👆 Активность обнаружена, включаем подсветку")
             if st_device:
                 st_device.set_backlight_level(100)
@@ -191,10 +191,12 @@ def draw_status_bar(draw):
     #draw.text((90, 0), status_data["esp_status"], font=font_unselect, fill="white")
     draw.text((160, 0), status_data["wifi"], font=font_unselect, fill="white")
     if status_data.get("charging"):
+
         x, y = 70, 0
         draw.line((x+2, y+0, x+8, y+8), fill="yellow")
         draw.line((x+8, y+8, x+2, y+8), fill="yellow")
         draw.line((x+2, y+8, x+8, y+16), fill="yellow")
+
 
 
 

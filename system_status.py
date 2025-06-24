@@ -217,9 +217,7 @@ def status_updater():
         wifi = get_wifi_status()
         charging = is_charging()
 
-
-
-
+        state.charging_is = charging
 
         update_status_data(battery, wifi, charging)
         time.sleep(0.2)
