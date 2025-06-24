@@ -46,7 +46,7 @@ async def inactivity_watcher(sleep_timeout=30):
             backlight_on = False
 
         # Включаем подсветку при активности
-        elif (elapsed <= sleep_timeout and not backlight_on) or state.charging_is:
+        elif not backlight_on and (elapsed <= sleep_timeout or state.charging_is):
             print("👆 Активность обнаружена, включаем подсветку")
             if st_device:
                 st_device.set_backlight_level(100)
