@@ -38,8 +38,28 @@ async def run_shotdown_halt():
     st_device.spi.close()
     #state.shutdown_pending = False
     await asyncio.sleep(0.5)
-    ret = os.system("sudo halt")
-    print(f"[HALT] Команда halt вернула код {ret}")
+
+    cleanup_and_shutdown()
 
         # 🛑 Мгновенно завершаем Python-процесс
     os._exit(0)
+
+
+def cleanup_and_shutdown():
+    print("⚙️ Выключаем подсветку и чистим GPIO перед завершением...")
+
+    try:
+        GPIO.setmode(GPIO.BCM)
+        BACKLIGHT_PIN = 12  # BCM12 соответствует физическому пину 32
+
+        GPIO.setup(BACKLIGHT_PIN, GPIO.OUT)
+        GPIO.output(BACKLIGHT_PIN, GPIO.LOW)  # Выключить подсветку
+
+        # Дополнительно можно отключить I2C (если используешь BitBangIO)
+        # i2c_bus.deinit()  # если не хочешь, чтобы ток шёл дальше
+
+        GPIO.cleanup()  # очистка всех пинов
+    except Exception as e:
+        print(f"[GPIO Cleanup Error] {e}")
+
+    os.system("halt")
