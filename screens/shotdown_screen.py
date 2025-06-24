@@ -7,7 +7,7 @@ import state
 from oled_ui import show_message, clear, st_device
 import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM)
+
 
 
 async def run_shotdown_halt():
@@ -51,17 +51,13 @@ def cleanup_and_shutdown():
     print("⚙️ Выключаем подсветку и чистим GPIO перед завершением...")
 
     try:
-        GPIO.setmode(GPIO.BCM)
-        BACKLIGHT_PIN = 12  # BCM12 соответствует физическому пину 32
+        GPIO.setmode(GPIO.BCM)  # Обязательно до любого использования GPIO
+        BACKLIGHT_PIN = 12
 
         GPIO.setup(BACKLIGHT_PIN, GPIO.OUT)
-        GPIO.output(BACKLIGHT_PIN, GPIO.LOW)  # Выключить подсветку
-
-        # Дополнительно можно отключить I2C (если используешь BitBangIO)
-        # i2c_bus.deinit()  # если не хочешь, чтобы ток шёл дальше
-
-        GPIO.cleanup()  # очистка всех пинов
+        GPIO.output(BACKLIGHT_PIN, GPIO.LOW)
+        GPIO.cleanup()  # Теперь безопасно
     except Exception as e:
         print(f"[GPIO Cleanup Error] {e}")
 
-    os.system("halt")
+    os.system("sudo halt")  # Требует прав root

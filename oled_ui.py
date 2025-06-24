@@ -49,7 +49,7 @@ async def inactivity_watcher(sleep_timeout=30):
         elif elapsed <= sleep_timeout and not backlight_on:
             print("👆 Активность обнаружена, включаем подсветку")
             if st_device:
-                st_device.set_backlight_level(5)
+                st_device.set_backlight_level(100)
             else:
                 print("[WARN] st_device не инициализирован — пропускаем установку яркости")
             backlight_on = True
