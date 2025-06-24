@@ -9,32 +9,37 @@ import os
 
 class ST7789:
     def __init__(self, spi_bus=0, spi_device=0, dc=23, reset=24, bl=12, width=240, height=240, enable_backlight=False):
-        self.width = width
-        self.height = height
+        t0 = time.time()
+        print("[ST7789] ⏱ Старт инициализации дисплея")
+
         self.spi = spidev.SpiDev()
         self.spi.open(spi_bus, spi_device)
-        self.spi.max_speed_hz = 30000000  # 30 MHz
+        self.spi.max_speed_hz = 30000000
         self.spi.mode = 3
 
-        self.dc = dc
-        self.reset = reset
-        self.bl = bl
+        t1 = time.time()
+        print(f"[ST7789] ✅ SPI готов за {t1 - t0:.3f} сек")
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(self.dc, GPIO.OUT)
         GPIO.setup(self.reset, GPIO.OUT)
-        #GPIO.setup(self.bl, GPIO.OUT)
+
+        t2 = time.time()
+        print(f"[ST7789] ✅ GPIO настроены за {t2 - t1:.3f} сек")
 
         self.use_hw_pwm()
-
-        #self.pwm = GPIO.PWM(bl, pwm_freq)
-        #self.pwm.start(100)  # Стартуем с полной яркостью
+        print(f"[ST7789] ✅ PWM инициализирован")
 
         self.reset_display()
         self.init_display()
+        print(f"[ST7789] ✅ Дисплей инициализирован")
+
         if enable_backlight:
+            print("[ST7789] 🟡 Включаем подсветку")
             self.set_backlight(True)
+
+        print(f"[ST7789] ⏱ Полная инициализация завершена за {time.time() - t0:.3f} сек")
 
     def reset_display(self):
         GPIO.output(self.reset, GPIO.HIGH)
