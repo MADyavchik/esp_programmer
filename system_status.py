@@ -219,8 +219,10 @@ def status_updater():
         wifi = get_wifi_status()
         charging = is_charging()
 
-        if charging:
+        # Вызываем update_activity только если статус зарядки изменился
+        if charging != previous_charging:
             update_activity()
+            previous_charging = charging  # Обновляем прошлое значение
 
         state.charging_is = charging
 
