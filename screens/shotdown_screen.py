@@ -43,11 +43,12 @@ async def run_shotdown_halt():
     cleanup_and_shutdown()
 
         # 🛑 Мгновенно завершаем Python-процесс
-    os._exit(0)
+    #os._exit(0)
 
 
 def cleanup_and_shutdown():
     print("⚙️ Выключаем подсветку и чистим GPIO перед завершением...")
+    state.status_updater_running = False
 
     try:
         GPIO.setmode(GPIO.BCM)  # Обязательно до любого использования GPIO
@@ -55,7 +56,7 @@ def cleanup_and_shutdown():
 
         GPIO.setup(BACKLIGHT_PIN, GPIO.OUT)
         GPIO.output(BACKLIGHT_PIN, GPIO.LOW)
-        GPIO.cleanup()  # Теперь безопасно
+        #GPIO.cleanup()  # Теперь безопасно
     except Exception as e:
         print(f"[GPIO Cleanup Error] {e}")
 

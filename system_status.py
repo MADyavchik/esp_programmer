@@ -12,6 +12,8 @@ from adafruit_ina219 import INA219
 from adafruit_bitbangio import I2C
 import board
 import RPi.GPIO as GPIO
+import state
+
 
 GPIO.setmode(GPIO.BCM)
 
@@ -210,7 +212,7 @@ def check_esp_connection():
 
 # Обновлённая фоновая функция
 def status_updater():
-    while True:
+    while state.status_updater_running:
         battery = get_battery_status()
         wifi = get_wifi_status()
         charging = is_charging()
