@@ -81,24 +81,44 @@ class ST7789:
         #level = max(0, min(100, level_percent))
         #self.pwm.ChangeDutyCycle(level)
 
-    def set_backlight_level(self, level_percent):
-        """Регулировка яркости через аппаратный PWM"""
-        print(f"🔆 Меняем яркость на {level_percent}%")
+    def set_backlight_level(self, level_percent, step_delay=0.01):
+        """Плавная регулировка яркости через аппаратный PWM"""
+        print(f"🔆 Плавно меняем яркость на {level_percent}%")
 
-        level = max(0, min(100, level_percent))
-        duty_ns = int(1000000 * level / 100)  # из 1_000_000 нс
-
-        print("📟 PWM состояние ДО изменения:")
-        self.debug_pwm()
+        target = max(0, min(100, level_percent))
+        target_duty = int(1000000 * target / 100)
 
         # Убедимся, что PWM включён
         with open(f"{self.pwm_path}/enable", "w") as f:
             f.write("1")
 
-        with open(f"{self.pwm_path}/duty_cycle", "w") as f:
-            f.write(str(duty_ns))
+        # Получаем текущее значение duty_cycle
+        try:
+            with open(f"{self.pwm_path}/duty_cycle", "r") as f:
+                current_duty = int(f.read().strip())
+        except:
+            current_duty = 1000000  # если не прочитали — считаем 100%
 
-        print("📟 PWM состояние ПОСЛЕ изменения:")
+        # Определим шаг в наносекундах
+        step = 10000  # 1% = 10_000 нс, можно настроить
+
+        if target_duty == current_duty:
+            print("🚫 Яркость уже на нужном уровне")
+            return
+
+        print(f"🌡 Переход от {current_duty} → {target_duty}")
+
+        # Направление: вверх или вниз
+        direction = 1 if target_duty > current_duty else -1
+
+        for duty in range(current_duty, target_duty + direction * step, direction * step):
+            # Ограничим диапазон
+            duty = max(0, min(1000000, duty))
+            with open(f"{self.pwm_path}/duty_cycle", "w") as f:
+                f.write(str(duty))
+            time.sleep(step_delay)  # Пауза между шагами
+
+        print("✅ Готово.")
         self.debug_pwm()
 
     #def set_backlight(self, on=True):
