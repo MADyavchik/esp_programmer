@@ -174,9 +174,9 @@ async def start_flash_menu():
 async def start_settings_menu():
     while True:
         menu_items = [
-            f"Print: {'On' if printer_connection['connected'] else 'Off'}",
-            f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}",
-            f"Sleep: {int(state.shutdown_timeout / 60)} min"
+            f"Принт: {'On' if printer_connection['connected'] else 'Off'}",
+            f"К-во: {DEFAULT_PRINTER_CONFIG.quantity}",
+            f"Сон: {int(state.shutdown_timeout / 60)} мин"
         ]
 
         index = await run_menu(menu_items, visible_lines=3, highlight_color="lime")
