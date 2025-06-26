@@ -49,8 +49,11 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
     async def select():
         update_activity()
         index = scroll[0] + cursor[0]
+        item = items[index]
+        if isinstance(item, dict) and item.get("label"):
+            return  # Нельзя выбрать заголовок
         if on_select:
-            await on_select(items[index])
+            await on_select(item)
         result[0] = index
 
     def up():
@@ -174,12 +177,14 @@ async def start_flash_menu():
 async def start_settings_menu():
     while True:
         menu_items = [
-            f"Принт: {'On' if printer_connection['connected'] else 'Off'}",
-            f"К-во: {DEFAULT_PRINTER_CONFIG.quantity}",
-            f"Сон: {int(state.shutdown_timeout / 60)} мин"
+            {"text": "Принтер", "label": True},
+            {"text": f"Подключение: {'On' if printer_connection['connected'] else 'Off'}"},
+            {"text": f"Копий: {DEFAULT_PRINTER_CONFIG.quantity}"},
+            {"text": "Система", "label": True},
+            {"text": f"Сон: {int(state.shutdown_timeout / 60)} мин"}
         ]
 
-        index = await run_menu(menu_items, visible_lines=3, highlight_color="lime")
+        index = await run_menu(menu_items, visible_lines=4, highlight_color="lime")
 
         if index == "main":
             return "main"

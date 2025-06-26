@@ -259,13 +259,10 @@ def draw_menu(
     image = Image.new("RGB", (240, 240), "black")
     draw = ImageDraw.Draw(image)
 
-    # Сначала всегда статус-бар
     draw_status_bar(draw)
 
-    y_offset = 40  # статус-бар занимает 40 пикселей
-
+    y_offset = 40
     if show_back_button:
-        # Рисуем жёлтый круг
         center_x, center_y = 24, y_offset + 24
         radius = 15
         draw.ellipse(
@@ -281,26 +278,30 @@ def draw_menu(
 
     line_height = 42
     radius = line_height // 2
-
     if visible_lines is None:
         visible_lines = len(items)
 
     for i in range(visible_lines):
         index = scroll + i
         if index >= len(items):
-            break  # если индекс вышел за пределы списка, остановить рисование
+            break
 
+        item = items[index]
+        text = item["text"] if isinstance(item, dict) else str(item)
+        is_label = item.get("label") if isinstance(item, dict) else False
         y = y_offset + i * line_height
 
-        if index == selected_index:
+        if index == selected_index and not is_label:
             draw.rounded_rectangle(
                 (5, y - 2, 235, y + line_height - 10),
                 radius=radius,
                 fill=highlight_color
             )
-            draw.text((30, y), items[index], font=font_bold, fill="black")
+            draw.text((30, y), text, font=font_bold, fill="black")
         else:
-            draw.text((30, y), items[index], font=font_unselect, fill="grey")
+            font = font_unselect if not is_label else font_bold
+            color = "grey" if not is_label else "lime"
+            draw.text((30, y), text, font=font, fill=color)
 
     display_on_all(image)
 
