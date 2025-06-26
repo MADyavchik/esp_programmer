@@ -198,10 +198,10 @@ async def start_flash_menu():
 async def start_settings_menu():
     while True:
         menu_items = [
-            {"text": "Принтер", "label": True},
+            {"text": "--PRINTER--", "label": True},
             {"text": f"Подкл: {'Да' if printer_connection['connected'] else 'Нет'}"},
             {"text": f"Копий: {DEFAULT_PRINTER_CONFIG.quantity}"},
-            {"text": "Система", "label": True},
+            {"text": "--SYSTEM--", "label": True},
             {"text": f"Сон: {int(state.shutdown_timeout / 60)} мин"}
         ]
 
