@@ -208,7 +208,7 @@ async def change_print_quantity():
         DEFAULT_PRINTER_CONFIG.quantity = int(options[idx])
 
 async def change_shutdown_timeout():
-    min_sleep = [1, 10, 30, 60]
+    min_sleep = ["1", "10", "30", "60"]
     idx = await run_menu(min_sleep, visible_lines=4, highlight_color="lime")
 
     if isinstance(idx, int):
