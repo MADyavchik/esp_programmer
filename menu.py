@@ -205,7 +205,7 @@ async def start_settings_menu():
             {"text": f"Сон: {int(state.shutdown_timeout / 60)} мин"}
         ]
 
-        index = await run_menu(menu_items, visible_lines=4, highlight_color="linen")
+        index = await run_menu(menu_items, visible_lines=4, highlight_color="antiquewhite")
 
         if index == "main":
             return "main"
@@ -228,7 +228,7 @@ async def start_settings_menu():
 
 async def change_print_quantity():
     options = [str(i) for i in range(1, 11)]
-    idx = await run_menu(options, visible_lines=4, highlight_color="linen")
+    idx = await run_menu(options, visible_lines=4, highlight_color="antiquewhite")
 
     if isinstance(idx, int):
         DEFAULT_PRINTER_CONFIG.quantity = int(options[idx])
@@ -237,6 +237,6 @@ async def change_shutdown_timeout():
     values = [1, 10, 30, 60]
     labels = [f"{v} мин" for v in values]
 
-    idx = await run_menu(labels, visible_lines=4, highlight_color="linen")
+    idx = await run_menu(labels, visible_lines=4, highlight_color="antiquewhite")
     if isinstance(idx, int):
         state.shutdown_timeout = values[idx] * 60
