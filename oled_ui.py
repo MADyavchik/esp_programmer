@@ -300,7 +300,7 @@ def draw_menu(
             draw.text((30, y), text, font=font_bold, fill="black")
         else:
             font = font_unselect if not is_label else font_message
-            color = "grey" if not is_label else "white"
+            color = "grey" if not is_label else "linen"
             draw.text((30, y), text, font=font, fill=color)
 
     display_on_all(image)
