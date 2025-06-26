@@ -179,7 +179,7 @@ async def start_settings_menu():
             f"Sleep:{state.shutdown_timeout/60} min"
         ]
 
-        index = await run_menu(menu_items, visible_lines=2, highlight_color="lime")
+        index = await run_menu(menu_items, visible_lines=3, highlight_color="lime")
 
         if index == "main":
             return "main"
