@@ -59,19 +59,23 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
     def up():
         update_activity()
         while True:
-            selected[0] = (selected[0] - 1) % len(items)
-            item = items[selected[0]]
-            if not (isinstance(item, dict) and item.get("label")):
+            if cursor[0] > 0:
+                cursor[0] -= 1
+            elif scroll[0] > 0:
+                scroll[0] -= 1
+            else:
+                # Если на первом элементе, переход к последнему доступному
+                max_index = len(items) - 1
+                for i in reversed(range(len(items))):
+                    if not (isinstance(items[i], dict) and items[i].get("label")):
+                        scroll[0] = max(0, i - visible_lines + 1)
+                        cursor[0] = i - scroll[0]
+                        break
                 break
 
-        # Обновляем курсор и прокрутку
-        if cursor[0] > 0:
-            cursor[0] -= 1
-        else:
-            scroll[0] = max(0, scroll[0] - 1)
-            if scroll[0] < 0:
-                scroll[0] = max(0, len(items) - visible_lines)
-                cursor[0] = min(visible_lines - 1, len(items) - 1)
+            index = scroll[0] + cursor[0]
+            if not (isinstance(items[index], dict) and items[index].get("label")):
+                break
 
         draw()
         last_redraw[0] = time.time()
@@ -79,18 +83,22 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
     def down():
         update_activity()
         while True:
-            selected[0] = (selected[0] + 1) % len(items)
-            item = items[selected[0]]
-            if not (isinstance(item, dict) and item.get("label")):
+            if cursor[0] < min(visible_lines - 1, len(items) - scroll[0] - 1):
+                cursor[0] += 1
+            elif scroll[0] + visible_lines < len(items):
+                scroll[0] += 1
+            else:
+                # Если внизу — перейти к первому интерактивному
+                for i in range(len(items)):
+                    if not (isinstance(items[i], dict) and items[i].get("label")):
+                        scroll[0] = 0
+                        cursor[0] = i
+                        break
                 break
 
-        if cursor[0] < min(visible_lines - 1, len(items) - 1):
-            cursor[0] += 1
-        else:
-            scroll[0] += 1
-            if scroll[0] > len(items) - visible_lines:
-                scroll[0] = 0
-                cursor[0] = 0
+            index = scroll[0] + cursor[0]
+            if not (isinstance(items[index], dict) and items[index].get("label")):
+                break
 
         draw()
         last_redraw[0] = time.time()
@@ -202,7 +210,7 @@ async def start_settings_menu():
         if index == "main":
             return "main"
 
-        if index == 0:
+        if index == 1:
             # Переключение принтера
             #if printer_connection["connected"]:
                 #await disconnect_from_printer()
@@ -210,11 +218,11 @@ async def start_settings_menu():
                 #await connect_to_printer()
             return "print_connect"
 
-        elif index == 1:
+        elif index == 2:
             # Изменение количества
             await change_print_quantity()
 
-        elif index == 2:
+        elif index == 4:
 
             await change_shutdown_timeout()
 
