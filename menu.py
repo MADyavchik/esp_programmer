@@ -237,6 +237,6 @@ async def change_shutdown_timeout():
     values = [1, 10, 30, 60]
     labels = [f"{v} мин" for v in values]
 
-    idx = await run_menu(labels, visible_lines=4, highlight_color="lime")
+    idx = await run_menu(labels, visible_lines=4, highlight_color="white")
     if isinstance(idx, int):
         state.shutdown_timeout = values[idx] * 60
