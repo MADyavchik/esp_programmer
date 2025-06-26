@@ -212,4 +212,4 @@ async def change_shutdown_timeout():
     idx = await run_menu(min_sleep, visible_lines=4, highlight_color="lime")
 
     if isinstance(idx, int):
-        state.shutdown_timeout = int(min_sleep[idx]*60)
+        state.shutdown_timeout = int(min_sleep[idx])*60
