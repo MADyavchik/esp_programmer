@@ -175,7 +175,8 @@ async def start_settings_menu():
     while True:
         menu_items = [
             f"Print: {'On' if printer_connection['connected'] else 'Off'}",
-            f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}"
+            f"Quant: {DEFAULT_PRINTER_CONFIG.quantity}",
+            f"Sleep:{state.shutdown_timeout/60} min"
         ]
 
         index = await run_menu(menu_items, visible_lines=2, highlight_color="lime")
@@ -195,9 +196,20 @@ async def start_settings_menu():
             # Изменение количества
             await change_print_quantity()
 
+        elif index == 2:
+
+            await change_shutdown_timeout()
+
 async def change_print_quantity():
     options = [str(i) for i in range(1, 11)]
-    idx = await run_menu(options, visible_lines=5, highlight_color="lime")
+    idx = await run_menu(options, visible_lines=4, highlight_color="lime")
 
     if isinstance(idx, int):
         DEFAULT_PRINTER_CONFIG.quantity = int(options[idx])
+
+async def change_shutdown_timeout():
+    min_sleep = [1, 10, 30, 60]
+    idx = await run_menu(min_sleep, visible_lines=4, highlight_color="lime")
+
+    if isinstance(idx, int):
+        state.shutdown_timeout = int(min_sleep[idx]*60)
