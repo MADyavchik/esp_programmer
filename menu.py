@@ -58,7 +58,13 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
 
     def up():
         update_activity()
-        selected[0] = (selected[0] - 1) % len(items)
+        while True:
+            selected[0] = (selected[0] - 1) % len(items)
+            item = items[selected[0]]
+            if not (isinstance(item, dict) and item.get("label")):
+                break
+
+        # Обновляем курсор и прокрутку
         if cursor[0] > 0:
             cursor[0] -= 1
         else:
@@ -66,12 +72,18 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
             if scroll[0] < 0:
                 scroll[0] = max(0, len(items) - visible_lines)
                 cursor[0] = min(visible_lines - 1, len(items) - 1)
+
         draw()
         last_redraw[0] = time.time()
 
     def down():
         update_activity()
-        selected[0] = (selected[0] + 1) % len(items)
+        while True:
+            selected[0] = (selected[0] + 1) % len(items)
+            item = items[selected[0]]
+            if not (isinstance(item, dict) and item.get("label")):
+                break
+
         if cursor[0] < min(visible_lines - 1, len(items) - 1):
             cursor[0] += 1
         else:
@@ -79,6 +91,7 @@ async def run_menu(items, *, visible_lines=4, highlight_color="yellow", show_bac
             if scroll[0] > len(items) - visible_lines:
                 scroll[0] = 0
                 cursor[0] = 0
+
         draw()
         last_redraw[0] = time.time()
 
@@ -178,7 +191,7 @@ async def start_settings_menu():
     while True:
         menu_items = [
             {"text": "Принтер", "label": True},
-            {"text": f"Подключение: {'On' if printer_connection['connected'] else 'Off'}"},
+            {"text": f"Подкл: {'Да' if printer_connection['connected'] else 'Нет'}"},
             {"text": f"Копий: {DEFAULT_PRINTER_CONFIG.quantity}"},
             {"text": "Система", "label": True},
             {"text": f"Сон: {int(state.shutdown_timeout / 60)} мин"}
