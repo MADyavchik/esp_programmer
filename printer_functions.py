@@ -105,7 +105,7 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     text_height = text_bbox[3] - text_bbox[1]
 
     draw.text(
-        (padding, height - text_height - padding),  # нижний левый угол
+        (padding*2, height - text_height - padding),  # нижний левый угол
         label_text,
         font=small_font,
         fill=0  # чёрный для печати
