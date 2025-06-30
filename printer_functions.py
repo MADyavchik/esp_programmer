@@ -68,13 +68,18 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     quantity = config.quantity
     density = config.density
 
+    label_text = "ver.1"
+    padding = 4
+
     image = Image.new("1", (width, height), "white")
     draw = ImageDraw.Draw(image)
 
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 28)
+        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 14)
     except:
         font = ImageFont.load_default()
+        small_font = ImageFont.load_default()
 
     max_line_length = 9
     cleaned = ''.join([c for i, c in enumerate(mac_address) if (i + 1) % max_line_length != 0])
@@ -84,10 +89,25 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     x = (width - max([draw.textbbox((0, 0), line, font=font)[2] for line in lines])) // 2
     y = (height - text_height) // 2
 
+
+
     y_offset = y
     for line in lines:
         draw.text((x, y_offset), line, font=font, fill=0)
         y_offset += draw.textbbox((0, 0), line, font=font)[3]
+
+    # Подпись с версией
+
+    text_bbox = draw.textbbox((0, 0), label_text, font=small_font)
+    #text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+
+    draw.text(
+        (padding, height - text_height - padding),  # нижний левый угол
+        label_text,
+        font=small_font,
+        fill=0  # чёрный для печати
+    )
 
     image = image.rotate(270, expand=True)
 
