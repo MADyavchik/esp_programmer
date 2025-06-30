@@ -7,3 +7,4 @@ shutdown_timeout = 600
 shutdown_pending = None
 status_updater_running = True
 charging_is = False
+firmware_version = "ver.2.0.42v2"

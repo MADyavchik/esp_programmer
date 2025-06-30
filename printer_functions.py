@@ -3,6 +3,8 @@ import sys
 import os
 import struct
 from types import MethodType
+
+import state
 from oled_ui import animate_activity
 
 sys.path.append(os.path.abspath('/home/pauro/NiimPrintX'))
@@ -68,7 +70,7 @@ async def print_mac_address(printer, mac_address: str, config=DEFAULT_PRINTER_CO
     quantity = config.quantity
     density = config.density
 
-    label_text = "ver.1"
+    label_text = state.firmware_version
     padding = 4
 
     image = Image.new("1", (width, height), "white")
