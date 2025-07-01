@@ -10,6 +10,8 @@ import threading
 from screens.print_screen import run_print_screen
 from google.google_sheet import append_mac_address
 
+from system_status import update_activity
+
 import state
 
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +27,8 @@ async def flash_firmware(firmware_name):
 
     state.firmware_label = firmware_name.lower()
 
+
+    update_activity()
     logging.info(f"🚀 Начинаем прошивку: {firmware_name}")
 
     firmware_path = os.path.join(FLASH_DIR, firmware_name)
@@ -62,17 +66,20 @@ async def flash_firmware(firmware_name):
     #mac_address = None  # Добавляем переменную для MAC-адреса
 
     try:
+        update_activity()
         logging.info("🔌 Перевод ESP32 в режим bootloader...")
         show_message("Bootloader...")
         enter_bootloader()
 
         # Прожигаем фьюзы
+        update_activity()
         logging.info("⚡ Прожигаем фьюзы...")
         show_message("Burning fuse...")
         subprocess.run([
             "espefuse.py", "--chip", "esp32", "-p", PORT, "set_flash_voltage", "3.3V", "--do-not-confirm"
         ], check=True)
 
+        update_activity()
         logging.info("🧽 Очистка флеша...")
         show_message("Erasing flash...")
 
@@ -102,21 +109,14 @@ async def flash_firmware(firmware_name):
 
 
 
-               # 🔍 Проверка статуса подключения принтера
-                #from printer_functions import printer_connection  # импортируем только когда нужен
-                #if printer_connection["connected"]:
-                    #logging.info("🖨️ Принтер уже подключен.")
-                    #if printer_connection.get("device"):
-                       # logging.info(f"🔧 Device: {printer_connection['device']}")
-                    #else:
-                        #logging.info("⚠️ Устройство не найдено в printer_connection.")
-                #else:
-                    #logging.info("🖨️ Принтер не подключен.")
+
         process.wait()
 
+        update_activity()
         logging.info("🔁 Повторный вход в bootloader...")
         enter_bootloader()
 
+        update_activity()
         logging.info("📦 Прошивка...")
         show_message("Flashing...")
 
@@ -161,6 +161,7 @@ async def flash_firmware(firmware_name):
         if process.returncode != 0:
             raise subprocess.CalledProcessError(process.returncode, flash_args)
 
+        update_activity()
         logging.info("✅ Прошивка завершена, перезагрузка...")
         draw_progress_bar(100, message="Done")
         time.sleep(1)
@@ -175,11 +176,14 @@ async def flash_firmware(firmware_name):
         from printer_functions import printer_connection  # импортируем только когда нужен
         if state.mac_address:
             append_mac_address(state.mac_address, state.firmware_label)
+            update_activity()
             print("✅ MAC должен был быть добавлен/обновлен в таблице")
             if printer_connection["connected"]:
+                update_activity()
                 logging.info("🖨️ Отправляем MAC на печать...")
                 return "print"
             else:
+                update_activity()
                 logging.info("🖨️ Принтер не подключен!")
         else:
             logging.warning("❗ MAC-адрес не получен, печать невозможна.")
@@ -205,6 +209,7 @@ async def flash_firmware(firmware_name):
 
 def get_mac_address():
     try:
+        update_activity()
         logging.info("📡 Получение MAC-адреса...")
         show_message("Read MAC...")
 

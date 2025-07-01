@@ -4,7 +4,7 @@ import time
 from oled_ui import update_status_data
 import serial
 import logging
-from esp_flasher import get_mac_address
+
 import os
 
 # Добавляем поддержку INA219
