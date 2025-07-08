@@ -27,7 +27,7 @@ font_message = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-B
 
 status_data = {"battery": "--%", "wifi": "-----", "esp_status": "   ", "charging": False}
 
-async def inactivity_watcher(sleep_timeout=30):
+async def inactivity_watcher(sleep_timeout=600):
     backlight_on = True
     shutdown_initiated = False
     shutdown_timeout = state.shutdown_timeout
