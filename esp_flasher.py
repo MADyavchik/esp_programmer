@@ -20,7 +20,7 @@ FLASH_DIR = "esp"
 PORT = "/dev/ttyS0"
 
 # Названия прошивок без NVS
-NO_NVS = ["test", "sens_sw", "sens_old"]
+NO_NVS = ["test", "sens_old"]
 
 async def flash_firmware(firmware_name):
     firmware_name = firmware_name.lower()
@@ -49,6 +49,11 @@ async def flash_firmware(firmware_name):
             nvs = os.path.join(firmware_path, "master_nvs_0x9000.bin")
         elif firmware_name == "repeater":
             nvs = os.path.join(firmware_path, "repeater_nvs_0x9000.bin")
+        elif firmware_name == "sens_sw":
+            nvs = os.path.join(firmware_path, "battery_sw_a_0x9000.bin")
+            show_message(f"{nvs}")
+            time.sleep(2)
+
         else:
             nvs = os.path.join(firmware_path, "sw_nvs_a_0x9000.bin")
             show_message(f"{nvs}")
