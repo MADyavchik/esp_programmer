@@ -40,7 +40,7 @@ async def inactivity_watcher(sleep_timeout=600):
         if elapsed > sleep_timeout and backlight_on and not state.charging_is:
             print("💤 Пользователь бездействует, выключаем подсветку!")
             if st_device:
-                st_device.set_backlight_level(5)
+                st_device.set_backlight_level(100)
             else:
                 print("[WARN] st_device не инициализирован — пропускаем установку яркости")
             backlight_on = False
@@ -54,12 +54,17 @@ async def inactivity_watcher(sleep_timeout=600):
                 print("[WARN] st_device не инициализирован — пропускаем установку яркости")
             backlight_on = True
 
-        # Завершаем работу устройства при долгом бездействии
-        if elapsed > shutdown_timeout and not shutdown_initiated and not state.charging_is:
-            print("⚠️ Долгое бездействие, выключаем устройство через 10 секунд...")
+        # 🔇 Заглушаем авто-выключение
+        # if elapsed > shutdown_timeout and not shutdown_initiated and not state.charging_is:
+        #     print("⚠️ Долгое бездействие, выключаем устройство через 10 секунд...")
+        #     state.shutdown_pending = True
+        #     return "shutdown"
 
-            state.shutdown_pending = True
-            return "shotdown"
+        # Просто игнорируем выключение
+        if elapsed > shutdown_timeout and not shutdown_initiated and not state.charging_is:
+            # Заглушка: просто выводим в лог, но ничего не делаем
+            print("🟡 Автоотключение отключено (заглушено)")
+            shutdown_initiated = True
 
 
 def display_on_all(image):
